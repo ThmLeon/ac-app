@@ -28,7 +28,7 @@
         isActive: true,
         items: [
           { title: "Alle Events", url: "/app/events/allEvents" },
-          { title: "Starred", url: "#" },
+          { title: "Events Master", url: "/app/events/master" },
           { title: "Settings", url: "#" },
         ],
       },
