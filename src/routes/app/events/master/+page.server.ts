@@ -6,7 +6,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.from('04_events_master')
 		.select('id, master_name, beschreibung');
 
-	return { events_master: data ?? [] };
+	if (error) return { data: null, error: true };
+	return { data: data ?? [], error: false };
 };
 
 export const actions: Actions = {
@@ -15,65 +16,48 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const eventId = formData.get('id');
 
-		console.log('Deleting event with ID:', eventId);
+		if (eventId == null) return { error: true };
 
-		if (typeof eventId !== 'string') {
-			return { success: false, error: 'Invalid event ID' };
-		}
+		const { error } = await supabase.from('04_events_master').delete().eq('id', eventId.toString());
 
-		const { error } = await supabase.from('04_events_master').delete().eq('id', eventId);
-
-		if (error) {
-			return { success: false, error: error.message };
-		}
-
-		return { success: true };
+		if (error) return { error: true };
+		return { error: false };
 	},
 
 	updateEventMaster: async ({ request, locals }) => {
 		const { supabase } = locals;
 		const formData = await request.formData();
+
 		const eventId = formData.get('id');
 		const masterName = formData.get('master_name');
 		const beschreibung = formData.get('beschreibung');
-		if (
-			typeof eventId !== 'string' ||
-			typeof masterName !== 'string' ||
-			typeof beschreibung !== 'string'
-		) {
-			return { success: false, error: 'Invalid input data' };
+		if (eventId == null || masterName == null || beschreibung == null) {
+			return { error: true };
 		}
 
 		const { error } = await supabase
 			.from('04_events_master')
-			.update({ master_name: masterName, beschreibung: beschreibung })
-			.eq('id', eventId);
+			.update({ master_name: masterName.toString(), beschreibung: beschreibung.toString() })
+			.eq('id', eventId.toString());
 
-		if (error) {
-			return { success: false, error: error.message };
-		}
-
-		return { success: true };
+		if (error) return { error: true };
+		return { error: false };
 	},
 
 	addEventMaster: async ({ request, locals }) => {
 		const { supabase } = locals;
 		const formData = await request.formData();
+
 		const masterName = formData.get('master_name');
 		const beschreibung = formData.get('beschreibung');
 
-		if (typeof masterName !== 'string' || typeof beschreibung !== 'string') {
-			return { success: false, error: 'Invalid input data' };
-		}
+		if (masterName == null || beschreibung == null) return { error: true };
 
 		const { error } = await supabase
 			.from('04_events_master')
-			.insert({ master_name: masterName, beschreibung: beschreibung });
+			.insert({ master_name: masterName.toString(), beschreibung: beschreibung.toString() });
 
-		if (error) {
-			return { success: false, error: error.message };
-		}
-
-		return { success: true };
+		if (error) return { error: true };
+		return { error: false };
 	}
 };

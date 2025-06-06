@@ -1,7 +1,5 @@
 <script>
-	let { data, children } = $props();
-
-	import AppSidebar from '$lib/components/AppSidebar.svelte';
+	import AppSidebar from '@/components/sidebar/AppSidebar.svelte';
 	import {
 		Breadcrumb,
 		BreadcrumbItem,
@@ -12,10 +10,15 @@
 	} from '$lib/components/ui/breadcrumb';
 	import { Separator } from '$lib/components/ui/separator';
 	import { SidebarInset, SidebarProvider, SidebarTrigger } from '$lib/components/ui/sidebar';
+
+	let { data, children } = $props();
 </script>
 
 <SidebarProvider>
-	<AppSidebar />
+	<AppSidebar
+		name={data.data.userDetails.vorname + ' ' + data.data.userDetails.nachname}
+		avatarUrl=""
+	/>
 	<SidebarInset>
 		<header
 			class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12"
