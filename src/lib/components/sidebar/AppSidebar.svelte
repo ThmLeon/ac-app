@@ -19,7 +19,8 @@
 			isActive: true,
 			items: [
 				{ title: 'Alle Events', url: '/app/events/events' },
-				{ title: 'Events Master', url: '/app/events/master' }
+				{ title: 'Events Master', url: '/app/events/master' },
+				{ title: 'Neues Event', url: '/app/events/neu' }
 			]
 		},
 		{

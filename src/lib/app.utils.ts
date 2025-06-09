@@ -37,7 +37,9 @@ export function getInitials(name: string): string {
 	return `${firstName}${lastName}`;
 }
 
-export function formatTextWithHTMLLineBreaks(text: string): string {
-	if (!text) return '';
-	return text.replace(/\n/g, '<br>');
+export function formatTextWithHTML(text: string): string {
+	return text
+		.replace(/\n/g, '<br>') // Zeilenumbrüche in <br>
+		.replace(/\t•\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;• ') // Tabs mit Bulletpoints ersetzen
+		.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
 }

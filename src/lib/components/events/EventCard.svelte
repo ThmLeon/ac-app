@@ -54,9 +54,10 @@
 			</div>
 
 			<!-- Rechte Seite: Button -->
-			<Button variant="default" onclick={() => (window.location.href = `./events/${eventId}`)}
-				>Details</Button
-			>
+			<a href={`./events/${eventId}`}>
+				<Button variant="default">Details</Button>
+			</a>
+
 			<!-- Navigate to event details -->
 		</CardFooter>
 	</div>
