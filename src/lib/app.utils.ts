@@ -28,3 +28,16 @@ export function formatApplicationDeadline(deadline: string): string {
 		return format(deadlineDate, 'dd.MM.yyyy HH:mm', { locale: de }); // Format date in German standard
 	}
 }
+
+export function getInitials(name: string): string {
+	const names = name.split(' ');
+	if (names.length === 0) return '';
+	const firstName = names[0].charAt(0).toUpperCase();
+	const lastName = names.length > 1 ? names[names.length - 1].charAt(0).toUpperCase() : '';
+	return `${firstName}${lastName}`;
+}
+
+export function formatTextWithHTMLLineBreaks(text: string): string {
+	if (!text) return '';
+	return text.replace(/\n/g, '<br>');
+}

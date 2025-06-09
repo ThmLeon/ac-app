@@ -1,13 +1,18 @@
 <script lang="ts">
+	import { Avatar, AvatarImage, AvatarFallback } from '$lib/components/ui/avatar';
+	import { getInitials } from '@/app.utils';
+
 	export let name: string;
 	export let imageUrl: string;
 </script>
 
-<div class="flex items-center gap-4 pr-5 border-[1px] rounded-[8px] w-fit">
-	<!-- Image Section -->
-	<img src={imageUrl} alt={name} class="w-16 h-auto object-cover rounded-l-[6.5px]" />
-	<!-- Ensure consistent border radius -->
-
-	<!-- Name Section -->
-	<p class="text-base font-normal whitespace-nowrap">{name}</p>
+<div class="flex items-center gap-2 pl-2 pt-4">
+	<Avatar class="h-11 w-11 rounded-lg">
+		<AvatarImage src={imageUrl} alt={name} />
+		<AvatarFallback class="rounded-lg">{getInitials(name)}</AvatarFallback>
+	</Avatar>
+	<div class="grid text-left text-sm leading-tight">
+		<span class="truncate font-medium">{name}</span>
+		<span class="truncate text-xs">Aktives Mitglied</span>
+	</div>
 </div>

@@ -8,7 +8,7 @@
 	export let data: PageServerData;
 </script>
 
-{#if (data.error = true || data.data == null)}
+{#if data.error == true || data.data == null}
 	<Error />
 {:else}
 	<!--TODO: if event is empty (none is shown) then show "no event with current filter found"-->

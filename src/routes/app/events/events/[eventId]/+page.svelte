@@ -9,7 +9,7 @@
 	import { Badge } from '$lib/components/ui/badge'; // Import the ShadCN badge component
 	import { Button } from '$lib/components/ui/button'; // Import the button component
 	import MitgliedCard from '@/components/general/MitgliedCard.svelte'; // Import MitgliedCard component
-	import { formatApplicationDeadline, formatDate } from '@/app.utils';
+	import { formatApplicationDeadline, formatDate, formatTextWithHTMLLineBreaks } from '@/app.utils';
 	import type { PageServerData } from './$types';
 	import Error from '@/components/general/Error.svelte';
 
@@ -55,13 +55,13 @@
 	</Card>
 
 	<!-- Description Card -->
-	<Card class="mt-8">
+	<Card>
 		<CardHeader>
 			<CardTitle class="text-xl font-bold">Beschreibung</CardTitle>
 		</CardHeader>
 		<CardContent>
 			<p class="text-gray-700">
-				{data.data?.beschreibung}
+				{@html formatTextWithHTMLLineBreaks(data.data?.beschreibung)}
 			</p>
 		</CardContent>
 	</Card>
@@ -81,7 +81,7 @@
 								name={verantwortlicher.mitglieder.vorname +
 									' ' +
 									verantwortlicher.mitglieder.nachname}
-								imageUrl="https://placehold.co/1000x1000"
+								imageUrl=""
 							/>
 						</div>
 					{/each}
