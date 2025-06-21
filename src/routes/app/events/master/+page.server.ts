@@ -1,10 +1,14 @@
 import type { Actions, PageServerLoad } from './$types';
+import { error as svelteError } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { supabase } = locals;
 	const { data, error } = await supabase
 		.from('04_events_master')
 		.select('id, master_name, beschreibung');
+
+	if (error || data.length === 0)
+		svelteError(500, { message: 'Events konnten nicht geladen werden' });
 
 	if (error) return { data: null, error: true };
 	return { data: data ?? [], error: false };

@@ -5,8 +5,6 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import type { PageServerData } from './$types';
-	import Error from '@/components/general/Error.svelte';
-	import type { Database } from '@/database.types';
 
 	export let data: PageServerData;
 
@@ -29,7 +27,7 @@
 </script>
 
 {#if data.data == null || data.error == true}
-	<Error />
+	<h1>Error</h1>
 {:else}
 	<div class="container mx-auto p-4">
 		<div class="flex flex-wrap justify-start gap-4">
