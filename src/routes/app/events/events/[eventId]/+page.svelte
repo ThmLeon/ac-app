@@ -10,14 +10,14 @@
 	import { Button } from '$lib/components/ui/button'; // Import the button component
 	import MitgliedCard from '@/components/general/MitgliedCard.svelte'; // Import MitgliedCard component
 	import { formatApplicationDeadline, formatDate, formatTextWithHTML } from '@/app.utils';
-	import { Skeleton } from '$lib/components/ui/skeleton';
 	import type { PageData } from './$types';
+	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
 
 	export let data: PageData;
 </script>
 
 {#await data.eventData}
-	<h1>Hello Waiting</h1>
+	<PageLoadSkeleton />
 {:then eventData}
 	<Card class="flex flex-col md:flex-row gap-4">
 		<!-- Image Section -->
