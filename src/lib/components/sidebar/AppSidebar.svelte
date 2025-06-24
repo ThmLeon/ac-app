@@ -3,7 +3,18 @@
 	import NavMain from './NavMain.svelte';
 	import NavUser from './NavUser.svelte';
 
-	import { BookOpen, Bot, Calendar, Settings2 } from 'lucide-svelte';
+	import {
+		BookOpen,
+		Bot,
+		Calendar,
+		Coins,
+		Settings2,
+		Euro,
+		PiggyBank,
+		Banknote,
+		Wallet,
+		Wallet2
+	} from 'lucide-svelte';
 	import SidebarFooter from '../ui/sidebar/sidebar-footer.svelte';
 	import NavFooter from './NavFooter.svelte';
 
@@ -14,45 +25,31 @@
 	const navItems = [
 		{
 			title: 'Events',
-			url: '/app/events/allEvents',
+			url: '/app/events/events',
 			icon: Calendar,
 			isActive: true,
 			items: [
 				{ title: 'Alle Events', url: '/app/events/events' },
-				{ title: 'Events Master', url: '/app/events/master' },
-				{ title: 'Neues Event', url: '/app/events/neu' }
+				{ title: 'Events Master', url: '/app/events/master' }
 			]
 		},
 		{
-			title: 'Models',
-			url: '#',
-			icon: Bot,
+			title: 'Finanzen',
+			url: '/app/finanzen',
+			icon: Wallet,
 			items: [
-				{ title: 'Genesis', url: '#' },
-				{ title: 'Explorer', url: '#' },
-				{ title: 'Quantum', url: '#' }
+				{ title: 'Budgetierung', url: '/app/finanzen/budgetierung' },
+				{ title: 'Auslagenerstattung', url: 'app/finanzen/auslagenerstattung' },
+				{ title: 'Kontobuchungen', url: 'app/finanzen/kontobuchungen' }
 			]
 		},
 		{
-			title: 'Documentation',
-			url: '#',
-			icon: BookOpen,
-			items: [
-				{ title: 'Introduction', url: '#' },
-				{ title: 'Get Started', url: '#' },
-				{ title: 'Tutorials', url: '#' },
-				{ title: 'Changelog', url: '#' }
-			]
-		},
-		{
-			title: 'Settings',
+			title: 'Einstellungen',
 			url: '#',
 			icon: Settings2,
 			items: [
-				{ title: 'General', url: '#' },
-				{ title: 'Team', url: '#' },
-				{ title: 'Billing', url: '#' },
-				{ title: 'Limits', url: '#' }
+				{ title: 'Persönlich', url: '#' },
+				{ title: 'Organisation', url: '#' }
 			]
 		}
 	];
