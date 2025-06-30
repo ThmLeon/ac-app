@@ -12,6 +12,7 @@
 	import { formatApplicationDeadline, formatDate, formatTextWithHTML } from '@/app.utils';
 	import type { PageData } from './$types';
 	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
+	import EventDetailsHeader from '@/components/events/EventDetailsHeader.svelte';
 
 	export let data: PageData;
 </script>
@@ -19,39 +20,7 @@
 {#await data.eventData}
 	<PageLoadSkeleton />
 {:then eventData}
-	<Card class="flex flex-col md:flex-row gap-4">
-		<!-- Image Section -->
-		<img
-			src="https://placehold.co/1600x1000"
-			alt={eventData.titel}
-			class="w-full md:w-1/3 h-auto object-cover rounded-lg aspect-[16/10]"
-		/>
-
-		<!-- Content Section -->
-		<div class="flex flex-1 flex-col justify-between">
-			<CardHeader>
-				<CardTitle>{eventData.titel}</CardTitle>
-				<CardDescription class="text-sm text-gray-500">
-					<strong>Beginn:</strong>
-					{formatDate(eventData.start_datum_zeit)}<br />
-					<strong>Ende:</strong>
-					{formatDate(eventData.ende_datum_zeit)}<br />
-					<strong>Bewerbungsfrist:</strong>
-					{formatApplicationDeadline(eventData.bewerbungs_deadline)}
-				</CardDescription>
-			</CardHeader>
-			<CardContent class="flex gap-2">
-				<Badge variant="default">Offen</Badge>
-				<Badge variant="default">
-					{eventData.event_master.master_name.charAt(0).toUpperCase() +
-						eventData.event_master.master_name.slice(1)}
-				</Badge>
-			</CardContent>
-			<CardContent class="mt-4">
-				<Button variant="default">Jetzt bewerben</Button>
-			</CardContent>
-		</div>
-	</Card>
+	<EventDetailsHeader {eventData} applyMode={true} />
 
 	<!-- Description Card -->
 	<Card>

@@ -74,31 +74,34 @@ export type Database = {
 			};
 			'04_events_bewerbungen': {
 				Row: {
-					attachements_file_name: string | null;
+					anwesend: boolean;
+					besetzt: boolean;
+					bewerbungs_datei_name: string | null;
+					bewerbungstext: string | null;
 					created_at: string;
 					event_id: string;
 					id: string;
 					mitglied_id: string;
-					present: boolean;
-					staffed: boolean;
 				};
 				Insert: {
-					attachements_file_name?: string | null;
+					anwesend: boolean;
+					besetzt: boolean;
+					bewerbungs_datei_name?: string | null;
+					bewerbungstext?: string | null;
 					created_at?: string;
 					event_id?: string;
 					id?: string;
 					mitglied_id: string;
-					present: boolean;
-					staffed: boolean;
 				};
 				Update: {
-					attachements_file_name?: string | null;
+					anwesend?: boolean;
+					besetzt?: boolean;
+					bewerbungs_datei_name?: string | null;
+					bewerbungstext?: string | null;
 					created_at?: string;
 					event_id?: string;
 					id?: string;
 					mitglied_id?: string;
-					present?: boolean;
-					staffed?: boolean;
 				};
 				Relationships: [
 					{
@@ -121,6 +124,8 @@ export type Database = {
 					anhang_beschreibung: string | null;
 					beschreibung: string;
 					bewerbungs_deadline: string;
+					bewerbungstext_benoetigt: boolean;
+					bewerbungstext_beschreibung: string | null;
 					created_at: string;
 					ende_datum_zeit: string;
 					event_master_id: string;
@@ -136,6 +141,8 @@ export type Database = {
 					anhang_beschreibung?: string | null;
 					beschreibung: string;
 					bewerbungs_deadline: string;
+					bewerbungstext_benoetigt: boolean;
+					bewerbungstext_beschreibung?: string | null;
 					created_at?: string;
 					ende_datum_zeit: string;
 					event_master_id?: string;
@@ -151,6 +158,8 @@ export type Database = {
 					anhang_beschreibung?: string | null;
 					beschreibung?: string;
 					bewerbungs_deadline?: string;
+					bewerbungstext_benoetigt?: boolean;
+					bewerbungstext_beschreibung?: string | null;
 					created_at?: string;
 					ende_datum_zeit?: string;
 					event_master_id?: string;

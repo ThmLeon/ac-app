@@ -5,21 +5,21 @@ import { error as svelteError } from '@sveltejs/kit';
 export const load: PageLoad = async ({ params }) => {
 	const eventId = params.eventId;
 
-	const eventDataPromise = supabase
+	const { data, error } = await supabase
 		.from('04_events_events')
 		.select(
-			`id, titel, beschreibung, start_datum_zeit, ende_datum_zeit, bewerbungs_deadline, ort_strasse_hausnummer, ort_plz_stadt,
+			`id, titel, beschreibung, start_datum_zeit, ende_datum_zeit, bewerbungs_deadline, ort_strasse_hausnummer, ort_plz_stadt, anhang_benoetigt, anhang_beschreibung, bewerbungstext_benoetigt, bewerbungstext_beschreibung,
              event_master:04_events_master(master_name),
              event_verantwortliche:04_events_verantwortliche(mitglieder:01_mitglieder_mitglieder(vorname, nachname))`
 		)
 		.eq('id', eventId)
-		.single()
-		.then(({ data, error }) => {
-			if (error || !data) throw svelteError(500, { message: 'Event not found' });
-			return data;
-		});
+		.single();
+
+	if (error || !data) {
+		throw svelteError(404, { message: 'Event not found' });
+	}
 
 	return {
-		eventData: eventDataPromise
+		eventData: data
 	};
 };
