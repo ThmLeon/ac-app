@@ -5,6 +5,10 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import type { PageServerData } from './$types';
+	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
+	import { enhance } from '$app/forms';
+	import { toast } from 'svelte-sonner';
+	import { handleActionResultSonners } from '@/app.utils';
 
 	export let data: PageServerData;
 
@@ -13,7 +17,7 @@
 
 	function onEdit(id: string) {
 		showSheet = false; // Reset the state to ensure reactivity
-		selectedEventMaster = data.data?.find((eventMaster) => eventMaster.id === id) ?? null;
+		selectedEventMaster = data.data.find((eventMaster) => eventMaster.id === id) ?? null;
 		showSheet = true; // Reopen the sheet
 	}
 
@@ -26,9 +30,9 @@
 	//TODO Meldungen hinzufügen, wenn es funktioniert hat bzw. nicht funktioniert hat --> mit check, was zurückkommt
 </script>
 
-{#if data.data == null || data.error == true}
-	<h1>Error</h1>
-{:else}
+{#await data}
+	<PageLoadSkeleton />
+{:then data}
 	<div class="container mx-auto p-4">
 		<div class="flex flex-wrap justify-start gap-4">
 			<button
@@ -57,7 +61,21 @@
 		{#if showSheet && selectedEventMaster}
 			<Sheet.Root open={showSheet}>
 				<Sheet.Content side="right" class="min-w-[500px] flex flex-col h-full">
-					<form method="POST" class="flex flex-col h-full">
+					<form
+						method="POST"
+						class="flex flex-col h-full"
+						use:enhance={() => {
+							toast.loading('Eingabe wird verarbeitet', {
+								id: 'event_master_form'
+							});
+							showSheet = false;
+
+							return async ({ update, result }) => {
+								await update();
+								handleActionResultSonners(result, 'event_master_form');
+							};
+						}}
+					>
 						<div class="flex-grow">
 							<Sheet.Header>
 								<Sheet.Title>
@@ -109,4 +127,4 @@
 			</Sheet.Root>
 		{/if}
 	</div>
-{/if}
+{/await}

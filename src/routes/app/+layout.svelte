@@ -10,9 +10,12 @@
 	} from '$lib/components/ui/breadcrumb';
 	import { Separator } from '$lib/components/ui/separator';
 	import { SidebarInset, SidebarProvider, SidebarTrigger } from '$lib/components/ui/sidebar';
+	import { Toaster } from 'svelte-sonner';
 
 	let { data, children } = $props();
 </script>
+
+<Toaster position="top-right" />
 
 <SidebarProvider>
 	<AppSidebar

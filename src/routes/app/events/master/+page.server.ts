@@ -1,17 +1,17 @@
 import type { Actions, PageServerLoad } from './$types';
-import { error as svelteError } from '@sveltejs/kit';
+import { fail, error as svelteError } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { supabase } = locals;
 	const { data, error } = await supabase
 		.from('04_events_master')
-		.select('id, master_name, beschreibung');
+		.select('id, master_name, beschreibung')
+		.order('master_name', { ascending: true });
 
 	if (error || data.length === 0)
-		svelteError(500, { message: 'Events konnten nicht geladen werden' });
+		svelteError(500, { message: 'Events Master konnten nicht geladen werden' });
 
-	if (error) return { data: null, error: true };
-	return { data: data ?? [], error: false };
+	return { data };
 };
 
 export const actions: Actions = {
@@ -24,8 +24,9 @@ export const actions: Actions = {
 
 		const { error } = await supabase.from('04_events_master').delete().eq('id', eventId.toString());
 
-		if (error) return { error: true };
-		return { error: false };
+		if (error) return fail(500, { error: true, message: 'Fehler beim Löschen des Events Master' });
+
+		return { success: true, message: 'Event Master erfolgreich gelöscht' };
 	},
 
 	updateEventMaster: async ({ request, locals }) => {
@@ -44,8 +45,9 @@ export const actions: Actions = {
 			.update({ master_name: masterName.toString(), beschreibung: beschreibung.toString() })
 			.eq('id', eventId.toString());
 
-		if (error) return { error: true };
-		return { error: false };
+		if (error)
+			return fail(500, { error: true, message: 'Fehler beim Aktualisieren des Events Master' });
+		return { success: true, message: 'Event Master erfolgreich aktualisiert' };
 	},
 
 	addEventMaster: async ({ request, locals }) => {
@@ -61,7 +63,9 @@ export const actions: Actions = {
 			.from('04_events_master')
 			.insert({ master_name: masterName.toString(), beschreibung: beschreibung.toString() });
 
-		if (error) return { error: true };
-		return { error: false };
+		if (error)
+			return fail(500, { error: true, message: 'Fehler beim Hinzufügen des Events Master' });
+
+		return { success: true, message: 'Event Master erfolgreich hinzugefügt' };
 	}
 };

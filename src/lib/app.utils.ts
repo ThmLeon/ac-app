@@ -1,5 +1,7 @@
+import type { ActionResult } from '@sveltejs/kit';
 import { format, differenceInMinutes, differenceInHours, differenceInDays } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { toast } from 'svelte-sonner';
 
 export function formatDate(date: string): string {
 	const parsedDate = new Date(date);
@@ -42,4 +44,28 @@ export function formatTextWithHTML(text: string): string {
 		.replace(/\n/g, '<br>') // Zeilenumbrüche in <br>
 		.replace(/\t•\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;• ') // Tabs mit Bulletpoints ersetzen
 		.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
+}
+
+type resultFormsType = ActionResult<
+	Record<string, unknown> | undefined,
+	Record<string, unknown> | undefined
+>;
+
+export function handleActionResultSonners(result: resultFormsType, toastId: string) {
+	toast.dismiss(toastId);
+	if (result.type === 'success') {
+		const message = (result.data?.message as string) || 'Eingabe erfolgreich';
+		toast.success(message, {
+			id: `${toastId}_success`
+		});
+	} else if (result.type === 'failure') {
+		const message = (result.data?.message as string) || 'Ein Fehler ist aufgetreten';
+		toast.error(message, {
+			id: `${toastId}_failure`
+		});
+	} else {
+		toast.error('Ein unerwarteter Fehler ist aufgetreten', {
+			id: `${toastId}_failure`
+		});
+	}
 }
