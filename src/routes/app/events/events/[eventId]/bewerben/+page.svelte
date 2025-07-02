@@ -13,7 +13,6 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Button } from '$lib/components/ui/button';
-	import { superForm } from 'sveltekit-superforms';
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
 	import { handleActionResultSonners } from '@/app.utils';
@@ -25,7 +24,7 @@
 {#await data.eventData}
 	<PageLoadSkeleton />
 {:then eventData}
-	<EventDetailsHeader {eventData} />
+	<EventDetailsHeader {eventData} eventBewerbung={data.alreadyApplied} bewerbungAktiviert={false} />
 
 	<form
 		method="POST"
@@ -39,7 +38,7 @@
 			return async ({ update, result }) => {
 				await update();
 				handleActionResultSonners(result, 'event_bewerbung_form');
-				goto(`../${eventData.id}`);
+				goto(`../events/${eventData.id}`);
 			};
 		}}
 	>

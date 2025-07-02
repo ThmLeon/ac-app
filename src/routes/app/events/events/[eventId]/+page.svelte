@@ -20,7 +20,11 @@
 {#await data.eventData}
 	<PageLoadSkeleton />
 {:then eventData}
-	<EventDetailsHeader {eventData} applyMode={!data.alreadyApplied} />
+	<EventDetailsHeader
+		{eventData}
+		eventBewerbung={data.alreadyApplied}
+		bewerbungAktiviert={data.alreadyApplied.length === 0}
+	/>
 
 	<!-- Description Card -->
 	<Card>

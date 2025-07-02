@@ -12,7 +12,19 @@
 		bewerbungs_deadline: string;
 		event_master: { master_name: string };
 	};
-	export let applyMode: boolean = false;
+	export let eventBewerbung: {
+		id: string;
+		besetzt: boolean;
+		anwesend: boolean;
+	}[];
+	export let bewerbungAktiviert: boolean = false;
+
+	let status = () => {
+		if (eventBewerbung.length === 0) return 'Offen';
+		if (eventBewerbung[0].anwesend) return 'Anwesend';
+		if (eventBewerbung[0].besetzt) return 'Besetzt';
+		return 'Beworben';
+	};
 </script>
 
 <Card class="flex flex-col md:flex-row gap-4">
@@ -37,14 +49,14 @@
 			</CardDescription>
 		</CardHeader>
 		<CardContent class="flex gap-2">
-			<Badge variant="default">Offen</Badge>
+			<Badge variant="default">{status()}</Badge>
 			<Badge variant="default">
 				{eventData.event_master.master_name.charAt(0).toUpperCase() +
 					eventData.event_master.master_name.slice(1)}
 			</Badge>
 		</CardContent>
 		<CardContent class="mt-4">
-			{#if applyMode}
+			{#if bewerbungAktiviert}
 				<a href={`./${eventData.id}/bewerben`}>
 					<Button variant="default">Jetzt bewerben</Button>
 				</a>

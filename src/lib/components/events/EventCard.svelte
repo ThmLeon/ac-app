@@ -20,9 +20,21 @@
 	export let startDate: string;
 	export let endDate: string;
 	export let applicationDeadline: string;
-	export let status: string;
 	export let masterName: string;
-	export let eventId: string; // Add eventId as a prop
+	export let eventId: string;
+	export let eventBewerbung: {
+		id: string;
+		mitglied_id: string;
+		besetzt: boolean;
+		anwesend: boolean;
+	}[];
+
+	let status = () => {
+		if (eventBewerbung.length === 0) return 'Offen';
+		if (eventBewerbung[0].anwesend) return 'Anwesend';
+		if (eventBewerbung[0].besetzt) return 'Besetzt';
+		return 'Beworben';
+	};
 </script>
 
 <Card class="flex flex-col md:flex-row gap-4">
@@ -46,7 +58,7 @@
 			<!-- Linke Seite: Badges -->
 			<div class="flex gap-2">
 				<Badge variant="default">
-					{status.charAt(0).toUpperCase() + status.slice(1)}
+					{status()}
 				</Badge>
 				<Badge variant="default">
 					{masterName.charAt(0).toUpperCase() + masterName.slice(1)}

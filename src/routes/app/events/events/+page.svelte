@@ -17,7 +17,7 @@
 			startDate={event.start_datum_zeit}
 			endDate={event.ende_datum_zeit}
 			applicationDeadline={event.bewerbungs_deadline}
-			status="offen"
+			eventBewerbung={event.event_bewerbung}
 			masterName={event.event_master.master_name}
 			eventId={event.id}
 		/>

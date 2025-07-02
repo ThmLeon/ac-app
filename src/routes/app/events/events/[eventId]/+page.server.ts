@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 	const { data: alreadyApplied, error: alreadyAppliedError } = await supabase
 		.from('04_events_bewerbungen')
-		.select('id')
+		.select('id, besetzt, anwesend')
 		.eq('event_id', eventId)
 		.eq('mitglied_id', userId);
 
@@ -36,6 +36,6 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 	return {
 		eventData: eventData,
-		alreadyApplied: alreadyApplied.length != 0
+		alreadyApplied: alreadyApplied
 	};
 };
