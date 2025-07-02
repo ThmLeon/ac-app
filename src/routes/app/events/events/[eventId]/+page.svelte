@@ -20,7 +20,7 @@
 {#await data.eventData}
 	<PageLoadSkeleton />
 {:then eventData}
-	<EventDetailsHeader {eventData} applyMode={true} />
+	<EventDetailsHeader {eventData} applyMode={!data.alreadyApplied} />
 
 	<!-- Description Card -->
 	<Card>
