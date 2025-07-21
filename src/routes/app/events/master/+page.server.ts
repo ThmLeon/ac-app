@@ -1,5 +1,8 @@
 import type { Actions, PageServerLoad } from './$types';
 import { fail, error as svelteError } from '@sveltejs/kit';
+import { superValidate, message } from 'sveltekit-superforms/server';
+import { zod } from 'sveltekit-superforms/adapters';
+import { eventMasterSchema } from '@/schemas/eventMaster';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { supabase } = locals;
@@ -11,61 +14,56 @@ export const load: PageServerLoad = async ({ locals }) => {
 	if (error || data.length === 0)
 		svelteError(500, { message: 'Events Master konnten nicht geladen werden' });
 
-	return { data };
+	const form = await superValidate(zod(eventMasterSchema));
+
+	return { data, form };
 };
 
 export const actions: Actions = {
 	deleteEventMaster: async ({ request, locals }) => {
 		const { supabase } = locals;
-		const formData = await request.formData();
-		const eventId = formData.get('id');
+		const form = await superValidate(request, zod(eventMasterSchema));
 
-		if (eventId == null) return { error: true };
+		if (!form.valid || !form.data.id) return fail(400, { form });
 
-		const { error } = await supabase.from('04_events_master').delete().eq('id', eventId.toString());
+		const { error } = await supabase.from('04_events_master').delete().eq('id', form.data.id);
 
-		if (error) return fail(500, { error: true, message: 'Fehler beim Löschen des Events Master' });
+		if (error) return message(form, 'Fehler beim Löschen des Events Master', { status: 500 });
 
-		return { success: true, message: 'Event Master erfolgreich gelöscht' };
+		return message(form, 'Event Master erfolgreich gelöscht');
 	},
 
 	updateEventMaster: async ({ request, locals }) => {
 		const { supabase } = locals;
-		const formData = await request.formData();
+		const form = await superValidate(request, zod(eventMasterSchema));
 
-		const eventId = formData.get('id');
-		const masterName = formData.get('master_name');
-		const beschreibung = formData.get('beschreibung');
-		if (eventId == null || masterName == null || beschreibung == null) {
-			return { error: true };
-		}
+		if (!form.valid || !form.data.id) return fail(400, { form });
 
 		const { error } = await supabase
 			.from('04_events_master')
-			.update({ master_name: masterName.toString(), beschreibung: beschreibung.toString() })
-			.eq('id', eventId.toString());
+			.update({
+				master_name: form.data.master_name,
+				beschreibung: form.data.beschreibung
+			})
+			.eq('id', form.data.id);
 
-		if (error)
-			return fail(500, { error: true, message: 'Fehler beim Aktualisieren des Events Master' });
-		return { success: true, message: 'Event Master erfolgreich aktualisiert' };
+		if (error) return message(form, 'Fehler beim Aktualisieren des Events Master', { status: 500 });
+		return message(form, 'Event Master erfolgreich aktualisiert');
 	},
 
 	addEventMaster: async ({ request, locals }) => {
 		const { supabase } = locals;
-		const formData = await request.formData();
+		const form = await superValidate(request, zod(eventMasterSchema));
 
-		const masterName = formData.get('master_name');
-		const beschreibung = formData.get('beschreibung');
+		if (!form.valid) return fail(400, { form });
 
-		if (masterName == null || beschreibung == null) return { error: true };
+		const { error } = await supabase.from('04_events_master').insert({
+			master_name: form.data.master_name,
+			beschreibung: form.data.beschreibung
+		});
 
-		const { error } = await supabase
-			.from('04_events_master')
-			.insert({ master_name: masterName.toString(), beschreibung: beschreibung.toString() });
+		if (error) return message(form, 'Fehler beim Hinzufügen des Events Master', { status: 500 });
 
-		if (error)
-			return fail(500, { error: true, message: 'Fehler beim Hinzufügen des Events Master' });
-
-		return { success: true, message: 'Event Master erfolgreich hinzugefügt' };
+		return message(form, 'Event Master erfolgreich hinzugefügt');
 	}
 };
