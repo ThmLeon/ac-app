@@ -6,27 +6,38 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import type { PageServerData } from './$types';
 	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
-	import { enhance } from '$app/forms';
+	import { superForm } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { eventMasterSchema } from '@/schemas/eventMaster';
 	import { toast } from 'svelte-sonner';
 	import { handleActionResultSonners } from '@/app.utils';
 
 	export let data: PageServerData;
 
+	const eventFormHandler = superForm(data.form, {
+		validators: zodClient(eventMasterSchema)
+	});
+
+	const { form, enhance } = eventFormHandler;
+
 	let showSheet = false;
-	let selectedEventMaster: { id: string; master_name: string; beschreibung: string } | null = null;
 
 	function onEdit(id: string) {
-		showSheet = false; // Reset the state to ensure reactivity
-		selectedEventMaster = data.data.find((eventMaster) => eventMaster.id === id) ?? null;
-		showSheet = true; // Reopen the sheet
+		const current = data.data.find((eventMaster) => eventMaster.id === id);
+		if (current) {
+			eventFormHandler.form.set({
+				id: current.id,
+				master_name: current.master_name,
+				beschreibung: current.beschreibung
+			});
+			showSheet = true;
+		}
 	}
 
 	function onAddNew() {
-		showSheet = false; // Reset the state to ensure reactivity
-		selectedEventMaster = { id: '', master_name: '', beschreibung: '' }; // Empty fields
-		showSheet = true; // Open the sheet
+		eventFormHandler.form.set({ id: '', master_name: '', beschreibung: '' });
+		showSheet = true;
 	}
-
 	//TODO Meldungen hinzufügen, wenn es funktioniert hat bzw. nicht funktioniert hat --> mit check, was zurückkommt
 </script>
 
@@ -58,45 +69,41 @@
 			{/each}
 		</div>
 
-		{#if showSheet && selectedEventMaster}
+		{#if showSheet}
 			<Sheet.Root open={showSheet}>
 				<Sheet.Content side="right" class="min-w-[500px] flex flex-col h-full">
 					<form
 						method="POST"
 						class="flex flex-col h-full"
-						use:enhance={() => {
-							toast.loading('Eingabe wird verarbeitet', {
-								id: 'event_master_form'
-							});
-							showSheet = false;
-
-							return async ({ update, result }) => {
-								await update();
+						use:enhance={enhance({
+							onSubmit: () => {
+								toast.loading('Eingabe wird verarbeitet', { id: 'event_master_form' });
+								showSheet = false;
+							},
+							onResult: ({ result }) => {
 								handleActionResultSonners(result, 'event_master_form');
-							};
-						}}
+							}
+						})}
 					>
 						<div class="flex-grow">
 							<Sheet.Header>
 								<Sheet.Title>
-									{selectedEventMaster.id
-										? 'Event Master bearbeiten'
-										: 'Neuen Event Master hinzufügen'}
+									{$form.id ? 'Event Master bearbeiten' : 'Neuen Event Master hinzufügen'}
 								</Sheet.Title>
 								<Sheet.Description>
-									{selectedEventMaster.id
+									{$form.id
 										? 'Ändere die Details des Event Masters unten. Klicke auf "Speichern", wenn du fertig bist.'
 										: 'Fülle die Details des neuen Event Masters aus. Klicke auf "Hinzufügen", wenn du fertig bist.'}
 								</Sheet.Description>
 							</Sheet.Header>
-							<input type="hidden" name="id" value={selectedEventMaster.id} />
+							<input type="hidden" name="id" bind:value={$form.id} />
 							<div class="grid gap-4 py-4">
 								<div class="grid grid-cols-4 gap-4 items-center">
 									<Label for="master_name" class="col-span-1 text-left">Master Name</Label>
 									<Input
 										id="master_name"
 										name="master_name"
-										bind:value={selectedEventMaster!.master_name}
+										bind:value={$form.master_name}
 										class="col-span-3"
 									/>
 								</div>
@@ -105,7 +112,7 @@
 									<textarea
 										id="beschreibung"
 										name="beschreibung"
-										bind:value={selectedEventMaster!.beschreibung}
+										bind:value={$form.beschreibung}
 										class="col-span-3 resize-y border rounded p-2"
 										rows="4"
 									></textarea>
@@ -113,7 +120,7 @@
 							</div>
 						</div>
 						<Sheet.Footer class="flex justify-end gap-4 mt-4">
-							{#if selectedEventMaster.id}
+							{#if $form.id}
 								<Button formaction="?/deleteEventMaster" type="submit" variant="destructive"
 									>Löschen</Button
 								>
