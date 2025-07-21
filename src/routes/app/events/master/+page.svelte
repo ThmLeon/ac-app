@@ -15,7 +15,16 @@
 	export let data: PageServerData;
 
 	const eventFormHandler = superForm(data.form, {
-		validators: zodClient(eventMasterSchema)
+		validators: zodClient(eventMasterSchema),
+		onSubmit: () => {
+			toast.loading('Eingabe wird verarbeitet', { id: 'event_master_form' });
+		},
+		onResult: ({ result }) => {
+			handleActionResultSonners(result, 'event_master_form');
+			if (result.type === 'success') {
+				showSheet = false;
+			}
+		}
 	});
 
 	const { form, enhance } = eventFormHandler;
@@ -70,21 +79,9 @@
 		</div>
 
 		{#if showSheet}
-			<Sheet.Root open={showSheet}>
+			<Sheet.Root bind:open={showSheet}>
 				<Sheet.Content side="right" class="min-w-[500px] flex flex-col h-full">
-					<form
-						method="POST"
-						class="flex flex-col h-full"
-						use:enhance={enhance({
-							onSubmit: () => {
-								toast.loading('Eingabe wird verarbeitet', { id: 'event_master_form' });
-								showSheet = false;
-							},
-							onResult: ({ result }) => {
-								handleActionResultSonners(result, 'event_master_form');
-							}
-						})}
-					>
+					<form method="POST" class="flex flex-col h-full" use:enhance>
 						<div class="flex-grow">
 							<Sheet.Header>
 								<Sheet.Title>
