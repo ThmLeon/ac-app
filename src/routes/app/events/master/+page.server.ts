@@ -1,22 +1,28 @@
 import type { Actions, PageServerLoad } from './$types';
-import { fail, error as svelteError } from '@sveltejs/kit';
+import { fail, error as svelteError, defer } from '@sveltejs/kit';
 import { superValidate, message } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { eventMasterSchema } from '@/schemas/eventMaster';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { supabase } = locals;
-	const { data, error } = await supabase
+
+	const eventMasters = supabase
 		.from('04_events_master')
 		.select('id, master_name, beschreibung')
-		.order('master_name', { ascending: true });
-
-	if (error || data.length === 0)
-		svelteError(500, { message: 'Events Master konnten nicht geladen werden' });
+		.order('master_name', { ascending: true })
+		.then(({ data, error }) => {
+			if (error || !data || data.length === 0) {
+				throw svelteError(500, {
+					message: 'Events Master konnten nicht geladen werden'
+				});
+			}
+			return data;
+		});
 
 	const form = await superValidate(zod(eventMasterSchema));
 
-	return { data, form };
+	return defer({ eventMasters, form });
 };
 
 export const actions: Actions = {

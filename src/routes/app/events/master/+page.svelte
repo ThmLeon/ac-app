@@ -1,7 +1,7 @@
 <script lang="ts">
 	import EventMasterSheet from '$lib/components/pages/events/master/EventMasterSheet.svelte';
 	import EventMasterList from '$lib/components/pages/events/master/EventMasterList.svelte';
-	import type { PageServerData } from './$types';
+	import type { PageData } from './$types';
 	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -9,7 +9,7 @@
 	import { toast } from 'svelte-sonner';
 	import { handleActionResultSonners } from '@/app.utils';
 
-	export let data: PageServerData;
+	export let data: PageData;
 
 	const eventFormHandler = superForm(data.form, {
 		validators: zodClient(eventMasterSchema),
@@ -29,15 +29,17 @@
 	let showSheet = false;
 
 	function onEdit(id: string) {
-		const current = data.data.find((eventMaster) => eventMaster.id === id);
-		if (current) {
-			eventFormHandler.form.set({
-				id: current.id,
-				master_name: current.master_name,
-				beschreibung: current.beschreibung
-			});
-			showSheet = true;
-		}
+		data.eventMasters.then((masters) => {
+			const current = masters.find((eventMaster) => eventMaster.id === id);
+			if (current) {
+				eventFormHandler.form.set({
+					id: current.id,
+					master_name: current.master_name,
+					beschreibung: current.beschreibung
+				});
+				showSheet = true;
+			}
+		});
 	}
 
 	function onAddNew() {
@@ -46,11 +48,11 @@
 	}
 </script>
 
-{#await data}
+{#await data.eventMasters}
 	<PageLoadSkeleton />
-{:then data}
+{:then eventMasters}
 	<div class="container mx-auto p-4">
-		<EventMasterList events={data.data} {onAddNew} {onEdit} />
+		<EventMasterList events={eventMasters} {onAddNew} {onEdit} />
 		{#if showSheet}
 			<EventMasterSheet bind:open={showSheet} {form} {enhance} />
 		{/if}
