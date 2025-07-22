@@ -1,6 +1,6 @@
 <script lang="ts">
-       import EventMasterSheet from '$lib/components/pages/events/master/EventMasterSheet.svelte';
-       import EventMasterList from '$lib/components/pages/events/master/EventMasterList.svelte';
+	import EventMasterSheet from '$lib/components/pages/events/master/EventMasterSheet.svelte';
+	import EventMasterList from '$lib/components/pages/events/master/EventMasterList.svelte';
 	import type { PageServerData } from './$types';
 	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
 	import { superForm } from 'sveltekit-superforms';
@@ -44,15 +44,13 @@
 		eventFormHandler.form.set({ id: '', master_name: '', beschreibung: '' });
 		showSheet = true;
 	}
-	//TODO Meldungen hinzufügen, wenn es funktioniert hat bzw. nicht funktioniert hat --> mit check, was zurückkommt
 </script>
 
 {#await data}
 	<PageLoadSkeleton />
 {:then data}
-       <div class="container mx-auto p-4">
-               <EventMasterList events={data.data} onAddNew={onAddNew} onEdit={onEdit} />
-
+	<div class="container mx-auto p-4">
+		<EventMasterList events={data.data} {onAddNew} {onEdit} />
 		{#if showSheet}
 			<EventMasterSheet bind:open={showSheet} {form} {enhance} />
 		{/if}

@@ -8,7 +8,7 @@
 
 	export let open: boolean;
 	export let form: Writable<any>;
-	export let enhance: Action<HTMLFormElement, unknown> | undefined;
+	export let enhance: Action<HTMLFormElement>;
 </script>
 
 <Sheet.Root bind:open>
