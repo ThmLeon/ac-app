@@ -36,5 +36,8 @@ export default class SupabaseServerClient {
   }
 }
 
+export function supabaseServerClient() : SupabaseClient<Database> {
+    return SupabaseServerClient.getInstance();
+}
 
 

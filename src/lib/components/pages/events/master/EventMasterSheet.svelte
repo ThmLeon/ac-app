@@ -5,10 +5,12 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import type { Action } from 'svelte/action';
 	import type { Writable } from 'svelte/store';
+	import type { SuperFormErrors } from 'sveltekit-superforms/client';
 
 	export let open: boolean;
 	export let form: Writable<any>;
 	export let enhance: Action<HTMLFormElement>;
+	export let errors: SuperFormErrors<any>;
 </script>
 
 <Sheet.Root bind:open>
@@ -45,6 +47,7 @@
 							class="col-span-3 resize-y border rounded p-2"
 							rows="4"
 						></textarea>
+						{#if $errors.beschreibung}<span class="invalid">{$errors.beschreibung}</span>{/if}
 					</div>
 				</div>
 			</div>
