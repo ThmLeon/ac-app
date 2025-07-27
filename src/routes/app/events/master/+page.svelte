@@ -5,41 +5,41 @@
 	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	//import { eventMasterSchema } from '@/formSchemas/eventMaster';
 	import { toast } from 'svelte-sonner';
 	import { handleActionResultSonners } from '@/app.utils';
-	import { eventMasterSchema } from '@/schemas/eventMaster';
+	import { eventMasterSchema } from '@/schemas/eventMasterSchema';
 
 	export let data: PageServerData;
-	let showSheet = false;
-	const { form, enhance, errors } = superForm(data.form, {
+	let sheetStatus: 'new' | 'edit' | 'hidden' = 'hidden';
+	const form = superForm(data.form, {
 		validators: zodClient(eventMasterSchema),
 		onSubmit: () => {
 			toast.loading('Eingabe wird verarbeitet', { id: 'event_master_form' });
 		},
 		onResult: ({ result }) => {
 			handleActionResultSonners(result, 'event_master_form');
-			if (result.type === 'failure' && result.status === 500) {
-				showSheet = false;
+			if (result.type != 'failure' && result.status != 500) {
+				sheetStatus = 'hidden';
 			}
 		}
 	});
+	const { form: formData } = form;
 
 	function onEdit(id: string) {
 		const current = data.data.find((eventMaster) => eventMaster.id === id);
 		if (current) {
-			form.set({
+			formData.set({
 				id: current.id,
 				master_name: current.master_name,
 				beschreibung: current.beschreibung
 			});
-			showSheet = true;
+			sheetStatus = 'edit';
 		}
 	}
 
 	function onAddNew() {
-		form.set({ id: '', master_name: '', beschreibung: '' });
-		showSheet = true;
+		formData.set({ id: '', master_name: '', beschreibung: '' });
+		sheetStatus = 'new';
 	}
 </script>
 
@@ -48,8 +48,6 @@
 {:then data}
 	<div class="container mx-auto p-4">
 		<EventMasterList events={data.data} {onAddNew} {onEdit} />
-		{#if showSheet}
-			<EventMasterSheet bind:open={showSheet} {form} {enhance} {errors} />
-		{/if}
+		<EventMasterSheet bind:sheetStatus {form} />
 	</div>
 {/await}

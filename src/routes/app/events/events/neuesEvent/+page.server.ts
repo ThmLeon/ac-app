@@ -1,60 +1,26 @@
+import { superValidate } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect, error as svelteError } from '@sveltejs/kit';
+import { newEventSchema } from '@/schemas/newEventSchema';
+import { zod } from 'sveltekit-superforms/adapters';
+import { returnActionResult } from '@/utils/utils.server';
+import { createNewEvent } from '@/server/database/events.server';
+
+export const load: PageServerLoad = async ({ locals }) => {
+	const form = await superValidate(zod(newEventSchema));
+	return { form };
+};
 
 export const actions: Actions = {
-	sendApplication: async ({ request, locals }) => {
-		const { supabase } = locals;
-		const formData = await request.formData();
-		const eventId = formData.get('event_id');
-		const bewerbungstext = formData.get('bewerbungstext');
-		const anhang = formData.get('anhang') as File;
-		const userId = (await locals.safeGetSession()).user?.id;
-
-		let fileName = '';
-
-		if (!eventId || !userId) return fail(400, { error: true, message: 'Fehlerhafte Daten' });
-
-		const { data: existingApplications, error: existingApplicationsError } = await supabase
-			.from('04_events_bewerbungen')
-			.select('id')
-			.eq('event_id', eventId.toString())
-			.eq('mitglied_id', userId.toString());
-
-		if (existingApplicationsError) {
-			return fail(500, { error: true, message: 'Fehler beim Abrufen der Bewerbungen' });
-		}
-		if (existingApplications.length != 0) {
-			return fail(500, {
-				error: true,
-				message: 'Du hast dich bereits für dieses Event beworben'
-			});
-		}
-
-		if (anhang) {
-			fileName = `${eventId}/${userId}/${anhang.name}`;
-			const { data: fileData, error: fileError } = await supabase.storage
-				.from('event.anhaenge')
-				.upload(fileName, anhang, {
-					cacheControl: '3600',
-					upsert: true
-				});
-			if (fileError) {
-				return fail(500, { error: true, message: 'Fehler beim Hochladen der Datei' });
-			}
-		}
-
-		const { error } = await supabase.from('04_events_bewerbungen').insert({
-			event_id: eventId.toString(),
-			bewerbungstext: bewerbungstext?.toString(),
-			bewerbungs_datei_name: fileName,
-			mitglied_id: userId.toString(),
-			besetzt: false,
-			anwesend: false
-		});
-
-		if (error) {
-			return fail(500, { error: true, message: 'Fehler beim Senden der Bewerbung' });
-		}
-		return { success: true, message: 'Bewerbung erfolgreich gesendet' };
+	createNewEvent: async ({ request }) => {
+		console.log('Creating new event');
+		const form = await superValidate(request, zod(newEventSchema));
+		console.log('Form data:', form.data);
+		return returnActionResult(
+			form,
+			() => createNewEvent(form.data),
+			'Fehler beim Erstellen des Events',
+			'Event erfolgreich erstellt'
+		);
 	}
 };

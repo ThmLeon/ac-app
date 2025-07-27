@@ -2,57 +2,71 @@
 	import * as Sheet from '$lib/components/ui/sheet/index.js';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
-	import type { Action } from 'svelte/action';
-	import type { Writable } from 'svelte/store';
-	import type { SuperFormErrors } from 'sveltekit-superforms/client';
+	import type { SuperForm, SuperFormData } from 'sveltekit-superforms/client';
+	import { type EventMasterForm } from '@/schemas/eventMasterSchema';
+	import { FormControl, FormField, FormFieldErrors, FormLabel } from '@/components/ui/form';
+	import Textarea from '@/components/ui/textarea/textarea.svelte';
 
-	export let open: boolean;
-	export let form: Writable<any>;
-	export let enhance: Action<HTMLFormElement>;
-	export let errors: SuperFormErrors<any>;
+	export let form: SuperForm<EventMasterForm>;
+	export let sheetStatus: 'new' | 'edit' | 'hidden';
+	let formData: SuperFormData<EventMasterForm> = form.form;
+
+	let sheetOpen = sheetStatus !== 'hidden';
+	$: sheetOpen = sheetStatus !== 'hidden';
 </script>
 
-<Sheet.Root bind:open>
+<Sheet.Root
+	bind:open={sheetOpen}
+	onOpenChange={(open) => {
+		form.errors.clear();
+		if (!open) sheetStatus = 'hidden';
+	}}
+>
 	<Sheet.Content side="right" class="min-w-[500px] flex flex-col h-full">
-		<form method="POST" class="flex flex-col h-full" use:enhance>
+		<form method="POST" class="flex flex-col h-full" use:form.enhance>
 			<div class="flex-grow">
 				<Sheet.Header>
 					<Sheet.Title>
-						{$form.id ? 'Event Master bearbeiten' : 'Neuen Event Master hinzufügen'}
+						{$formData.id ? 'Event Master bearbeiten' : 'Neuen Event Master hinzufügen'}
 					</Sheet.Title>
 					<Sheet.Description>
-						{$form.id
+						{$formData.id
 							? 'Ändere die Details des Event Masters unten. Klicke auf "Speichern", wenn du fertig bist.'
 							: 'Fülle die Details des neuen Event Masters aus. Klicke auf "Hinzufügen", wenn du fertig bist.'}
 					</Sheet.Description>
 				</Sheet.Header>
-				<input type="hidden" name="id" bind:value={$form.id} />
-				<div class="grid gap-4 py-4">
-					<div class="grid grid-cols-4 gap-4 items-center">
-						<Label for="master_name" class="col-span-1 text-left">Master Name</Label>
-						<Input
-							id="master_name"
-							name="master_name"
-							bind:value={$form.master_name}
-							class="col-span-3"
-						/>
-					</div>
-					<div class="grid grid-cols-4 gap-4 items-start">
-						<Label for="beschreibung" class="col-span-1 text-left">Beschreibung</Label>
-						<textarea
-							id="beschreibung"
-							name="beschreibung"
-							bind:value={$form.beschreibung}
-							class="col-span-3 resize-y border rounded p-2"
-							rows="4"
-						></textarea>
-						{#if $errors.beschreibung}<span class="invalid">{$errors.beschreibung}</span>{/if}
-					</div>
-				</div>
+
+				<FormField {form} name="master_name">
+					<FormControl>
+						{#snippet children({ props })}
+							<FormLabel>Master Name</FormLabel>
+							<Input {...props} bind:value={$formData.master_name} />
+						{/snippet}
+					</FormControl>
+					<FormFieldErrors />
+				</FormField>
+
+				<FormField {form} name="beschreibung">
+					<FormControl>
+						{#snippet children({ props })}
+							<FormLabel>Beschreibung</FormLabel>
+							<Textarea {...props} bind:value={$formData.beschreibung} />
+						{/snippet}
+					</FormControl>
+					<FormFieldErrors />
+				</FormField>
+
+				<FormField {form} name="id">
+					<FormControl>
+						{#snippet children({ props })}
+							<Input {...props} type="hidden" bind:value={$formData.id} />
+						{/snippet}
+					</FormControl>
+					<FormFieldErrors />
+				</FormField>
 			</div>
 			<Sheet.Footer class="flex justify-end gap-4 mt-4">
-				{#if $form.id}
+				{#if sheetStatus === 'edit'}
 					<Button formaction="?/deleteEventMaster" type="submit" variant="destructive"
 						>Löschen</Button
 					>

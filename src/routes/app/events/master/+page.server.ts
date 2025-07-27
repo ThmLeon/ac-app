@@ -1,8 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
-import { fail, error as svelteError } from '@sveltejs/kit';
-import { superValidate, message } from 'sveltekit-superforms/server';
+import { superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
-import { eventMasterSchema } from '@/schemas/eventMaster';
+import { eventMasterSchema } from '@/schemas/eventMasterSchema';
 import {
 	addEventMaster,
 	deleteEventMaster,

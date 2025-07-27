@@ -134,7 +134,6 @@ export type Database = {
 					ort_strasse_hausnummer: string;
 					start_datum_zeit: string;
 					titel: string;
-					titelbild_datei_name: string | null;
 				};
 				Insert: {
 					anhang_benoetigt: boolean;
@@ -151,7 +150,6 @@ export type Database = {
 					ort_strasse_hausnummer: string;
 					start_datum_zeit: string;
 					titel?: string;
-					titelbild_datei_name?: string | null;
 				};
 				Update: {
 					anhang_benoetigt?: boolean;
@@ -168,7 +166,6 @@ export type Database = {
 					ort_strasse_hausnummer?: string;
 					start_datum_zeit?: string;
 					titel?: string;
-					titelbild_datei_name?: string | null;
 				};
 				Relationships: [
 					{
@@ -237,6 +234,107 @@ export type Database = {
 					}
 				];
 			};
+			finanzen_budgets: {
+				Row: {
+					betrag_beantragt: number;
+					betrag_freigegeben: number;
+					created_at: string;
+					id: string;
+					ist_fixkosten: boolean;
+					kommentar_anfrage: string | null;
+					kommentar_freigabe: string | null;
+					kostenstelle: string;
+					name: string;
+					semester: string;
+				};
+				Insert: {
+					betrag_beantragt: number;
+					betrag_freigegeben?: number;
+					created_at?: string;
+					id?: string;
+					ist_fixkosten: boolean;
+					kommentar_anfrage?: string | null;
+					kommentar_freigabe?: string | null;
+					kostenstelle: string;
+					name: string;
+					semester: string;
+				};
+				Update: {
+					betrag_beantragt?: number;
+					betrag_freigegeben?: number;
+					created_at?: string;
+					id?: string;
+					ist_fixkosten?: boolean;
+					kommentar_anfrage?: string | null;
+					kommentar_freigabe?: string | null;
+					kostenstelle?: string;
+					name?: string;
+					semester?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'finanzen_budgets_kostenstelle_fkey';
+						columns: ['kostenstelle'];
+						referencedRelation: 'finanzen_kostenstellen';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'finanzen_budgets_semester_fkey';
+						columns: ['semester'];
+						referencedRelation: 'meta_semester';
+						referencedColumns: ['name'];
+					}
+				];
+			};
+			finanzen_kostenstellen: {
+				Row: {
+					created_at: string;
+					eltern_kostenstelle: string | null;
+					id: string;
+					name: string;
+					rang: number;
+				};
+				Insert: {
+					created_at?: string;
+					eltern_kostenstelle?: string | null;
+					id?: string;
+					name: string;
+					rang: number;
+				};
+				Update: {
+					created_at?: string;
+					eltern_kostenstelle?: string | null;
+					id?: string;
+					name?: string;
+					rang?: number;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'finanzen_kostenstellen_eltern_kostenstelle_fkey';
+						columns: ['eltern_kostenstelle'];
+						referencedRelation: 'finanzen_kostenstellen';
+						referencedColumns: ['name'];
+					}
+				];
+			};
+			meta_semester: {
+				Row: {
+					created_at: string;
+					id: string;
+					name: string;
+				};
+				Insert: {
+					created_at?: string;
+					id?: string;
+					name: string;
+				};
+				Update: {
+					created_at?: string;
+					id?: string;
+					name?: string;
+				};
+				Relationships: [];
+			};
 			SalesAktivitaeten: {
 				Row: {
 					aktivitaetArt: number | null;
@@ -280,26 +378,26 @@ export type Database = {
 					id: number;
 					mitgliedID: number | null;
 					name: string;
-					salesTeam: number | null;
+					salesTeamID: number | null;
 				};
 				Insert: {
 					archiviert?: boolean;
 					id?: number;
 					mitgliedID?: number | null;
 					name: string;
-					salesTeam?: number | null;
+					salesTeamID?: number | null;
 				};
 				Update: {
 					archiviert?: boolean;
 					id?: number;
 					mitgliedID?: number | null;
 					name?: string;
-					salesTeam?: number | null;
+					salesTeamID?: number | null;
 				};
 				Relationships: [
 					{
-						foreignKeyName: 'SalesTeamMitglieder_salesTeam_fkey';
-						columns: ['salesTeam'];
+						foreignKeyName: 'SalesTeamMitglieder_salesTeamID_fkey';
+						columns: ['salesTeamID'];
 						referencedRelation: 'SalesTeams';
 						referencedColumns: ['id'];
 					}
