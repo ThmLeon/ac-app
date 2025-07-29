@@ -44,7 +44,7 @@
 
 <!--TODO: if event is empty (none is shown) then show "no event with current filter found"-->
 <div class="container mx-auto p-4 space-y-4">
-	{#each data.eventsData as event}
+	{#each data.data as event}
 		<EventCard
 			imageUrl="https://placehold.co/1600x1000"
 			title={event.titel}

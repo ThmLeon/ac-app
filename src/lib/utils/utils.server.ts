@@ -50,3 +50,11 @@ export async function returnActionResult(
 	}
 	return message(form, successMessage);
 }
+
+export function throwMissingErrorIfNeeded(argument: string | undefined): string {
+	if (!argument) {
+		throw svelteError(400, { message: 'Fehler in den Daten' });
+	} else {
+		return argument;
+	}
+}

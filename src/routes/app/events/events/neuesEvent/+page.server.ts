@@ -13,9 +13,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
 	createNewEvent: async ({ request }) => {
-		console.log('Creating new event');
 		const form = await superValidate(request, zod(newEventSchema));
-		console.log('Form data:', form.data);
 		return returnActionResult(
 			form,
 			() => createNewEvent(form.data),

@@ -1,46 +1,23 @@
+import { throwMissingErrorIfNeeded } from '@/utils/utils.server';
 import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect, error as svelteError } from '@sveltejs/kit';
+import { getEventApplicationState, getEventDetailsById } from '@/server/database/events.server';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-	const eventId = params.eventId;
-	const { supabase } = locals;
-	const userId = (await locals.safeGetSession()).user?.id;
+	const eventId = throwMissingErrorIfNeeded(params.eventId);
+	const userId = throwMissingErrorIfNeeded(locals.user?.id);
 
-	if (!eventId || !userId) {
-		throw svelteError(400, { message: 'Fehler in den Daten' });
-	}
+	const eventData = await getEventDetailsById(eventId);
+	const applicationState = await getEventApplicationState(eventId, userId);
 
-	const { data: eventData, error: eventError } = await supabase
-		.from('04_events_events')
-		.select(
-			`id, titel, beschreibung, start_datum_zeit, ende_datum_zeit, bewerbungs_deadline, ort_strasse_hausnummer, ort_plz_stadt, anhang_benoetigt, anhang_beschreibung, bewerbungstext_benoetigt, bewerbungstext_beschreibung,
-             event_master:04_events_master(master_name),
-             event_verantwortliche:04_events_verantwortliche(mitglieder:01_mitglieder_mitglieder(vorname, nachname))`
-		)
-		.eq('id', eventId)
-		.single();
-
-	if (eventError || !eventData) {
-		throw svelteError(500, { message: 'Event not found' });
-	}
-
-	const { data: alreadyApplied, error: alreadyAppliedError } = await supabase
-		.from('04_events_bewerbungen')
-		.select('id, besetzt, anwesend')
-		.eq('event_id', eventId)
-		.eq('mitglied_id', userId);
-
-	if (alreadyAppliedError) {
-		throw svelteError(500, { message: 'Fehler beim laden der Bewerbungen' });
-	}
-
-	if (alreadyApplied.length != 0) {
+	if (applicationState.length != 0) {
+		// already applied, not allowed to apply again
 		redirect(303, `../${eventId}`);
 	}
 
 	return {
 		eventData: eventData,
-		alreadyApplied: alreadyApplied
+		alreadyApplied: applicationState
 	};
 };
 
