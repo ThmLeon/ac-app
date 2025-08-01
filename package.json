@@ -21,6 +21,7 @@
 		"@sinclair/typebox": "^0.34.37",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
+		"@tanstack/table-core": "^8.21.3",
 		"@typeschema/class-validator": "^0.2.0",
 		"@vinejs/vine": "^1.8.0",
 		"arktype": "^2.1.20",
