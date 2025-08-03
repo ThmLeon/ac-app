@@ -1,4 +1,4 @@
-import { getAllCostCentersWithBudgetsBySemester } from '@/server/database/finanzen.server';
+import { getAllCostCentersWithBudgetsBySemester } from '@/server/supabase/finanzen.server';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {

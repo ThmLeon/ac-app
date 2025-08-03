@@ -1,6 +1,6 @@
 import { type Handle, redirect } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
-import SupabaseServerClient from "@/server/database/supabaseServerClient.server";
+import SupabaseServerClient from '@/server/supabase/supabaseServerClient.server';
 
 const supabase: Handle = async ({ event, resolve }) => {
 	if (event.url.pathname.startsWith('/.well-known/appspecific/com.chrome.devtools')) {

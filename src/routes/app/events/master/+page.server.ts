@@ -7,7 +7,7 @@ import {
 	deleteEventMaster,
 	getAllEventMasters,
 	updateEventMaster
-} from '@/server/database/events.server';
+} from '@/server/supabase/events.server';
 import { returnActionResult } from '@/utils/utils.server';
 
 export const load: PageServerLoad = async ({ locals }) => {
