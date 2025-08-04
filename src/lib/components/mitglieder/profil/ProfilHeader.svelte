@@ -4,7 +4,7 @@
 
 <div class="flex flex-col md:flex-row gap-6 mb-4">
 	<!-- Profile Image -->
-	<div class="flex-shrink-0">
+	<div class="shrink-0">
 		<img
 			src="https://placehold.co/1000x1000"
 			alt="Profilbild"

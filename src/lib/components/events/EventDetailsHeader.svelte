@@ -32,7 +32,7 @@
 	<img
 		src="https://placehold.co/1600x1000"
 		alt={eventData.titel}
-		class="w-full md:w-1/3 h-auto object-cover rounded-lg aspect-[16/10]"
+		class="w-full md:w-1/3 h-auto object-cover rounded-lg aspect-16/10"
 	/>
 
 	<!-- Content Section -->

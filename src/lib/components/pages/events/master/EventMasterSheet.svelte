@@ -24,7 +24,7 @@
 >
 	<Sheet.Content side="right" class="min-w-[500px] flex flex-col h-full">
 		<form method="POST" class="flex flex-col h-full" use:form.enhance>
-			<div class="flex-grow">
+			<div class="grow">
 				<Sheet.Header>
 					<Sheet.Title>
 						{$formData.id ? 'Event Master bearbeiten' : 'Neuen Event Master hinzufügen'}

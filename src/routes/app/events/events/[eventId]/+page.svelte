@@ -48,7 +48,7 @@
 			<CardContent>
 				<div class="flex flex-wrap gap-4 w-full">
 					{#each eventData.event_verantwortliche! as verantwortlicher}
-						<div class="flex-shrink-0">
+						<div class="shrink-0">
 							<MitgliedCard
 								name={verantwortlicher.mitglieder.vorname +
 									' ' +
@@ -62,7 +62,7 @@
 		</Card>
 
 		<!-- Location Card -->
-		<Card class="w-[350px] flex-shrink-0">
+		<Card class="w-[350px] shrink-0">
 			<CardHeader>
 				<CardTitle class="text-xl font-bold">Ort</CardTitle>
 			</CardHeader>
