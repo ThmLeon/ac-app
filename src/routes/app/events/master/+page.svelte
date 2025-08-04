@@ -25,20 +25,20 @@
 	});
 	const { form: formData } = form;
 
-	function onEdit(id: string) {
-		const current = data.data.find((eventMaster) => eventMaster.id === id);
+	function onEdit(id: number) {
+		const current = data.data.find((eventMaster: { ID: number }) => eventMaster.ID === id);
 		if (current) {
 			formData.set({
-				id: current.id,
-				master_name: current.master_name,
-				beschreibung: current.beschreibung
+				ID: current.ID.toString(),
+				Title: current.Titel!,
+				MasterBeschreibung: current.MasterBeschreibung!
 			});
 			sheetStatus = 'edit';
 		}
 	}
 
 	function onAddNew() {
-		formData.set({ id: '', master_name: '', beschreibung: '' });
+		formData.set({ ID: '', Title: '', MasterBeschreibung: '' });
 		sheetStatus = 'new';
 	}
 </script>
@@ -47,7 +47,7 @@
 	<PageLoadSkeleton />
 {:then data}
 	<div class="container mx-auto p-4">
-		<EventMasterList events={data.data} {onAddNew} {onEdit} />
+		<EventMasterList eventMasters={data.data} {onAddNew} {onEdit} />
 		<EventMasterSheet bind:sheetStatus {form} />
 	</div>
 {/await}

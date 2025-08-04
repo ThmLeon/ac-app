@@ -4,7 +4,7 @@ import { fail, redirect, error as svelteError } from '@sveltejs/kit';
 import { newEventSchema } from '@/schemas/newEventSchema';
 import { zod } from 'sveltekit-superforms/adapters';
 import { returnActionResult } from '@/utils/utils.server';
-import { createNewEvent } from '@/server/database/events.server';
+import { createNewEvent } from '@/server/supabase/events.server';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const form = await superValidate(zod(newEventSchema));

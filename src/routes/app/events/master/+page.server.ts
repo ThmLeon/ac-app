@@ -2,13 +2,9 @@ import type { Actions, PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { eventMasterSchema } from '@/schemas/eventMasterSchema';
-import {
-	addEventMaster,
-	deleteEventMaster,
-	getAllEventMasters,
-	updateEventMaster
-} from '@/server/supabase/events.server';
+import { getAllEventMasters } from '@/server/supabase/events.server';
 import { returnActionResult } from '@/utils/utils.server';
+import { updateEventMaster } from '@/server/sharepoint/events.server';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const data = await getAllEventMasters();
@@ -17,7 +13,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	deleteEventMaster: async ({ request }) => {
+	/*deleteEventMaster: async ({ request }) => {
 		const form = await superValidate(request, zod(eventMasterSchema));
 
 		return returnActionResult(
@@ -26,7 +22,7 @@ export const actions: Actions = {
 			'Fehler beim Löschen des Events Master',
 			'Event Master erfolgreich gelöscht'
 		);
-	},
+	},*/
 
 	updateEventMaster: async ({ request }) => {
 		const form = await superValidate(request, zod(eventMasterSchema));
@@ -37,9 +33,9 @@ export const actions: Actions = {
 			'Fehler beim Aktualisieren des Events Master',
 			'Event Master erfolgreich aktualisiert'
 		);
-	},
+	}
 
-	addEventMaster: async ({ request }) => {
+	/*addEventMaster: async ({ request }) => {
 		const form = await superValidate(request, zod(eventMasterSchema));
 
 		return returnActionResult(
@@ -48,5 +44,5 @@ export const actions: Actions = {
 			'Fehler beim Hinzufügen des Events Master',
 			'Event Master erfolgreich hinzugefügt'
 		);
-	}
+	}*/
 };

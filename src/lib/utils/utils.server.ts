@@ -35,7 +35,7 @@ export function throwFetchErrorIfNeeded<T>(
 
 export async function returnActionResult(
 	form: SuperValidated<any>,
-	action: () => Promise<PostgrestError | null>,
+	action: () => Promise<Error | null>,
 	errorMessage: string = 'Ein Fehler ist aufgetreten',
 	successMessage: string = 'Die Aktion war erfolgreich'
 ) {

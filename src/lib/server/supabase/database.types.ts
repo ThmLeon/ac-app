@@ -1,6 +1,11 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
+	// Allows to automatically instanciate createClient with right options
+	// instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+	__InternalSupabase: {
+		PostgrestVersion: '12.2.3 (519615d)';
+	};
 	graphql_public: {
 		Tables: {
 			[_ in never]: never;
@@ -26,398 +31,194 @@ export type Database = {
 			[_ in never]: never;
 		};
 	};
-	pgbouncer: {
-		Tables: {
-			[_ in never]: never;
-		};
-		Views: {
-			[_ in never]: never;
-		};
-		Functions: {
-			get_auth: {
-				Args: { p_usename: string };
-				Returns: {
-					username: string;
-					password: string;
-				}[];
-			};
-		};
-		Enums: {
-			[_ in never]: never;
-		};
-		CompositeTypes: {
-			[_ in never]: never;
-		};
-	};
 	public: {
 		Tables: {
-			'01_mitglieder_mitglieder': {
+			'1_Mitglieder': {
 				Row: {
+					Anwaertergeneration: string | null;
+					Art: string | null;
+					Aufnahmedatum: string | null;
+					AusnahmeMVs: boolean | null;
+					AzureSync: boolean | null;
+					Beraterstufe: string | null;
+					BIC: string | null;
+					CollmexID: number | null;
 					created_at: string;
-					id: string;
-					nachname: string;
-					vorname: string;
+					EmailAC: string | null;
+					EmailPrivat: string | null;
+					Erstellt: string | null;
+					'Erstellt von': string | null;
+					Geändert: string | null;
+					'Geändert von': string | null;
+					Geburtstag: string | null;
+					Generation: number | null;
+					Handy: string | null;
+					Hausnummer: string | null;
+					IBAN: string | null;
+					ID: number;
+					IstWechsler: boolean | null;
+					Kleinunternehmerregelung: boolean | null;
+					Legacy_ID: number | null;
+					LinkedInJSON: string | null;
+					LinkedInProfile: string | null;
+					Mandatsreferenz: string | null;
+					MandatUnterzeichnetAm: string | null;
+					Nachname: string | null;
+					PassivScoreAusnahme: boolean | null;
+					Postleitzahl: string | null;
+					Rolle: string | null;
+					Rueckkehrdatum: string | null;
+					Stadt: string | null;
+					Steuernummer: string | null;
+					Strasse: string | null;
+					Traineegeneration: string | null;
+					TransponderID: number | null;
+					UserID: string | null;
+					Vorname: string | null;
+					Weiblich: boolean | null;
 				};
 				Insert: {
+					Anwaertergeneration?: string | null;
+					Art?: string | null;
+					Aufnahmedatum?: string | null;
+					AusnahmeMVs?: boolean | null;
+					AzureSync?: boolean | null;
+					Beraterstufe?: string | null;
+					BIC?: string | null;
+					CollmexID?: number | null;
 					created_at?: string;
-					id?: string;
-					nachname?: string;
-					vorname?: string;
+					EmailAC?: string | null;
+					EmailPrivat?: string | null;
+					Erstellt?: string | null;
+					'Erstellt von'?: string | null;
+					Geändert?: string | null;
+					'Geändert von'?: string | null;
+					Geburtstag?: string | null;
+					Generation?: number | null;
+					Handy?: string | null;
+					Hausnummer?: string | null;
+					IBAN?: string | null;
+					ID?: number;
+					IstWechsler?: boolean | null;
+					Kleinunternehmerregelung?: boolean | null;
+					Legacy_ID?: number | null;
+					LinkedInJSON?: string | null;
+					LinkedInProfile?: string | null;
+					Mandatsreferenz?: string | null;
+					MandatUnterzeichnetAm?: string | null;
+					Nachname?: string | null;
+					PassivScoreAusnahme?: boolean | null;
+					Postleitzahl?: string | null;
+					Rolle?: string | null;
+					Rueckkehrdatum?: string | null;
+					Stadt?: string | null;
+					Steuernummer?: string | null;
+					Strasse?: string | null;
+					Traineegeneration?: string | null;
+					TransponderID?: number | null;
+					UserID?: string | null;
+					Vorname?: string | null;
+					Weiblich?: boolean | null;
 				};
 				Update: {
+					Anwaertergeneration?: string | null;
+					Art?: string | null;
+					Aufnahmedatum?: string | null;
+					AusnahmeMVs?: boolean | null;
+					AzureSync?: boolean | null;
+					Beraterstufe?: string | null;
+					BIC?: string | null;
+					CollmexID?: number | null;
 					created_at?: string;
-					id?: string;
-					nachname?: string;
-					vorname?: string;
+					EmailAC?: string | null;
+					EmailPrivat?: string | null;
+					Erstellt?: string | null;
+					'Erstellt von'?: string | null;
+					Geändert?: string | null;
+					'Geändert von'?: string | null;
+					Geburtstag?: string | null;
+					Generation?: number | null;
+					Handy?: string | null;
+					Hausnummer?: string | null;
+					IBAN?: string | null;
+					ID?: number;
+					IstWechsler?: boolean | null;
+					Kleinunternehmerregelung?: boolean | null;
+					Legacy_ID?: number | null;
+					LinkedInJSON?: string | null;
+					LinkedInProfile?: string | null;
+					Mandatsreferenz?: string | null;
+					MandatUnterzeichnetAm?: string | null;
+					Nachname?: string | null;
+					PassivScoreAusnahme?: boolean | null;
+					Postleitzahl?: string | null;
+					Rolle?: string | null;
+					Rueckkehrdatum?: string | null;
+					Stadt?: string | null;
+					Steuernummer?: string | null;
+					Strasse?: string | null;
+					Traineegeneration?: string | null;
+					TransponderID?: number | null;
+					UserID?: string | null;
+					Vorname?: string | null;
+					Weiblich?: boolean | null;
 				};
 				Relationships: [];
 			};
-			'04_events_bewerbungen': {
+			'4_eventMaster': {
 				Row: {
-					anwesend: boolean;
-					besetzt: boolean;
-					bewerbungs_datei_name: string | null;
-					bewerbungstext: string | null;
 					created_at: string;
-					event_id: string;
-					id: string;
-					mitglied_id: string;
+					Eventart: string | null;
+					ID: number;
+					MasterBeschreibung: string | null;
+					MasterTitelbild: string | null;
+					TeamsWorkspaceURL: string | null;
+					Titel: string | null;
 				};
 				Insert: {
-					anwesend: boolean;
-					besetzt: boolean;
-					bewerbungs_datei_name?: string | null;
-					bewerbungstext?: string | null;
 					created_at?: string;
-					event_id?: string;
-					id?: string;
-					mitglied_id: string;
+					Eventart?: string | null;
+					ID?: number;
+					MasterBeschreibung?: string | null;
+					MasterTitelbild?: string | null;
+					TeamsWorkspaceURL?: string | null;
+					Titel?: string | null;
 				};
 				Update: {
-					anwesend?: boolean;
-					besetzt?: boolean;
-					bewerbungs_datei_name?: string | null;
-					bewerbungstext?: string | null;
 					created_at?: string;
-					event_id?: string;
-					id?: string;
-					mitglied_id?: string;
-				};
-				Relationships: [
-					{
-						foreignKeyName: '04_events_bewerbungen_event_id_fkey';
-						columns: ['event_id'];
-						referencedRelation: '04_events_events';
-						referencedColumns: ['id'];
-					},
-					{
-						foreignKeyName: '04_events_bewerbungen_mitglied_id_fkey';
-						columns: ['mitglied_id'];
-						referencedRelation: '01_mitglieder_mitglieder';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			'04_events_events': {
-				Row: {
-					anhang_benoetigt: boolean;
-					anhang_beschreibung: string | null;
-					beschreibung: string;
-					bewerbungs_deadline: string;
-					bewerbungstext_benoetigt: boolean;
-					bewerbungstext_beschreibung: string | null;
-					created_at: string;
-					ende_datum_zeit: string;
-					event_master_id: string;
-					id: string;
-					ort_plz_stadt: string;
-					ort_strasse_hausnummer: string;
-					start_datum_zeit: string;
-					titel: string;
-				};
-				Insert: {
-					anhang_benoetigt: boolean;
-					anhang_beschreibung?: string | null;
-					beschreibung: string;
-					bewerbungs_deadline: string;
-					bewerbungstext_benoetigt: boolean;
-					bewerbungstext_beschreibung?: string | null;
-					created_at?: string;
-					ende_datum_zeit: string;
-					event_master_id?: string;
-					id?: string;
-					ort_plz_stadt: string;
-					ort_strasse_hausnummer: string;
-					start_datum_zeit: string;
-					titel?: string;
-				};
-				Update: {
-					anhang_benoetigt?: boolean;
-					anhang_beschreibung?: string | null;
-					beschreibung?: string;
-					bewerbungs_deadline?: string;
-					bewerbungstext_benoetigt?: boolean;
-					bewerbungstext_beschreibung?: string | null;
-					created_at?: string;
-					ende_datum_zeit?: string;
-					event_master_id?: string;
-					id?: string;
-					ort_plz_stadt?: string;
-					ort_strasse_hausnummer?: string;
-					start_datum_zeit?: string;
-					titel?: string;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 'events_events_event_master_id_fkey';
-						columns: ['event_master_id'];
-						referencedRelation: '04_events_master';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			'04_events_master': {
-				Row: {
-					beschreibung: string;
-					created_at: string;
-					id: string;
-					master_name: string;
-					titelbild_datei_name: string | null;
-				};
-				Insert: {
-					beschreibung?: string;
-					created_at?: string;
-					id?: string;
-					master_name?: string;
-					titelbild_datei_name?: string | null;
-				};
-				Update: {
-					beschreibung?: string;
-					created_at?: string;
-					id?: string;
-					master_name?: string;
-					titelbild_datei_name?: string | null;
+					Eventart?: string | null;
+					ID?: number;
+					MasterBeschreibung?: string | null;
+					MasterTitelbild?: string | null;
+					TeamsWorkspaceURL?: string | null;
+					Titel?: string | null;
 				};
 				Relationships: [];
 			};
-			'04_events_verantwortliche': {
+			kontobewegungen: {
 				Row: {
-					created_at: string;
-					event_id: string;
+					beguenstiger: string;
+					betrag: number;
+					buchungsdatum: string;
 					id: string;
-					user_id: string;
+					konto: string;
+					verwendungszweck: string;
 				};
 				Insert: {
-					created_at?: string;
-					event_id?: string;
-					id?: string;
-					user_id?: string;
-				};
-				Update: {
-					created_at?: string;
-					event_id?: string;
-					id?: string;
-					user_id?: string;
-				};
-				Relationships: [
-					{
-						foreignKeyName: '04_events_verantwortliche_event_id_fkey';
-						columns: ['event_id'];
-						referencedRelation: '04_events_events';
-						referencedColumns: ['id'];
-					},
-					{
-						foreignKeyName: '04_events_verantwortliche_user_id_fkey';
-						columns: ['user_id'];
-						referencedRelation: '01_mitglieder_mitglieder';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			finanzen_budgets: {
-				Row: {
-					betrag_beantragt: number;
-					betrag_freigegeben: number;
-					created_at: string;
+					beguenstiger: string;
+					betrag: number;
+					buchungsdatum: string;
 					id: string;
-					ist_fixkosten: boolean;
-					kommentar_anfrage: string | null;
-					kommentar_freigabe: string | null;
-					kostenstelle: string;
-					name: string;
-					semester: string;
-				};
-				Insert: {
-					betrag_beantragt: number;
-					betrag_freigegeben?: number;
-					created_at?: string;
-					id?: string;
-					ist_fixkosten: boolean;
-					kommentar_anfrage?: string | null;
-					kommentar_freigabe?: string | null;
-					kostenstelle: string;
-					name: string;
-					semester: string;
+					konto: string;
+					verwendungszweck: string;
 				};
 				Update: {
-					betrag_beantragt?: number;
-					betrag_freigegeben?: number;
-					created_at?: string;
+					beguenstiger?: string;
+					betrag?: number;
+					buchungsdatum?: string;
 					id?: string;
-					ist_fixkosten?: boolean;
-					kommentar_anfrage?: string | null;
-					kommentar_freigabe?: string | null;
-					kostenstelle?: string;
-					name?: string;
-					semester?: string;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 'finanzen_budgets_kostenstelle_fkey';
-						columns: ['kostenstelle'];
-						referencedRelation: 'finanzen_kostenstellen';
-						referencedColumns: ['id'];
-					},
-					{
-						foreignKeyName: 'finanzen_budgets_semester_fkey';
-						columns: ['semester'];
-						referencedRelation: 'meta_semester';
-						referencedColumns: ['name'];
-					}
-				];
-			};
-			finanzen_kostenstellen: {
-				Row: {
-					created_at: string;
-					eltern_kostenstelle: string | null;
-					id: string;
-					name: string;
-					rang: number;
-				};
-				Insert: {
-					created_at?: string;
-					eltern_kostenstelle?: string | null;
-					id?: string;
-					name: string;
-					rang: number;
-				};
-				Update: {
-					created_at?: string;
-					eltern_kostenstelle?: string | null;
-					id?: string;
-					name?: string;
-					rang?: number;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 'finanzen_kostenstellen_eltern_kostenstelle_fkey';
-						columns: ['eltern_kostenstelle'];
-						referencedRelation: 'finanzen_kostenstellen';
-						referencedColumns: ['name'];
-					}
-				];
-			};
-			meta_semester: {
-				Row: {
-					created_at: string;
-					id: string;
-					name: string;
-				};
-				Insert: {
-					created_at?: string;
-					id?: string;
-					name: string;
-				};
-				Update: {
-					created_at?: string;
-					id?: string;
-					name?: string;
-				};
-				Relationships: [];
-			};
-			SalesAktivitaeten: {
-				Row: {
-					aktivitaetArt: number | null;
-					archiviert: boolean | null;
-					datum: string | null;
-					id: number;
-					pt: number | null;
-					salesTeamID: number | null;
-					titel: string;
-				};
-				Insert: {
-					aktivitaetArt?: number | null;
-					archiviert?: boolean | null;
-					datum?: string | null;
-					id?: number;
-					pt?: number | null;
-					salesTeamID?: number | null;
-					titel: string;
-				};
-				Update: {
-					aktivitaetArt?: number | null;
-					archiviert?: boolean | null;
-					datum?: string | null;
-					id?: number;
-					pt?: number | null;
-					salesTeamID?: number | null;
-					titel?: string;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 'SalesAktivitaeten_salesTeamID_fkey';
-						columns: ['salesTeamID'];
-						referencedRelation: 'SalesTeams';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			SalesTeamMitglieder: {
-				Row: {
-					archiviert: boolean;
-					id: number;
-					mitgliedID: number | null;
-					name: string;
-					salesTeamID: number | null;
-				};
-				Insert: {
-					archiviert?: boolean;
-					id?: number;
-					mitgliedID?: number | null;
-					name: string;
-					salesTeamID?: number | null;
-				};
-				Update: {
-					archiviert?: boolean;
-					id?: number;
-					mitgliedID?: number | null;
-					name?: string;
-					salesTeamID?: number | null;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 'SalesTeamMitglieder_salesTeamID_fkey';
-						columns: ['salesTeamID'];
-						referencedRelation: 'SalesTeams';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			SalesTeams: {
-				Row: {
-					archiviert: boolean;
-					id: number;
-					name: string;
-				};
-				Insert: {
-					archiviert?: boolean;
-					id?: number;
-					name: string;
-				};
-				Update: {
-					archiviert?: boolean;
-					id?: number;
-					name?: string;
+					konto?: string;
+					verwendungszweck?: string;
 				};
 				Relationships: [];
 			};
@@ -427,417 +228,6 @@ export type Database = {
 		};
 		Functions: {
 			[_ in never]: never;
-		};
-		Enums: {
-			[_ in never]: never;
-		};
-		CompositeTypes: {
-			[_ in never]: never;
-		};
-	};
-	storage: {
-		Tables: {
-			buckets: {
-				Row: {
-					allowed_mime_types: string[] | null;
-					avif_autodetection: boolean | null;
-					created_at: string | null;
-					file_size_limit: number | null;
-					id: string;
-					name: string;
-					owner: string | null;
-					owner_id: string | null;
-					public: boolean | null;
-					updated_at: string | null;
-				};
-				Insert: {
-					allowed_mime_types?: string[] | null;
-					avif_autodetection?: boolean | null;
-					created_at?: string | null;
-					file_size_limit?: number | null;
-					id: string;
-					name: string;
-					owner?: string | null;
-					owner_id?: string | null;
-					public?: boolean | null;
-					updated_at?: string | null;
-				};
-				Update: {
-					allowed_mime_types?: string[] | null;
-					avif_autodetection?: boolean | null;
-					created_at?: string | null;
-					file_size_limit?: number | null;
-					id?: string;
-					name?: string;
-					owner?: string | null;
-					owner_id?: string | null;
-					public?: boolean | null;
-					updated_at?: string | null;
-				};
-				Relationships: [];
-			};
-			migrations: {
-				Row: {
-					executed_at: string | null;
-					hash: string;
-					id: number;
-					name: string;
-				};
-				Insert: {
-					executed_at?: string | null;
-					hash: string;
-					id: number;
-					name: string;
-				};
-				Update: {
-					executed_at?: string | null;
-					hash?: string;
-					id?: number;
-					name?: string;
-				};
-				Relationships: [];
-			};
-			objects: {
-				Row: {
-					bucket_id: string | null;
-					created_at: string | null;
-					id: string;
-					last_accessed_at: string | null;
-					level: number | null;
-					metadata: Json | null;
-					name: string | null;
-					owner: string | null;
-					owner_id: string | null;
-					path_tokens: string[] | null;
-					updated_at: string | null;
-					user_metadata: Json | null;
-					version: string | null;
-				};
-				Insert: {
-					bucket_id?: string | null;
-					created_at?: string | null;
-					id?: string;
-					last_accessed_at?: string | null;
-					level?: number | null;
-					metadata?: Json | null;
-					name?: string | null;
-					owner?: string | null;
-					owner_id?: string | null;
-					path_tokens?: string[] | null;
-					updated_at?: string | null;
-					user_metadata?: Json | null;
-					version?: string | null;
-				};
-				Update: {
-					bucket_id?: string | null;
-					created_at?: string | null;
-					id?: string;
-					last_accessed_at?: string | null;
-					level?: number | null;
-					metadata?: Json | null;
-					name?: string | null;
-					owner?: string | null;
-					owner_id?: string | null;
-					path_tokens?: string[] | null;
-					updated_at?: string | null;
-					user_metadata?: Json | null;
-					version?: string | null;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 'objects_bucketId_fkey';
-						columns: ['bucket_id'];
-						referencedRelation: 'buckets';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			prefixes: {
-				Row: {
-					bucket_id: string;
-					created_at: string | null;
-					level: number;
-					name: string;
-					updated_at: string | null;
-				};
-				Insert: {
-					bucket_id: string;
-					created_at?: string | null;
-					level?: number;
-					name: string;
-					updated_at?: string | null;
-				};
-				Update: {
-					bucket_id?: string;
-					created_at?: string | null;
-					level?: number;
-					name?: string;
-					updated_at?: string | null;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 'prefixes_bucketId_fkey';
-						columns: ['bucket_id'];
-						referencedRelation: 'buckets';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			s3_multipart_uploads: {
-				Row: {
-					bucket_id: string;
-					created_at: string;
-					id: string;
-					in_progress_size: number;
-					key: string;
-					owner_id: string | null;
-					upload_signature: string;
-					user_metadata: Json | null;
-					version: string;
-				};
-				Insert: {
-					bucket_id: string;
-					created_at?: string;
-					id: string;
-					in_progress_size?: number;
-					key: string;
-					owner_id?: string | null;
-					upload_signature: string;
-					user_metadata?: Json | null;
-					version: string;
-				};
-				Update: {
-					bucket_id?: string;
-					created_at?: string;
-					id?: string;
-					in_progress_size?: number;
-					key?: string;
-					owner_id?: string | null;
-					upload_signature?: string;
-					user_metadata?: Json | null;
-					version?: string;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 's3_multipart_uploads_bucket_id_fkey';
-						columns: ['bucket_id'];
-						referencedRelation: 'buckets';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			s3_multipart_uploads_parts: {
-				Row: {
-					bucket_id: string;
-					created_at: string;
-					etag: string;
-					id: string;
-					key: string;
-					owner_id: string | null;
-					part_number: number;
-					size: number;
-					upload_id: string;
-					version: string;
-				};
-				Insert: {
-					bucket_id: string;
-					created_at?: string;
-					etag: string;
-					id?: string;
-					key: string;
-					owner_id?: string | null;
-					part_number: number;
-					size?: number;
-					upload_id: string;
-					version: string;
-				};
-				Update: {
-					bucket_id?: string;
-					created_at?: string;
-					etag?: string;
-					id?: string;
-					key?: string;
-					owner_id?: string | null;
-					part_number?: number;
-					size?: number;
-					upload_id?: string;
-					version?: string;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 's3_multipart_uploads_parts_bucket_id_fkey';
-						columns: ['bucket_id'];
-						referencedRelation: 'buckets';
-						referencedColumns: ['id'];
-					},
-					{
-						foreignKeyName: 's3_multipart_uploads_parts_upload_id_fkey';
-						columns: ['upload_id'];
-						referencedRelation: 's3_multipart_uploads';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-		};
-		Views: {
-			[_ in never]: never;
-		};
-		Functions: {
-			add_prefixes: {
-				Args: { _bucket_id: string; _name: string };
-				Returns: undefined;
-			};
-			can_insert_object: {
-				Args: { bucketid: string; name: string; owner: string; metadata: Json };
-				Returns: undefined;
-			};
-			delete_prefix: {
-				Args: { _bucket_id: string; _name: string };
-				Returns: boolean;
-			};
-			extension: {
-				Args: { name: string };
-				Returns: string;
-			};
-			filename: {
-				Args: { name: string };
-				Returns: string;
-			};
-			foldername: {
-				Args: { name: string };
-				Returns: string[];
-			};
-			get_level: {
-				Args: { name: string };
-				Returns: number;
-			};
-			get_prefix: {
-				Args: { name: string };
-				Returns: string;
-			};
-			get_prefixes: {
-				Args: { name: string };
-				Returns: string[];
-			};
-			get_size_by_bucket: {
-				Args: Record<PropertyKey, never>;
-				Returns: {
-					size: number;
-					bucket_id: string;
-				}[];
-			};
-			list_multipart_uploads_with_delimiter: {
-				Args: {
-					bucket_id: string;
-					prefix_param: string;
-					delimiter_param: string;
-					max_keys?: number;
-					next_key_token?: string;
-					next_upload_token?: string;
-				};
-				Returns: {
-					key: string;
-					id: string;
-					created_at: string;
-				}[];
-			};
-			list_objects_with_delimiter: {
-				Args: {
-					bucket_id: string;
-					prefix_param: string;
-					delimiter_param: string;
-					max_keys?: number;
-					start_after?: string;
-					next_token?: string;
-				};
-				Returns: {
-					name: string;
-					id: string;
-					metadata: Json;
-					updated_at: string;
-				}[];
-			};
-			operation: {
-				Args: Record<PropertyKey, never>;
-				Returns: string;
-			};
-			search: {
-				Args: {
-					prefix: string;
-					bucketname: string;
-					limits?: number;
-					levels?: number;
-					offsets?: number;
-					search?: string;
-					sortcolumn?: string;
-					sortorder?: string;
-				};
-				Returns: {
-					name: string;
-					id: string;
-					updated_at: string;
-					created_at: string;
-					last_accessed_at: string;
-					metadata: Json;
-				}[];
-			};
-			search_legacy_v1: {
-				Args: {
-					prefix: string;
-					bucketname: string;
-					limits?: number;
-					levels?: number;
-					offsets?: number;
-					search?: string;
-					sortcolumn?: string;
-					sortorder?: string;
-				};
-				Returns: {
-					name: string;
-					id: string;
-					updated_at: string;
-					created_at: string;
-					last_accessed_at: string;
-					metadata: Json;
-				}[];
-			};
-			search_v1_optimised: {
-				Args: {
-					prefix: string;
-					bucketname: string;
-					limits?: number;
-					levels?: number;
-					offsets?: number;
-					search?: string;
-					sortcolumn?: string;
-					sortorder?: string;
-				};
-				Returns: {
-					name: string;
-					id: string;
-					updated_at: string;
-					created_at: string;
-					last_accessed_at: string;
-					metadata: Json;
-				}[];
-			};
-			search_v2: {
-				Args: {
-					prefix: string;
-					bucket_name: string;
-					limits?: number;
-					levels?: number;
-					start_after?: string;
-				};
-				Returns: {
-					key: string;
-					name: string;
-					id: string;
-					updated_at: string;
-					created_at: string;
-					metadata: Json;
-				}[];
-			};
 		};
 		Enums: {
 			[_ in never]: never;
@@ -848,21 +238,25 @@ export type Database = {
 	};
 };
 
-type DefaultSchema = Database[Extract<keyof Database, 'public'>];
+type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>;
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>];
 
 export type Tables<
 	DefaultSchemaTableNameOrOptions extends
 		| keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
-		| { schema: keyof Database },
+		| { schema: keyof DatabaseWithoutInternals },
 	TableName extends DefaultSchemaTableNameOrOptions extends {
-		schema: keyof Database;
+		schema: keyof DatabaseWithoutInternals;
 	}
-		? keyof (Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-				Database[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+		? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+				DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
 		: never = never
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-	? (Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-			Database[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+	schema: keyof DatabaseWithoutInternals;
+}
+	? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+			DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
 			Row: infer R;
 		}
 		? R
@@ -878,14 +272,16 @@ export type Tables<
 export type TablesInsert<
 	DefaultSchemaTableNameOrOptions extends
 		| keyof DefaultSchema['Tables']
-		| { schema: keyof Database },
+		| { schema: keyof DatabaseWithoutInternals },
 	TableName extends DefaultSchemaTableNameOrOptions extends {
-		schema: keyof Database;
+		schema: keyof DatabaseWithoutInternals;
 	}
-		? keyof Database[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+		? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
 		: never = never
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-	? Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+	schema: keyof DatabaseWithoutInternals;
+}
+	? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
 			Insert: infer I;
 		}
 		? I
@@ -901,14 +297,16 @@ export type TablesInsert<
 export type TablesUpdate<
 	DefaultSchemaTableNameOrOptions extends
 		| keyof DefaultSchema['Tables']
-		| { schema: keyof Database },
+		| { schema: keyof DatabaseWithoutInternals },
 	TableName extends DefaultSchemaTableNameOrOptions extends {
-		schema: keyof Database;
+		schema: keyof DatabaseWithoutInternals;
 	}
-		? keyof Database[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+		? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
 		: never = never
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-	? Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+	schema: keyof DatabaseWithoutInternals;
+}
+	? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
 			Update: infer U;
 		}
 		? U
@@ -922,14 +320,18 @@ export type TablesUpdate<
 		: never;
 
 export type Enums<
-	DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums'] | { schema: keyof Database },
+	DefaultSchemaEnumNameOrOptions extends
+		| keyof DefaultSchema['Enums']
+		| { schema: keyof DatabaseWithoutInternals },
 	EnumName extends DefaultSchemaEnumNameOrOptions extends {
-		schema: keyof Database;
+		schema: keyof DatabaseWithoutInternals;
 	}
-		? keyof Database[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+		? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
 		: never = never
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-	? Database[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+	schema: keyof DatabaseWithoutInternals;
+}
+	? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
 	: DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
 		? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
 		: never;
@@ -937,14 +339,16 @@ export type Enums<
 export type CompositeTypes<
 	PublicCompositeTypeNameOrOptions extends
 		| keyof DefaultSchema['CompositeTypes']
-		| { schema: keyof Database },
+		| { schema: keyof DatabaseWithoutInternals },
 	CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-		schema: keyof Database;
+		schema: keyof DatabaseWithoutInternals;
 	}
-		? keyof Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+		? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
 		: never = never
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-	? Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+	schema: keyof DatabaseWithoutInternals;
+}
+	? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
 	: PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
 		? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
 		: never;
@@ -953,13 +357,7 @@ export const Constants = {
 	graphql_public: {
 		Enums: {}
 	},
-	pgbouncer: {
-		Enums: {}
-	},
 	public: {
-		Enums: {}
-	},
-	storage: {
 		Enums: {}
 	}
 } as const;

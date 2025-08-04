@@ -36,21 +36,21 @@
 					</Sheet.Description>
 				</Sheet.Header>
 
-				<FormField {form} name="master_name">
+				<FormField {form} name="Title">
 					<FormControl>
 						{#snippet children({ props })}
 							<FormLabel>Master Name</FormLabel>
-							<Input {...props} bind:value={$formData.master_name} />
+							<Input {...props} bind:value={$formData.Title} />
 						{/snippet}
 					</FormControl>
 					<FormFieldErrors />
 				</FormField>
 
-				<FormField {form} name="beschreibung">
+				<FormField {form} name="MasterBeschreibung">
 					<FormControl>
 						{#snippet children({ props })}
 							<FormLabel>Beschreibung</FormLabel>
-							<Textarea {...props} bind:value={$formData.beschreibung} />
+							<Textarea {...props} bind:value={$formData.MasterBeschreibung} />
 						{/snippet}
 					</FormControl>
 					<FormFieldErrors />

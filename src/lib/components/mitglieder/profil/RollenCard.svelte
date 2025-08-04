@@ -2,7 +2,7 @@
 	import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 </script>
 
-<Card>
+<Card class="col-span-2">
 	<CardHeader>
 		<CardTitle>Rollen</CardTitle>
 	</CardHeader>

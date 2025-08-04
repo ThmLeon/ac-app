@@ -7,12 +7,17 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 	if (!user || error) throw redirect(303, '/');
 
 	const { data: userDetails, error: userDetailsError } = await locals.supabase
-		.from('01_mitglieder_mitglieder')
+		.from('1_Mitglieder')
 		.select('*')
-		.eq('id', user.user.id)
+		.eq('UserID', user.user.user_metadata.custom_claims.oid)
 		.single();
 
-	if (!userDetails || error) throw redirect(302, '/');
+	if (!userDetails || userDetailsError) {
+		console.log(user.user);
+		console.log(userDetails);
+		console.log(userDetailsError);
+		throw redirect(302, '/');
+	}
 
 	return { data: { user: user.user, userDetails }, error: false };
 };

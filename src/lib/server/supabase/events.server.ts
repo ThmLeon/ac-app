@@ -5,14 +5,15 @@ import type { NewEventForm } from '@/schemas/newEventSchema';
 
 export async function getAllEventMasters() {
 	let { data, error } = await supabaseServerClient()
-		.from('04_events_master')
-		.select('id, master_name, beschreibung')
-		.order('master_name', { ascending: true });
+		.from('4_eventMaster')
+		.select('ID, Titel, MasterBeschreibung, Eventart')
+		.order('Titel', { ascending: true });
 
 	data = throwFetchErrorIfNeeded(data, error, 'Events Master konnten nicht geladen werden');
 	return data;
 }
 
+/*
 export async function deleteEventMaster(id: string) {
 	const { error } = await supabaseServerClient().from('04_events_master').delete().eq('id', id);
 	return error;
@@ -88,4 +89,4 @@ export async function getEventApplicationState(eventId: string, userId: string) 
 
 	data = throwFetchErrorIfNeeded(data, error, 'Bewerbungsstatus konnte nicht geladen werden');
 	return data;
-}
+}*/
