@@ -1,4 +1,3 @@
-<!--
 <script lang="ts">
 	import EventMasterSheet from '$lib/components/pages/events/master/EventMasterSheet.svelte';
 	import EventMasterList from '$lib/components/pages/events/master/EventMasterList.svelte';
@@ -27,11 +26,11 @@
 	const { form: formData } = form;
 
 	function onEdit(id: number) {
-		const current = data.data.find((eventMaster: { ID: number }) => eventMaster.ID === id);
+		const current = data.data.find((eventMaster: { id: number }) => eventMaster.id === id);
 		if (current) {
 			formData.set({
-				ID: current.ID.toString(),
-				Title: current.Titel!,
+				id: current.id,
+				Titel: current.Titel!,
 				MasterBeschreibung: current.MasterBeschreibung!
 			});
 			sheetStatus = 'edit';
@@ -39,7 +38,7 @@
 	}
 
 	function onAddNew() {
-		formData.set({ ID: '', Title: '', MasterBeschreibung: '' });
+		formData.set({ id: 0, Titel: '', MasterBeschreibung: '' });
 		sheetStatus = 'new';
 	}
 </script>
@@ -52,4 +51,3 @@
 		<EventMasterSheet bind:sheetStatus {form} />
 	</div>
 {/await}
--->

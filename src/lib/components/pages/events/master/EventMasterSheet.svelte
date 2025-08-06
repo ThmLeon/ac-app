@@ -36,11 +36,11 @@
 					</Sheet.Description>
 				</Sheet.Header>
 
-				<FormField {form} name="Title">
+				<FormField {form} name="Titel">
 					<FormControl>
 						{#snippet children({ props })}
 							<FormLabel>Master Name</FormLabel>
-							<Input {...props} bind:value={$formData.Title} />
+							<Input {...props} bind:value={$formData.Titel} />
 						{/snippet}
 					</FormControl>
 					<FormFieldErrors />

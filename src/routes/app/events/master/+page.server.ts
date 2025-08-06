@@ -2,9 +2,22 @@ import type { Actions, PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { eventMasterSchema } from '@/schemas/eventMasterSchema';
-import { getAllEventMasters } from '@/server/supabase/events.server';
-import { returnActionResult } from '@/utils/utils.server';
-import { updateEventMaster } from '@/server/sharepoint/events.server';
+import {
+	addEventMaster as addEventMasterSupabase,
+	getAllEventMasters,
+	deleteEventMaster as deleteEventMasterSupabase,
+	updateEventMaster as updateEventMasterSupabase
+} from '@/server/supabase/events.server';
+import {
+	returnCreateActionResultBoth,
+	returnDeleteActionResultBoth,
+	returnUpdateActionResultBoth
+} from '@/utils/utils.server';
+import {
+	addEventMaster as addEventMasterSharepoint,
+	deleteEventMaster as deleteEventMasterSharepoint,
+	updateEventMaster as updateEventMasterSharepoint
+} from '@/server/sharepoint/events.server';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const data = await getAllEventMasters();
@@ -13,12 +26,13 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	/*deleteEventMaster: async ({ request }) => {
+	deleteEventMaster: async ({ request }) => {
 		const form = await superValidate(request, zod(eventMasterSchema));
 
-		return returnActionResult(
+		return returnDeleteActionResultBoth(
 			form,
-			() => deleteEventMaster(form.data.id),
+			() => deleteEventMasterSharepoint(form.data.id),
+			() => deleteEventMasterSupabase(form.data.id),
 			'Fehler beim Löschen des Events Master',
 			'Event Master erfolgreich gelöscht'
 		);
@@ -27,22 +41,24 @@ export const actions: Actions = {
 	updateEventMaster: async ({ request }) => {
 		const form = await superValidate(request, zod(eventMasterSchema));
 
-		return returnActionResult(
+		return returnUpdateActionResultBoth(
 			form,
-			() => updateEventMaster(form.data),
+			() => updateEventMasterSharepoint(form.data),
+			() => updateEventMasterSupabase(form.data),
 			'Fehler beim Aktualisieren des Events Master',
 			'Event Master erfolgreich aktualisiert'
 		);
-	}
+	},
 
 	addEventMaster: async ({ request }) => {
 		const form = await superValidate(request, zod(eventMasterSchema));
 
-		return returnActionResult(
+		return returnCreateActionResultBoth(
 			form,
-			() => addEventMaster(form.data),
+			() => addEventMasterSharepoint(form.data),
+			(id) => addEventMasterSupabase(form.data, id),
 			'Fehler beim Hinzufügen des Events Master',
 			'Event Master erfolgreich hinzugefügt'
 		);
-	}*/
+	}
 };

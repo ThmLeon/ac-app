@@ -6,39 +6,37 @@ import { fail, error as svelteError } from '@sveltejs/kit';
 
 export async function getAllEventMasters() {
 	let { data, error } = await supabaseServerClient()
-		.from('4_eventMaster')
-		.select('ID, Titel, MasterBeschreibung, Eventart')
-		.order('Titel', { ascending: true });
+		.from('4_EventMaster')
+		.select('id, Titel, MasterBeschreibung, Eventart')
+		.order('Eventart', { ascending: true });
 
 	data = throwFetchErrorIfNeeded(data, error, 'Events Master konnten nicht geladen werden');
 	return data;
 }
 
-export async function deleteEventMaster(id: string) {
-	//const { error } = await supabaseServerClient().from('04_events_master').delete().eq('id', id);
-	//return error;
-	throw svelteError(404, 'Nicht eingerichtet');
+export async function deleteEventMaster(id: number) {
+	const { error } = await supabaseServerClient().from('4_EventMaster').delete().eq('id', id);
+	return error;
 }
 
 export async function updateEventMaster(formData: EventMasterForm) {
-	/*const { error } = await supabaseServerClient()
-		.from('04_events_master')
+	const { error } = await supabaseServerClient()
+		.from('4_EventMaster')
 		.update({
-			master_name: formData.master_name,
-			beschreibung: formData.beschreibung
+			Titel: formData.Titel,
+			MasterBeschreibung: formData.MasterBeschreibung
 		})
 		.eq('id', formData.id);
-	return error;*/
-	throw svelteError(404, 'Nicht eingerichtet');
+	return error;
 }
 
-export async function addEventMaster(formData: EventMasterForm) {
-	/*const { error } = await supabaseServerClient().from('04_events_master').insert({
-		master_name: formData.master_name,
-		beschreibung: formData.beschreibung
+export async function addEventMaster(formData: EventMasterForm, id: number) {
+	const { error } = await supabaseServerClient().from('4_EventMaster').insert({
+		id: id,
+		Titel: formData.Titel,
+		MasterBeschreibung: formData.MasterBeschreibung
 	});
-	return error;*/
-	throw svelteError(404, 'Nicht eingerichtet');
+	return error;
 }
 
 export async function createNewEvent(formData: NewEventForm) {

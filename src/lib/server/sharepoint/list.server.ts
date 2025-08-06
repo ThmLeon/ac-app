@@ -13,69 +13,57 @@ class SharepointList {
 		this.listId = listIds[listName];
 	}
 
-	public async all() {
-		try {
-			const client = await getGraphClient();
-			const response = await client
-				.api(`${this.databaseUrl}${this.listId}/items`)
-				.expand('fields')
-				.get();
-			return response.value;
-		} catch (error: any) {
-			return new Error('Sharepoint Fetch Error');
-		}
-	}
-	public async getByFieldValue(fieldName: string, fieldValue: string) {
-		try {
-			const client = await getGraphClient();
-			const response = await client
-				.api(`${this.databaseUrl}${this.listId}/items`)
-				.filter(`${fieldName} eq '${fieldValue}'`)
-				.expand('fields')
-				.get();
-			return response.value;
-		} catch (error: any) {
-			return new Error('Sharepoint Fetch Error');
-		}
-	}
 	public async create(fields: Record<string, any>) {
+		const copiedFields = { ...fields };
+		delete copiedFields.id;
+		if (copiedFields.Titel) {
+			copiedFields.Title = fields.Titel;
+			delete copiedFields.Titel;
+		}
 		try {
 			const client = await getGraphClient();
 			const response = await client.api(`${this.databaseUrl}${this.listId}/items`).post({
-				fields: fields
+				fields: copiedFields
 			});
-			return response;
+			return response.fields.id as number;
 		} catch (error: any) {
+			console.log('Sharepoint Create Error:', error);
 			return new Error('Sharepoint Fetch Error');
 		}
 	}
-	public async update(itemId: string, fields: Record<string, any>) {
+	public async update(itemId: number, fields: Record<string, any>) {
+		const copiedFields = { ...fields };
+		if (copiedFields.id) {
+			delete copiedFields.id;
+		}
+		if (copiedFields.ID) {
+			delete copiedFields.ID;
+		}
+		if (copiedFields.Titel) {
+			copiedFields.Title = copiedFields.Titel;
+			delete copiedFields.Titel;
+		}
 		try {
 			const client = await getGraphClient();
 			const response = await client
 				.api(`${this.databaseUrl}${this.listId}/items/${itemId}/fields`)
-				.patch(fields);
-			return response;
+				.patch(copiedFields);
+			//everything worked fine, return null
+			return null;
 		} catch (error: any) {
-			console.log(error);
 			return new Error('Sharepoint Update Error');
 		}
 	}
 
-	public static async getListIdByName(listName: string) {
+	public async delete(itemId: number) {
 		try {
 			const client = await getGraphClient();
 			const response = await client
-				.api('/sites/academyconsult.sharepoint.com:/sites/database:/lists')
-				.get();
-
-			const list = response.value?.find(
-				(list: any) => list.name === listName || list.displayName === listName
-			);
-
-			return list ? list.id : null;
+				.api(`${this.databaseUrl}${this.listId}/items/${itemId}`)
+				.delete();
+			return null; //everything worked fine, return null
 		} catch (error: any) {
-			return new Error('Failed to fetch list by name');
+			return new Error('Sharepoint Delete Error');
 		}
 	}
 }
