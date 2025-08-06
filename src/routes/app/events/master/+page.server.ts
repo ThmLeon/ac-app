@@ -31,8 +31,8 @@ export const actions: Actions = {
 
 		return returnDeleteActionResultBoth(
 			form,
-			() => deleteEventMasterSharepoint(form.data.id),
-			() => deleteEventMasterSupabase(form.data.id),
+			() => deleteEventMasterSharepoint(form.data.ID),
+			() => deleteEventMasterSupabase(form.data.ID),
 			'Fehler beim Löschen des Events Master',
 			'Event Master erfolgreich gelöscht'
 		);

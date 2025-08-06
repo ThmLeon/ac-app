@@ -150,7 +150,7 @@ export type Database = {
         Row: {
           created_at: string
           Eventart: Database["public"]["Enums"]["eventart"] | null
-          id: number
+          ID: number
           MasterBeschreibung: string | null
           TeamsWorkspaceURL: string | null
           Titel: string | null
@@ -158,7 +158,7 @@ export type Database = {
         Insert: {
           created_at?: string
           Eventart?: Database["public"]["Enums"]["eventart"] | null
-          id?: number
+          ID?: number
           MasterBeschreibung?: string | null
           TeamsWorkspaceURL?: string | null
           Titel?: string | null
@@ -166,7 +166,7 @@ export type Database = {
         Update: {
           created_at?: string
           Eventart?: Database["public"]["Enums"]["eventart"] | null
-          id?: number
+          ID?: number
           MasterBeschreibung?: string | null
           TeamsWorkspaceURL?: string | null
           Titel?: string | null

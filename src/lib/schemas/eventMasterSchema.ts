@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const eventMasterSchema = z.object({
-	id: z.number(),
+	ID: z.number(),
 	Titel: z
 		.string({ required_error: 'Name darf nicht leer sein' })
 		.min(1, 'Name darf nicht leer sein'),

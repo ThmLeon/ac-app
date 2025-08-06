@@ -26,10 +26,10 @@
 	const { form: formData } = form;
 
 	function onEdit(id: number) {
-		const current = data.data.find((eventMaster: { id: number }) => eventMaster.id === id);
+		const current = data.data.find((eventMaster: { ID: number }) => eventMaster.ID === id);
 		if (current) {
 			formData.set({
-				id: current.id,
+				ID: current.ID,
 				Titel: current.Titel!,
 				MasterBeschreibung: current.MasterBeschreibung!
 			});
@@ -38,7 +38,7 @@
 	}
 
 	function onAddNew() {
-		formData.set({ id: 0, Titel: '', MasterBeschreibung: '' });
+		formData.set({ ID: 0, Titel: '', MasterBeschreibung: '' });
 		sheetStatus = 'new';
 	}
 </script>

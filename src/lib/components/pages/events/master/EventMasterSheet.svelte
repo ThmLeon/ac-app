@@ -27,10 +27,10 @@
 			<div class="grow">
 				<Sheet.Header>
 					<Sheet.Title>
-						{$formData.id ? 'Event Master bearbeiten' : 'Neuen Event Master hinzufügen'}
+						{$formData.ID ? 'Event Master bearbeiten' : 'Neuen Event Master hinzufügen'}
 					</Sheet.Title>
 					<Sheet.Description>
-						{$formData.id
+						{$formData.ID
 							? 'Ändere die Details des Event Masters unten. Klicke auf "Speichern", wenn du fertig bist.'
 							: 'Fülle die Details des neuen Event Masters aus. Klicke auf "Hinzufügen", wenn du fertig bist.'}
 					</Sheet.Description>
@@ -56,10 +56,10 @@
 					<FormFieldErrors />
 				</FormField>
 
-				<FormField {form} name="id">
+				<FormField {form} name="ID">
 					<FormControl>
 						{#snippet children({ props })}
-							<Input {...props} type="hidden" bind:value={$formData.id} />
+							<Input {...props} type="hidden" bind:value={$formData.ID} />
 						{/snippet}
 					</FormControl>
 					<FormFieldErrors />

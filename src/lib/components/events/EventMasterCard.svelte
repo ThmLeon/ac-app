@@ -12,7 +12,7 @@
 	import CardContent from '../ui/card/card-content.svelte';
 
 	export let eventMaster: EventMaster;
-	export let onEdit: (id: EventMaster['id']) => void; // Callback for edit action
+	export let onEdit: (id: EventMaster['ID']) => void; // Callback for edit action
 
 	const eventArtColors = {
 		Netzwerk: 'bg-blue-200 text-blue-800',
@@ -34,6 +34,6 @@
 		{eventMaster.MasterBeschreibung}
 	</CardContent>
 	<CardFooter class="mt-auto flex justify-end pb-4">
-		<Button variant="outline" onclick={() => onEdit(eventMaster.id)}>Bearbeiten</Button>
+		<Button variant="outline" onclick={() => onEdit(eventMaster.ID)}>Bearbeiten</Button>
 	</CardFooter>
 </Card>

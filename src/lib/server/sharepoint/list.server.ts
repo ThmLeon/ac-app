@@ -16,6 +16,7 @@ class SharepointList {
 	public async create(fields: Record<string, any>) {
 		const copiedFields = { ...fields };
 		delete copiedFields.id;
+		delete copiedFields.ID;
 		if (copiedFields.Titel) {
 			copiedFields.Title = fields.Titel;
 			delete copiedFields.Titel;
@@ -51,6 +52,7 @@ class SharepointList {
 			//everything worked fine, return null
 			return null;
 		} catch (error: any) {
+			console.log(error);
 			return new Error('Sharepoint Update Error');
 		}
 	}
