@@ -6,6 +6,10 @@
 	import { type EventMasterForm } from '@/schemas/eventMasterSchema';
 	import { FormControl, FormField, FormFieldErrors, FormLabel } from '@/components/ui/form';
 	import Textarea from '@/components/ui/textarea/textarea.svelte';
+	import { Select } from '@/components/ui/select';
+	import SelectTrigger from '@/components/ui/select/select-trigger.svelte';
+	import SelectContent from '@/components/ui/select/select-content.svelte';
+	import SelectItem from '@/components/ui/select/select-item.svelte';
 
 	export let form: SuperForm<EventMasterForm>;
 	export let sheetStatus: 'new' | 'edit' | 'hidden';
@@ -22,7 +26,7 @@
 		if (!open) sheetStatus = 'hidden';
 	}}
 >
-	<Sheet.Content side="right" class="min-w-[500px] flex flex-col h-full">
+	<Sheet.Content side="right" class="min-w-[500px] flex flex-col h-full p-5">
 		<form method="POST" class="flex flex-col h-full" use:form.enhance>
 			<div class="grow">
 				<Sheet.Header>
@@ -51,6 +55,25 @@
 						{#snippet children({ props })}
 							<FormLabel>Beschreibung</FormLabel>
 							<Textarea {...props} bind:value={$formData.MasterBeschreibung} />
+						{/snippet}
+					</FormControl>
+					<FormFieldErrors />
+				</FormField>
+
+				<FormField {form} name="Eventart">
+					<FormControl>
+						{#snippet children({ props })}
+							<FormLabel>Eventart</FormLabel>
+							<Select type="single" bind:value={$formData.Eventart} name="Eventart">
+								<SelectTrigger class="min-w-40">{$formData.Eventart}</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="HSM">HSM</SelectItem>
+									<SelectItem value="Kuratoren">Kuratoren</SelectItem>
+									<SelectItem value="Netzwerk">Netzwerk</SelectItem>
+									<SelectItem value="Social">Social</SelectItem>
+									<SelectItem value="Sonstiges">Sonstiges</SelectItem>
+								</SelectContent>
+							</Select>
 						{/snippet}
 					</FormControl>
 					<FormFieldErrors />

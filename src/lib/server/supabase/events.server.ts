@@ -23,7 +23,8 @@ export async function updateEventMaster(formData: EventMasterForm) {
 		.from('4_EventMaster')
 		.update({
 			Titel: formData.Titel,
-			MasterBeschreibung: formData.MasterBeschreibung
+			MasterBeschreibung: formData.MasterBeschreibung,
+			Eventart: formData.Eventart
 		})
 		.eq('ID', formData.ID);
 	return error;
@@ -33,7 +34,8 @@ export async function addEventMaster(formData: EventMasterForm, id: number) {
 	const { error } = await supabaseServerClient().from('4_EventMaster').insert({
 		ID: id,
 		Titel: formData.Titel,
-		MasterBeschreibung: formData.MasterBeschreibung
+		MasterBeschreibung: formData.MasterBeschreibung,
+		Eventart: formData.Eventart
 	});
 	return error;
 }

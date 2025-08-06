@@ -31,14 +31,15 @@
 			formData.set({
 				ID: current.ID,
 				Titel: current.Titel!,
-				MasterBeschreibung: current.MasterBeschreibung!
+				MasterBeschreibung: current.MasterBeschreibung!,
+				Eventart: current.Eventart!
 			});
 			sheetStatus = 'edit';
 		}
 	}
 
 	function onAddNew() {
-		formData.set({ ID: 0, Titel: '', MasterBeschreibung: '' });
+		formData.set({ ID: 0, Titel: '', MasterBeschreibung: '', Eventart: 'Sonstiges' });
 		sheetStatus = 'new';
 	}
 </script>
