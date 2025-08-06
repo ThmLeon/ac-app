@@ -1,4 +1,4 @@
-import { superValidate } from 'sveltekit-superforms/server';
+/*import { superValidate } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect, error as svelteError } from '@sveltejs/kit';
 import { newEventSchema } from '@/schemas/newEventSchema';
@@ -22,3 +22,4 @@ export const actions: Actions = {
 		);
 	}
 };
+*/

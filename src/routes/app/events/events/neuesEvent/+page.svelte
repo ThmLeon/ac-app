@@ -1,3 +1,4 @@
+<!--
 <script lang="ts">
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import NewEventForm from '@/components/pages/events/newEvent/newEventForm.svelte';
@@ -31,3 +32,4 @@
 		</CardContent>
 	</Card>
 </div>
+-->

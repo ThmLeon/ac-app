@@ -22,7 +22,7 @@ export const actions: Actions = {
 			'Fehler beim Löschen des Events Master',
 			'Event Master erfolgreich gelöscht'
 		);
-	},*/
+	},
 
 	updateEventMaster: async ({ request }) => {
 		const form = await superValidate(request, zod(eventMasterSchema));
@@ -35,7 +35,7 @@ export const actions: Actions = {
 		);
 	}
 
-	/*addEventMaster: async ({ request }) => {
+	addEventMaster: async ({ request }) => {
 		const form = await superValidate(request, zod(eventMasterSchema));
 
 		return returnActionResult(

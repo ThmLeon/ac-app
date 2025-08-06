@@ -2,6 +2,7 @@ import { throwFetchErrorIfNeeded } from '@/utils/utils.server';
 import { supabaseServerClient } from './supabaseServerClient.server';
 import type { EventMasterForm } from '@/schemas/eventMasterSchema';
 import type { NewEventForm } from '@/schemas/newEventSchema';
+import { fail, error as svelteError } from '@sveltejs/kit';
 
 type CostCenter = {
 	id: string;
@@ -18,7 +19,7 @@ type CostCenterNode = CostCenter & {
 };
 
 export async function getAllCostCentersWithBudgetsBySemester(semester: string) {
-	let { data, error } = await supabaseServerClient()
+	/*let { data, error } = await supabaseServerClient()
 		.from('finanzen_kostenstellen')
 		.select(
 			`id, name, eltern_kostenstelle, rang,
@@ -86,5 +87,6 @@ export async function getAllCostCentersWithBudgetsBySemester(semester: string) {
 	}
 
 	tree.forEach(computeBudgets);
-	return tree;
+	return tree;*/
+	throw svelteError(404, 'Nicht eingerichtet');
 }

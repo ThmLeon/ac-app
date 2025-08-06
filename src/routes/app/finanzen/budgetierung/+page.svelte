@@ -1,3 +1,4 @@
+<!--
 <script lang="ts">
 	import BudgetierungTabelle from '@/components/pages/finanzen/budgetierung/BudgetierungTabelle.svelte';
 
@@ -6,3 +7,5 @@
 </script>
 
 <BudgetierungTabelle {data} />
+
+-->

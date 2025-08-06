@@ -1,3 +1,4 @@
+<!--
 <script lang="ts">
 	import {
 		Card,
@@ -25,8 +26,6 @@
 		eventBewerbung={data.alreadyApplied}
 		bewerbungAktiviert={data.alreadyApplied.length === 0}
 	/>
-
-	<!-- Description Card -->
 	<Card>
 		<CardHeader>
 			<CardTitle class="text-xl font-bold">Beschreibung</CardTitle>
@@ -38,9 +37,7 @@
 		</CardContent>
 	</Card>
 
-	<!-- Two Side-by-Side Cards -->
 	<div class="flex gap-4 w-full">
-		<!-- Organizing Team Card -->
 		<Card class="flex-1">
 			<CardHeader>
 				<CardTitle class="text-xl font-bold">Orga-Team</CardTitle>
@@ -61,7 +58,6 @@
 			</CardContent>
 		</Card>
 
-		<!-- Location Card -->
 		<Card class="w-[350px] shrink-0">
 			<CardHeader>
 				<CardTitle class="text-xl font-bold">Ort</CardTitle>
@@ -73,3 +69,4 @@
 		</Card>
 	</div>
 {/await}
+-->

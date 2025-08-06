@@ -1,6 +1,6 @@
+/*
 import { throwMissingErrorIfNeeded } from '@/utils/utils.server';
 import type { PageServerLoad } from './$types';
-import { fail, error as svelteError } from '@sveltejs/kit';
 import { getEventApplicationState, getEventDetailsById } from '@/server/supabase/events.server';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
@@ -14,4 +14,4 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		eventData: eventData,
 		alreadyApplied: applicationState
 	};
-};
+};*/

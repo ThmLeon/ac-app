@@ -2,6 +2,7 @@ import { throwFetchErrorIfNeeded } from '@/utils/utils.server';
 import { supabaseServerClient } from './supabaseServerClient.server';
 import type { EventMasterForm } from '@/schemas/eventMasterSchema';
 import type { NewEventForm } from '@/schemas/newEventSchema';
+import { fail, error as svelteError } from '@sveltejs/kit';
 
 export async function getAllEventMasters() {
 	let { data, error } = await supabaseServerClient()
@@ -13,33 +14,35 @@ export async function getAllEventMasters() {
 	return data;
 }
 
-/*
 export async function deleteEventMaster(id: string) {
-	const { error } = await supabaseServerClient().from('04_events_master').delete().eq('id', id);
-	return error;
+	//const { error } = await supabaseServerClient().from('04_events_master').delete().eq('id', id);
+	//return error;
+	throw svelteError(404, 'Nicht eingerichtet');
 }
 
 export async function updateEventMaster(formData: EventMasterForm) {
-	const { error } = await supabaseServerClient()
+	/*const { error } = await supabaseServerClient()
 		.from('04_events_master')
 		.update({
 			master_name: formData.master_name,
 			beschreibung: formData.beschreibung
 		})
 		.eq('id', formData.id);
-	return error;
+	return error;*/
+	throw svelteError(404, 'Nicht eingerichtet');
 }
 
 export async function addEventMaster(formData: EventMasterForm) {
-	const { error } = await supabaseServerClient().from('04_events_master').insert({
+	/*const { error } = await supabaseServerClient().from('04_events_master').insert({
 		master_name: formData.master_name,
 		beschreibung: formData.beschreibung
 	});
-	return error;
+	return error;*/
+	throw svelteError(404, 'Nicht eingerichtet');
 }
 
 export async function createNewEvent(formData: NewEventForm) {
-	const { error } = await supabaseServerClient()
+	/*const { error } = await supabaseServerClient()
 		.from('04_events_events')
 		.insert({
 			...formData,
@@ -47,11 +50,12 @@ export async function createNewEvent(formData: NewEventForm) {
 			ende_datum_zeit: formData.ende_datum_zeit.toISOString(),
 			bewerbungs_deadline: formData.bewerbungs_deadline.toISOString()
 		});
-	return error;
+	return error;*/
+	throw svelteError(404, 'Nicht eingerichtet');
 }
 
 export async function getAllEvents(userId: string) {
-	let { data, error } = await supabaseServerClient()
+	/*let { data, error } = await supabaseServerClient()
 		.from('04_events_events')
 		.select(
 			`id, event_master_id, titel, beschreibung, start_datum_zeit, ende_datum_zeit, bewerbungs_deadline, 
@@ -62,11 +66,12 @@ export async function getAllEvents(userId: string) {
 		.eq('event_bewerbung.mitglied_id', userId);
 
 	data = throwFetchErrorIfNeeded(data, error, 'Events konnten nicht geladen werden');
-	return data;
+	return data;*/
+	throw svelteError(404, 'Nicht eingerichtet');
 }
 
 export async function getEventDetailsById(eventId: string) {
-	let { data, error } = await supabaseServerClient()
+	/*let { data, error } = await supabaseServerClient()
 		.from('04_events_events')
 		.select(
 			`id, titel, beschreibung, start_datum_zeit, ende_datum_zeit, bewerbungs_deadline, ort_strasse_hausnummer, ort_plz_stadt, anhang_benoetigt, anhang_beschreibung, bewerbungstext_benoetigt, bewerbungstext_beschreibung,
@@ -77,16 +82,18 @@ export async function getEventDetailsById(eventId: string) {
 		.single();
 
 	data = throwFetchErrorIfNeeded(data, error, 'Event konnte nicht geladen werden');
-	return data;
+	return data;*/
+	throw svelteError(404, 'Nicht eingerichtet');
 }
 
 export async function getEventApplicationState(eventId: string, userId: string) {
-	let { data, error } = await supabaseServerClient()
+	/*let { data, error } = await supabaseServerClient()
 		.from('04_events_bewerbungen')
 		.select('id, besetzt, anwesend')
 		.eq('event_id', eventId)
 		.eq('mitglied_id', userId);
 
 	data = throwFetchErrorIfNeeded(data, error, 'Bewerbungsstatus konnte nicht geladen werden');
-	return data;
-}*/
+	return data;*/
+	throw svelteError(404, 'Nicht eingerichtet');
+}

@@ -1,3 +1,4 @@
+<!--
 <script lang="ts">
 	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
 	import type { PageData } from './$types';
@@ -81,3 +82,4 @@
 		<Button formaction="?/sendApplication" type="submit" class="w-full">Bewerben</Button>
 	</form>
 {/await}
+-->

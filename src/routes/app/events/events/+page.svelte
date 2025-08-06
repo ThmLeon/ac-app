@@ -1,3 +1,4 @@
+<!--
 <script lang="ts">
 	import EventCard from '@/components/events/EventCard.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -6,11 +7,10 @@
 	import type { PageServerData } from './$types';
 
 	//TODO: Filter hinzufügen
-	//TODO: Pagination oder nachladen einbauen --> sodass nicht alle events geladen werden
+	//TODO: Pagination oder nachladen einbauen sodass nicht alle events geladen werden
 	export let data: PageServerData;
 </script>
 
-<!-- Filter and Add Event Section -->
 <div class="container mx-auto pt-5">
 	<div class="flex justify-between items-center">
 		<a href={`./events/neuesEvent`}>
@@ -42,7 +42,6 @@
 	</div>
 </div>
 
-<!--TODO: if event is empty (none is shown) then show "no event with current filter found"-->
 <div class="container mx-auto p-4 space-y-4">
 	{#each data.data as event}
 		<EventCard
@@ -58,3 +57,4 @@
 		/>
 	{/each}
 </div>
+-->

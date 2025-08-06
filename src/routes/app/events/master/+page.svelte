@@ -1,3 +1,4 @@
+<!--
 <script lang="ts">
 	import EventMasterSheet from '$lib/components/pages/events/master/EventMasterSheet.svelte';
 	import EventMasterList from '$lib/components/pages/events/master/EventMasterList.svelte';
@@ -51,3 +52,4 @@
 		<EventMasterSheet bind:sheetStatus {form} />
 	</div>
 {/await}
+-->

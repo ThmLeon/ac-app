@@ -1,4 +1,4 @@
-import { throwMissingErrorIfNeeded } from '@/utils/utils.server';
+/*import { throwMissingErrorIfNeeded } from '@/utils/utils.server';
 import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect, error as svelteError } from '@sveltejs/kit';
 import { getEventApplicationState, getEventDetailsById } from '@/server/supabase/events.server';
@@ -77,4 +77,4 @@ export const actions: Actions = {
 		}
 		return { success: true, message: 'Bewerbung erfolgreich gesendet' };
 	}
-};
+};*/
