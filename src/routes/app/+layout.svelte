@@ -18,10 +18,7 @@
 <Toaster position="top-right" />
 
 <SidebarProvider>
-	<AppSidebar
-		name={data.data.userDetails.vorname + ' ' + data.data.userDetails.nachname}
-		avatarUrl=""
-	/>
+	<AppSidebar name={data.data.vorname + ' ' + data.data.nachname} avatarUrl="" />
 	<SidebarInset>
 		<header
 			class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12"

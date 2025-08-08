@@ -1,6 +1,7 @@
 import { type Handle, redirect } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import SupabaseServerClient from '@/server/supabase/supabaseServerClient.server';
+import { fail, error as svelteError } from '@sveltejs/kit';
 
 const supabase: Handle = async ({ event, resolve }) => {
 	if (event.url.pathname.startsWith('/.well-known/appspecific/com.chrome.devtools')) {
@@ -61,6 +62,28 @@ const authGuard: Handle = async ({ event, resolve }) => {
 
 	if (event.locals.session && event.url.pathname === '/auth') {
 		redirect(303, '/private');
+	}
+
+	const userDetailsCookie = event.cookies.get('userDetails');
+	const oid = event.locals.user?.user_metadata?.custom_claims.oid;
+	if (!userDetailsCookie && oid) {
+		console.log('REFETCH');
+		const { error: userDetailsError, data: userDetails } = await event.locals.supabase
+			.from('1_Mitglieder')
+			.select('ID, Vorname, Nachname, Titel')
+			.eq('UserID', oid)
+			.single();
+
+		if (userDetailsError) {
+			console.log(userDetailsError);
+			svelteError(500, 'Error fetching user details');
+		} else {
+			event.cookies.set('userDetails', JSON.stringify(userDetails), {
+				httpOnly: true,
+				path: '/',
+				maxAge: 60 * 60 // 1 hour
+			});
+		}
 	}
 
 	return resolve(event);

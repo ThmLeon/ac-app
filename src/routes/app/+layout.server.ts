@@ -1,23 +1,11 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
+import { error as svelteError } from '@sveltejs/kit';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
-	const { data: user, error } = await locals.supabase.auth.getUser();
+	const fullName = locals.user?.user_metadata.full_name;
 
-	if (!user || error) throw redirect(303, '/');
+	if (!fullName) return svelteError(401, 'Unauthorized');
 
-	const { data: userDetails, error: userDetailsError } = await locals.supabase
-		.from('1_Mitglieder')
-		.select('*')
-		.eq('UserID', user.user.user_metadata.custom_claims.oid)
-		.single();
-
-	if (!userDetails || userDetailsError) {
-		console.log(user.user);
-		console.log(userDetails);
-		console.log(userDetailsError);
-		throw redirect(302, '/');
-	}
-
-	return { data: { user: user.user, userDetails }, error: false };
+	return { data: { vorname: fullName.split(' ')[0], nachname: fullName.split(' ')[1] } };
 };
