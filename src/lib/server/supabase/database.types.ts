@@ -17,20 +17,19 @@ export type Database = {
       "1_Mitglieder": {
         Row: {
           Anwaertergeneration: string | null
-          Art: string | null
+          Art:
+            | Database["public"]["Enums"]["MitgliedsstatusAktivPassivEhemalig"]
+            | null
           Aufnahmedatum: string | null
           AusnahmeMVs: boolean | null
+          AusnahmeVBTs: boolean | null
           AzureSync: boolean | null
-          Beraterstufe: string | null
+          Beraterstufe: Database["public"]["Enums"]["Beraterstufe"] | null
           BIC: string | null
           CollmexID: number | null
           created_at: string
           EmailAC: string | null
           EmailPrivat: string | null
-          Erstellt: string | null
-          "Erstellt von": string | null
-          Geändert: string | null
-          "Geändert von": string | null
           Geburtstag: string | null
           Generation: number | null
           Handy: string | null
@@ -47,33 +46,35 @@ export type Database = {
           Nachname: string | null
           PassivScoreAusnahme: boolean | null
           Postleitzahl: string | null
-          Rolle: string | null
+          Rolle:
+            | Database["public"]["Enums"]["MitgliedsrolleAlumniAnwaerterMitglied"]
+            | null
           Rueckkehrdatum: string | null
           Stadt: string | null
           Steuernummer: string | null
           Strasse: string | null
+          Titel: string | null
           Traineegeneration: string | null
-          TransponderID: number | null
+          TransponderID: string | null
           UserID: string | null
           Vorname: string | null
           Weiblich: boolean | null
         }
         Insert: {
           Anwaertergeneration?: string | null
-          Art?: string | null
+          Art?:
+            | Database["public"]["Enums"]["MitgliedsstatusAktivPassivEhemalig"]
+            | null
           Aufnahmedatum?: string | null
           AusnahmeMVs?: boolean | null
+          AusnahmeVBTs?: boolean | null
           AzureSync?: boolean | null
-          Beraterstufe?: string | null
+          Beraterstufe?: Database["public"]["Enums"]["Beraterstufe"] | null
           BIC?: string | null
           CollmexID?: number | null
           created_at?: string
           EmailAC?: string | null
           EmailPrivat?: string | null
-          Erstellt?: string | null
-          "Erstellt von"?: string | null
-          Geändert?: string | null
-          "Geändert von"?: string | null
           Geburtstag?: string | null
           Generation?: number | null
           Handy?: string | null
@@ -90,33 +91,35 @@ export type Database = {
           Nachname?: string | null
           PassivScoreAusnahme?: boolean | null
           Postleitzahl?: string | null
-          Rolle?: string | null
+          Rolle?:
+            | Database["public"]["Enums"]["MitgliedsrolleAlumniAnwaerterMitglied"]
+            | null
           Rueckkehrdatum?: string | null
           Stadt?: string | null
           Steuernummer?: string | null
           Strasse?: string | null
+          Titel?: string | null
           Traineegeneration?: string | null
-          TransponderID?: number | null
+          TransponderID?: string | null
           UserID?: string | null
           Vorname?: string | null
           Weiblich?: boolean | null
         }
         Update: {
           Anwaertergeneration?: string | null
-          Art?: string | null
+          Art?:
+            | Database["public"]["Enums"]["MitgliedsstatusAktivPassivEhemalig"]
+            | null
           Aufnahmedatum?: string | null
           AusnahmeMVs?: boolean | null
+          AusnahmeVBTs?: boolean | null
           AzureSync?: boolean | null
-          Beraterstufe?: string | null
+          Beraterstufe?: Database["public"]["Enums"]["Beraterstufe"] | null
           BIC?: string | null
           CollmexID?: number | null
           created_at?: string
           EmailAC?: string | null
           EmailPrivat?: string | null
-          Erstellt?: string | null
-          "Erstellt von"?: string | null
-          Geändert?: string | null
-          "Geändert von"?: string | null
           Geburtstag?: string | null
           Generation?: number | null
           Handy?: string | null
@@ -133,13 +136,16 @@ export type Database = {
           Nachname?: string | null
           PassivScoreAusnahme?: boolean | null
           Postleitzahl?: string | null
-          Rolle?: string | null
+          Rolle?:
+            | Database["public"]["Enums"]["MitgliedsrolleAlumniAnwaerterMitglied"]
+            | null
           Rueckkehrdatum?: string | null
           Stadt?: string | null
           Steuernummer?: string | null
           Strasse?: string | null
+          Titel?: string | null
           Traineegeneration?: string | null
-          TransponderID?: number | null
+          TransponderID?: string | null
           UserID?: string | null
           Vorname?: string | null
           Weiblich?: boolean | null
@@ -149,7 +155,7 @@ export type Database = {
       "4_EventMaster": {
         Row: {
           created_at: string
-          Eventart: Database["public"]["Enums"]["eventart"] | null
+          Eventart: Database["public"]["Enums"]["Eventart"] | null
           ID: number
           MasterBeschreibung: string | null
           TeamsWorkspaceURL: string | null
@@ -157,7 +163,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          Eventart?: Database["public"]["Enums"]["eventart"] | null
+          Eventart?: Database["public"]["Enums"]["Eventart"] | null
           ID?: number
           MasterBeschreibung?: string | null
           TeamsWorkspaceURL?: string | null
@@ -165,7 +171,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          Eventart?: Database["public"]["Enums"]["eventart"] | null
+          Eventart?: Database["public"]["Enums"]["Eventart"] | null
           ID?: number
           MasterBeschreibung?: string | null
           TeamsWorkspaceURL?: string | null
@@ -229,7 +235,16 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      eventart: "Netzwerk" | "Social" | "Kuratoren" | "HSM" | "Sonstiges"
+      Beraterstufe:
+        | "Junior Consultant"
+        | "Consultant"
+        | "Senior Consultant"
+        | "Managing Consultant"
+        | "Director"
+        | "Senior Director"
+      Eventart: "Netzwerk" | "Social" | "Kuratoren" | "HSM" | "Sonstiges"
+      MitgliedsrolleAlumniAnwaerterMitglied: "Mitglied" | "Anwärter" | "Alumni"
+      MitgliedsstatusAktivPassivEhemalig: "Aktiv" | "Passiv" | "Ehemalig"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -357,7 +372,17 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      eventart: ["Netzwerk", "Social", "Kuratoren", "HSM", "Sonstiges"],
+      Beraterstufe: [
+        "Junior Consultant",
+        "Consultant",
+        "Senior Consultant",
+        "Managing Consultant",
+        "Director",
+        "Senior Director",
+      ],
+      Eventart: ["Netzwerk", "Social", "Kuratoren", "HSM", "Sonstiges"],
+      MitgliedsrolleAlumniAnwaerterMitglied: ["Mitglied", "Anwärter", "Alumni"],
+      MitgliedsstatusAktivPassivEhemalig: ["Aktiv", "Passiv", "Ehemalig"],
     },
   },
 } as const
