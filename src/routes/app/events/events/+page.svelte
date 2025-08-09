@@ -1,14 +1,52 @@
-<!--
 <script lang="ts">
 	import EventCard from '@/components/events/EventCard.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
-	import type { PageServerData } from './$types';
+	import { inview } from 'svelte-inview';
+	import { onMount } from 'svelte';
+	import { superForm } from 'sveltekit-superforms/client';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { filterEventsSchema } from '@/schemas/filterEventsSchema';
 
-	//TODO: Filter hinzufügen
-	//TODO: Pagination oder nachladen einbauen sodass nicht alle events geladen werden
-	export let data: PageServerData;
+	let isLoading = false;
+	const { form } = superForm(filterEventsSchema.parse({}), {
+		validators: zodClient(filterEventsSchema)
+	});
+
+	let allEvents: any = [];
+
+	onMount(async () => {
+		await loadEvents(false);
+	});
+
+	async function loadEvents(filterChange: boolean) {
+		isLoading = true;
+
+		if (filterChange) {
+			$form.skip = 0;
+			$form.limit = 10;
+		} else {
+			$form.skip = allEvents.length;
+			$form.limit = allEvents.length + 10;
+		}
+
+		const formData = new FormData();
+		Object.entries($form).forEach(([key, value]) => {
+			formData.set(key, String(value));
+		});
+
+		const response = await fetch('?/', {
+			method: 'POST',
+			body: formData
+		});
+		if (filterChange) {
+			allEvents = (await response.json()).events;
+		} else {
+			allEvents = [...allEvents, ...(await response.json()).events];
+		}
+		isLoading = false;
+	}
 </script>
 
 <div class="container mx-auto pt-5">
@@ -17,44 +55,66 @@
 			<Button variant="default">Neues Event hinzufügen</Button>
 		</a>
 
-		<div class="flex items-center gap-4">
-			<Input type="text" placeholder="Nach Name filtern..." class="w-64" />
+		<form>
+			<div class="flex items-center gap-4">
+				<Input
+					type="text"
+					placeholder="Nach Name filtern..."
+					class="w-64"
+					bind:value={$form.textSearch}
+					oninput={() => loadEvents(true)}
+				/>
 
-			<Select type="single">
-				<SelectTrigger class="w-48">Datum</SelectTrigger>
-				<SelectContent>
-					<SelectItem value="all">Alle</SelectItem>
-					<SelectItem value="upcoming">Kommende Events</SelectItem>
-					<SelectItem value="past">Vergangene Events</SelectItem>
-				</SelectContent>
-			</Select>
+				<Select type="single" bind:value={$form.dateFilter} onValueChange={() => loadEvents(true)}>
+					<SelectTrigger class="w-48">Datum</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Alle</SelectItem>
+						<SelectItem value="upcoming">Kommende Events</SelectItem>
+						<SelectItem value="past">Vergangene Events</SelectItem>
+					</SelectContent>
+				</Select>
 
-			<Select type="single">
-				<SelectTrigger class="w-48">Bewerbungsstatus</SelectTrigger>
-				<SelectContent>
-					<SelectItem value="offen">Offene Events</SelectItem>
-					<SelectItem value="beworben">Beworben</SelectItem>
-					<SelectItem value="besetzt">Besetzt</SelectItem>
-					<SelectItem value="anwesend">Anwesend</SelectItem>
-				</SelectContent>
-			</Select>
-		</div>
+				<Select
+					type="single"
+					bind:value={$form.statusFilter}
+					onValueChange={() => loadEvents(true)}
+				>
+					<SelectTrigger class="w-48">Bewerbungsstatus</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Alle</SelectItem>
+						<SelectItem value="beworben">Beworben</SelectItem>
+						<SelectItem value="besetzt">Besetzt</SelectItem>
+						<SelectItem value="anwesend">Anwesend</SelectItem>
+					</SelectContent>
+				</Select>
+			</div>
+		</form>
 	</div>
 </div>
 
 <div class="container mx-auto p-4 space-y-4">
-	{#each data.data as event}
-		<EventCard
-			imageUrl="https://placehold.co/1600x1000"
-			title={event.titel}
-			description={event.beschreibung}
-			startDate={event.start_datum_zeit}
-			endDate={event.ende_datum_zeit}
-			applicationDeadline={event.bewerbungs_deadline}
-			eventBewerbung={event.event_bewerbung}
-			masterName={event.event_master.master_name}
-			eventId={event.id}
-		/>
+	{#each allEvents as event, index}
+		<EventCard imageURL="https://placehold.co/1600x1000" {event} />
+		{#if index === allEvents.length - 4}
+			<div
+				use:inview
+				on:inview_change={(event) => {
+					const { inView } = event.detail;
+					if (inView && !isLoading) {
+						loadEvents(false);
+					}
+				}}
+			></div>
+		{/if}
 	{/each}
+
+	{#if isLoading}
+		<div class="text-center py-4">
+			<p>Lade weitere Events...</p>
+		</div>
+	{:else if allEvents.length === 0}
+		<div class="text-center py-4">
+			<p>Keine Events gefunden.</p>
+		</div>
+	{/if}
 </div>
--->

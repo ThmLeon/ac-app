@@ -117,7 +117,7 @@ export async function returnCreateActionResultBoth(
 	return message(form, successMessage);
 }
 
-export function throwMissingErrorIfNeeded(argument: string | undefined): string {
+export function throwMissingErrorIfNeeded<T>(argument: T | undefined): T {
 	if (!argument) {
 		throw svelteError(400, { message: 'Fehler in den Daten' });
 	} else {

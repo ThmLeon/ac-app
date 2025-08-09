@@ -67,7 +67,6 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	const userDetailsCookie = event.cookies.get('userDetails');
 	const oid = event.locals.user?.user_metadata?.custom_claims.oid;
 	if (!userDetailsCookie && oid) {
-		console.log('REFETCH');
 		const { error: userDetailsError, data: userDetails } = await event.locals.supabase
 			.from('1_Mitglieder')
 			.select('ID, Vorname, Nachname, Titel')
@@ -75,7 +74,6 @@ const authGuard: Handle = async ({ event, resolve }) => {
 			.single();
 
 		if (userDetailsError) {
-			console.log(userDetailsError);
 			svelteError(500, 'Error fetching user details');
 		} else {
 			event.cookies.set('userDetails', JSON.stringify(userDetails), {
@@ -85,6 +83,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
 			});
 		}
 	}
+	event.locals.userDetails = JSON.parse(event.cookies.get('userDetails') || '{}');
 
 	return resolve(event);
 };

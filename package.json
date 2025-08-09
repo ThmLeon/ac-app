@@ -12,7 +12,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
-		"genSupabaseTypes": "supabase gen types typescript --project-id cvtgbcawyzxelwgnjsrj --schema public > src/lib/server/supabase/database.types.ts"
+		"genSupabaseTypes": "supabase gen types typescript --project-id cvtgbcawyzxelwgnjsrj --schema public > src/lib/database.types.ts"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
@@ -72,6 +72,7 @@
 		"date-fns": "^4.1.0",
 		"isomorphic-fetch": "^3.0.0",
 		"jwt-decode": "^4.0.0",
+		"svelte-inview": "^4.0.4",
 		"svelte-ux": "^1.0.7"
 	}
 }

@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-	import type { Database } from '@/server/supabase/database.types';
+	import type { Database } from '@/database.types';
 
 	//generate the type from database for a row from 04_EventMaster
 	export type EventMaster = Pick<

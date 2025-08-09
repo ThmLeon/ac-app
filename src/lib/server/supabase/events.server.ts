@@ -3,6 +3,7 @@ import { supabaseServerClient } from './supabaseServerClient.server';
 import type { EventMasterForm } from '@/schemas/eventMasterSchema';
 import type { NewEventForm } from '@/schemas/newEventSchema';
 import { fail, error as svelteError } from '@sveltejs/kit';
+import type { FilterEventsSchema } from '@/schemas/filterEventsSchema';
 
 export async function getAllEventMasters() {
 	let { data, error } = await supabaseServerClient()
@@ -53,20 +54,43 @@ export async function createNewEvent(formData: NewEventForm) {
 	throw svelteError(404, 'Nicht eingerichtet');
 }
 
-export async function getAllEvents(userId: string) {
-	/*let { data, error } = await supabaseServerClient()
-		.from('04_events_events')
+export async function getAllEventsPaginated(formData: FilterEventsSchema, userId: number) {
+	let query = supabaseServerClient()
+		.from('4_Events')
 		.select(
-			`id, event_master_id, titel, beschreibung, start_datum_zeit, ende_datum_zeit, bewerbungs_deadline, 
-			event_master:04_events_master(master_name),
-			event_bewerbung:04_events_bewerbungen(id, mitglied_id, besetzt, anwesend)
+			`ID, Titel, Beschreibung, Beginn, Ende, Bewerbungsdeadline, 
+			eventMaster:4_EventMaster(Titel),
+			eventBewerbungen:4_EventBewerbungen(ID, MitgliedID, Besetzt, Anwesend)
 			`
 		)
-		.eq('event_bewerbung.mitglied_id', userId);
+		.eq('eventBewerbungen.MitgliedID', userId)
+		.order('Beginn', { ascending: false })
+		.range(formData.skip, formData.limit);
 
+	if (formData.textSearch) query = query.ilike('Titel', `%${formData.textSearch}%`);
+	switch (formData.dateFilter) {
+		case 'upcoming':
+			query = query.gte('Beginn', new Date().toISOString());
+			break;
+		case 'past':
+			query = query.lt('Beginn', new Date().toISOString());
+			break;
+	}
+	switch (formData.statusFilter) {
+		case 'beworben':
+			query = query.eq('eventBewerbungen.Beworben', true);
+			break;
+		case 'besetzt':
+			query = query.eq('eventBewerbungen.Besetzt', true);
+			break;
+		case 'anwesend':
+			query = query.eq('eventBewerbungen.Anwesend', true);
+			break;
+	}
+
+	let { data, error } = await query;
 	data = throwFetchErrorIfNeeded(data, error, 'Events konnten nicht geladen werden');
-	return data;*/
-	throw svelteError(404, 'Nicht eingerichtet');
+	return data;
 }
 
 export async function getEventDetailsById(eventId: string) {

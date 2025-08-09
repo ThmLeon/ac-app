@@ -1,12 +1,13 @@
-/*import { throwMissingErrorIfNeeded } from '@/utils/utils.server';
-import type { PageServerLoad } from './$types';
-import { error as svelteError } from '@sveltejs/kit';
-import { getAllEvents } from '@/server/supabase/events.server';
+import { returnActionResult, throwMissingErrorIfNeeded } from '@/utils/utils.server';
+import type { Actions, PageServerLoad } from './$types';
+import { getAllEventsPaginated } from '@/server/supabase/events.server';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	const userId = throwMissingErrorIfNeeded(locals.user?.id);
+export const load: PageServerLoad = async ({ url, locals }: Parameters<PageServerLoad>[0]) => {
+	/*const userId = throwMissingErrorIfNeeded(locals.userDetails?.ID);
+	const skip = 0;
+	const limit = 10;
 
-	const data = await getAllEvents(userId);
+	const data = await getAllEventsPaginated(userId, skip, limit, '');
 
-	return { data };
-};*/
+	return { data };*/
+};

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Database } from '@/server/supabase/database.types';
+import type { Database } from '@/database.types';
 
 export type EventArt = Database['public']['Enums']['Eventart'];
 const eventArtEnumValues: EventArt[] = ['HSM', 'Kuratoren', 'Netzwerk', 'Social', 'Sonstiges'];

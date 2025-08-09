@@ -152,6 +152,63 @@ export type Database = {
         }
         Relationships: []
       }
+      "4_EventBewerbungen": {
+        Row: {
+          Anwesend: boolean | null
+          Besetzt: boolean | null
+          BewerbungText: string | null
+          created_at: string
+          Essgewohnheiten: string | null
+          EventID: number | null
+          HSMScore: number | null
+          ID: number
+          MitgliedID: number | null
+          SEPAMandat: boolean | null
+          Titel: string | null
+        }
+        Insert: {
+          Anwesend?: boolean | null
+          Besetzt?: boolean | null
+          BewerbungText?: string | null
+          created_at?: string
+          Essgewohnheiten?: string | null
+          EventID?: number | null
+          HSMScore?: number | null
+          ID?: number
+          MitgliedID?: number | null
+          SEPAMandat?: boolean | null
+          Titel?: string | null
+        }
+        Update: {
+          Anwesend?: boolean | null
+          Besetzt?: boolean | null
+          BewerbungText?: string | null
+          created_at?: string
+          Essgewohnheiten?: string | null
+          EventID?: number | null
+          HSMScore?: number | null
+          ID?: number
+          MitgliedID?: number | null
+          SEPAMandat?: boolean | null
+          Titel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "4_EventBewerbungen_EventID_fkey"
+            columns: ["EventID"]
+            isOneToOne: false
+            referencedRelation: "4_Events"
+            referencedColumns: ["ID"]
+          },
+          {
+            foreignKeyName: "4_EventBewerbungen_MitgliedID_fkey"
+            columns: ["MitgliedID"]
+            isOneToOne: false
+            referencedRelation: "1_Mitglieder"
+            referencedColumns: ["ID"]
+          },
+        ]
+      }
       "4_EventMaster": {
         Row: {
           created_at: string
@@ -178,6 +235,146 @@ export type Database = {
           Titel?: string | null
         }
         Relationships: []
+      }
+      "4_Events": {
+        Row: {
+          AngabeEssgewGewuenscht: string | null
+          AnlageGewuenscht: boolean | null
+          AnlageInhalte: string | null
+          Anmeldeart: Database["public"]["Enums"]["EventAnmeldeart"] | null
+          Beginn: string | null
+          Beschreibung: string | null
+          Bewerbungsdeadline: string | null
+          BewerbungstextGewuenscht: boolean | null
+          BewTextVorgabe: string | null
+          CheckInBeginn: string | null
+          created_at: string
+          Ende: string | null
+          FCFSSlots: number | null
+          HSMPoints: number | null
+          ID: number
+          IsVisible: boolean | null
+          KostenEUR: number | null
+          KostenString: string | null
+          LinkOnlineDokument: string | null
+          MasterEventID: number | null
+          Ort: string | null
+          Postleitzahl: string | null
+          Semester: string | null
+          StrasseHausnummer: string | null
+          Titel: string | null
+        }
+        Insert: {
+          AngabeEssgewGewuenscht?: string | null
+          AnlageGewuenscht?: boolean | null
+          AnlageInhalte?: string | null
+          Anmeldeart?: Database["public"]["Enums"]["EventAnmeldeart"] | null
+          Beginn?: string | null
+          Beschreibung?: string | null
+          Bewerbungsdeadline?: string | null
+          BewerbungstextGewuenscht?: boolean | null
+          BewTextVorgabe?: string | null
+          CheckInBeginn?: string | null
+          created_at?: string
+          Ende?: string | null
+          FCFSSlots?: number | null
+          HSMPoints?: number | null
+          ID?: number
+          IsVisible?: boolean | null
+          KostenEUR?: number | null
+          KostenString?: string | null
+          LinkOnlineDokument?: string | null
+          MasterEventID?: number | null
+          Ort?: string | null
+          Postleitzahl?: string | null
+          Semester?: string | null
+          StrasseHausnummer?: string | null
+          Titel?: string | null
+        }
+        Update: {
+          AngabeEssgewGewuenscht?: string | null
+          AnlageGewuenscht?: boolean | null
+          AnlageInhalte?: string | null
+          Anmeldeart?: Database["public"]["Enums"]["EventAnmeldeart"] | null
+          Beginn?: string | null
+          Beschreibung?: string | null
+          Bewerbungsdeadline?: string | null
+          BewerbungstextGewuenscht?: boolean | null
+          BewTextVorgabe?: string | null
+          CheckInBeginn?: string | null
+          created_at?: string
+          Ende?: string | null
+          FCFSSlots?: number | null
+          HSMPoints?: number | null
+          ID?: number
+          IsVisible?: boolean | null
+          KostenEUR?: number | null
+          KostenString?: string | null
+          LinkOnlineDokument?: string | null
+          MasterEventID?: number | null
+          Ort?: string | null
+          Postleitzahl?: string | null
+          Semester?: string | null
+          StrasseHausnummer?: string | null
+          Titel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "4_Events_MasterEventID_fkey"
+            columns: ["MasterEventID"]
+            isOneToOne: false
+            referencedRelation: "4_EventMaster"
+            referencedColumns: ["ID"]
+          },
+        ]
+      }
+      "4_EventVerantwortliche": {
+        Row: {
+          Besetzt: boolean | null
+          BewerbungText: string | null
+          created_at: string
+          Essgewohnheiten: string | null
+          EventID: number | null
+          ID: number
+          MitgliedID: number | null
+          Titel: string | null
+        }
+        Insert: {
+          Besetzt?: boolean | null
+          BewerbungText?: string | null
+          created_at?: string
+          Essgewohnheiten?: string | null
+          EventID?: number | null
+          ID?: number
+          MitgliedID?: number | null
+          Titel?: string | null
+        }
+        Update: {
+          Besetzt?: boolean | null
+          BewerbungText?: string | null
+          created_at?: string
+          Essgewohnheiten?: string | null
+          EventID?: number | null
+          ID?: number
+          MitgliedID?: number | null
+          Titel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "4_EventVerantwortliche_EventID_fkey"
+            columns: ["EventID"]
+            isOneToOne: false
+            referencedRelation: "4_Events"
+            referencedColumns: ["ID"]
+          },
+          {
+            foreignKeyName: "4_EventVerantwortliche_MitgliedID_fkey"
+            columns: ["MitgliedID"]
+            isOneToOne: false
+            referencedRelation: "1_Mitglieder"
+            referencedColumns: ["ID"]
+          },
+        ]
       }
       gocardless_tokens: {
         Row: {
@@ -242,6 +439,7 @@ export type Database = {
         | "Managing Consultant"
         | "Director"
         | "Senior Director"
+      EventAnmeldeart: "Bewerben" | "Einschreiben" | "FCFS"
       Eventart: "Netzwerk" | "Social" | "Kuratoren" | "HSM" | "Sonstiges"
       MitgliedsrolleAlumniAnwaerterMitglied: "Mitglied" | "Anwärter" | "Alumni"
       MitgliedsstatusAktivPassivEhemalig: "Aktiv" | "Passiv" | "Ehemalig"
@@ -380,6 +578,7 @@ export const Constants = {
         "Director",
         "Senior Director",
       ],
+      EventAnmeldeart: ["Bewerben", "Einschreiben", "FCFS"],
       Eventart: ["Netzwerk", "Social", "Kuratoren", "HSM", "Sonstiges"],
       MitgliedsrolleAlumniAnwaerterMitglied: ["Mitglied", "Anwärter", "Alumni"],
       MitgliedsstatusAktivPassivEhemalig: ["Aktiv", "Passiv", "Ehemalig"],
