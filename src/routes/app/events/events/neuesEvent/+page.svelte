@@ -23,8 +23,6 @@
 	const { form: formData } = form;
 </script>
 
-<SuperDebug data={$formData} />
-
 <div class="container mx-auto py-8 px-4 max-w-2xl">
 	<Card>
 		<CardHeader>

@@ -74,7 +74,7 @@ export const newEventSchema = z
 			invalid_type_error: 'Semester muss ein Text sein.'
 		}),
 		Postleitzahl: z
-			.number({
+			.string({
 				required_error: 'Postleitzahl ist erforderlich.',
 				invalid_type_error: 'Postleitzahl muss eine Zahl sein.'
 			})

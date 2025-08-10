@@ -68,6 +68,29 @@ class SharepointList {
 			return new Error('Sharepoint Delete Error');
 		}
 	}
+
+	// Returns the list's columns (fields). Set includeHidden=false to exclude hidden columns.
+	public async getFields(includeHidden: boolean = true) {
+		try {
+			const client = await getGraphClient();
+			const base = `${this.databaseUrl}${this.listId}/columns`;
+			const url = includeHidden ? base : `${base}?$filter=hidden eq false`;
+			const response = await client.api(url).get();
+			return response.value as Array<{
+				id: string;
+				name: string; // internal name
+				displayName?: string;
+				hidden?: boolean;
+				required?: boolean;
+				indexed?: boolean;
+				description?: string;
+				columnGroup?: string;
+			}>;
+		} catch (error: any) {
+			console.log('Sharepoint Get Fields Error:', error);
+			return new Error('Sharepoint Fetch Error');
+		}
+	}
 }
 
 export default SharepointList;

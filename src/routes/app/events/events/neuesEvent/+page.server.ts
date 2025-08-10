@@ -24,13 +24,14 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions: Actions = {
 	createNewEvent: async ({ request }) => {
 		const form = await superValidate(request, zod(newEventSchema));
+		console.log('Anmeldeart' + form.data.Anmeldeart);
 
 		return returnCreateActionResultBoth(
 			form,
 			() => createNewEventSharepoint(form.data),
 			(id) => createNewEventSupabase(form.data, id),
-			'Fehler beim Hinzufügen des Events Master',
-			'Event Master erfolgreich hinzugefügt'
+			'Fehler beim Hinzufügen des Events',
+			'Event erfolgreich hinzugefügt'
 		);
 	}
 };

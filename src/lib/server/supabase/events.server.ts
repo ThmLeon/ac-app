@@ -14,6 +14,20 @@ export async function getAllEventMasters() {
 	return data;
 }
 
+export async function getEventMasterById(id: number) {
+	let { data, error } = await supabaseServerClient()
+		.from('4_EventMaster')
+		.select('Eventart')
+		.eq('ID', id)
+		.single();
+
+	console.log(id);
+
+	console.log(error, data);
+	data = throwFetchErrorIfNeeded(data, error, 'Event Master konnte nicht geladen werden');
+	return data;
+}
+
 export async function deleteEventMaster(id: number) {
 	const { error } = await supabaseServerClient().from('4_EventMaster').delete().eq('ID', id);
 	return error;

@@ -24,8 +24,7 @@
 		{eventData}
 		alreadyApplied={data.alreadyApplied}
 		bewerbungAktiviert={data.alreadyApplied.length === 0 &&
-			!!eventData.Bewerbungsdeadline &&
-			new Date(eventData.Bewerbungsdeadline) > new Date()}
+			(!eventData.Bewerbungsdeadline || new Date(eventData.Bewerbungsdeadline!) > new Date())}
 	/>
 	<Card>
 		<CardHeader>

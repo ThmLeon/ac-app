@@ -18,7 +18,7 @@
 		BewTextVorgabe: string | null;
 		AnlageGewuenscht: boolean | null;
 		AnlageInhalte: string | null;
-		AngabeEssgewGewuenscht: string | null;
+		AngabeEssgewGewuenscht: boolean | null;
 		event_master: {
 			Titel: string | null;
 		} | null;
@@ -77,7 +77,7 @@
 				{formatDate(eventData.Beginn)}<br />
 				<strong>Ende:</strong>
 				{formatDate(eventData.Ende)}<br />
-				<strong>Bewerbungsfrist:</strong>
+				<strong>Bewerbungsdeadline:</strong>
 				{formatApplicationDeadline(eventData.Bewerbungsdeadline)}
 			</CardDescription>
 		</CardHeader>

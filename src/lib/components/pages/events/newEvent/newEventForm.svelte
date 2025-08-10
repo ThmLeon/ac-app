@@ -14,21 +14,26 @@
 	import RequiredLabel from '@/components/general/RequiredLabel.svelte';
 	import DateTimePicker from '@/components/general/DateTimePicker.svelte';
 
-	export let form: SuperForm<NewEventForm>;
-	export let eventMasters: Array<{ ID: number; Titel: string | null }>;
+	const { form, eventMasters } = $props<{
+		form: SuperForm<NewEventForm>;
+		eventMasters: Array<{ ID: number; Titel: string | null }>;
+	}>();
 
 	let formData: SuperFormData<NewEventForm> = form.form;
 	const file = fileProxy(form, 'image');
 
-	let selectedTitle: string | undefined;
-	$formData.MasterEventID = -1;
+	// Use ID as the select value to avoid title matching issues
+	let selectedMasterId = $state<string | undefined>();
 
-	$: if (selectedTitle) {
-		const selectedMaster = eventMasters.find((master) => master.Titel === selectedTitle);
-		if (selectedMaster) {
-			$formData.MasterEventID = selectedMaster.ID;
+	// Remove manual override of MasterEventID to -1
+	// $formData.MasterEventID = -1;
+
+	// Keep MasterEventID in sync with the select value
+	$effect(() => {
+		if (selectedMasterId != null && selectedMasterId !== '') {
+			$formData.MasterEventID = Number(selectedMasterId);
 		}
-	}
+	});
 </script>
 
 <form method="POST" enctype="multipart/form-data" use:form.enhance class="space-y-3">
@@ -51,11 +56,22 @@
 		<FormControl>
 			{#snippet children({ props })}
 				<RequiredLabel required label="Event Master" />
-				<Select type="single" bind:value={selectedTitle}>
-					<SelectTrigger class="w-full">{selectedTitle || 'Event Master auswählen'}</SelectTrigger>
+				<!-- Hidden input ensures MasterEventID is submitted -->
+				<input type="hidden" {...props} value={$formData.MasterEventID} />
+
+				<Select type="single" bind:value={selectedMasterId}>
+					<SelectTrigger class="w-full">
+						{#if selectedMasterId}
+							{eventMasters.find(
+								(m: { ID: number; Titel: string | null }) => String(m.ID) === selectedMasterId
+							)?.Titel || 'Event Master auswählen'}
+						{:else}
+							Event Master auswählen
+						{/if}
+					</SelectTrigger>
 					<SelectContent>
 						{#each eventMasters as { ID, Titel }}
-							<SelectItem value={Titel || 'Kein Titel'}>{Titel}</SelectItem>
+							<SelectItem value={String(ID)}>{Titel ?? `#${ID}`}</SelectItem>
 						{/each}
 					</SelectContent>
 				</Select>
@@ -76,6 +92,9 @@
 		<FormControl>
 			{#snippet children({ props })}
 				<RequiredLabel required label="Anmeldeart" />
+				<!-- Sicherstellen, dass der Wert gesendet wird -->
+				<input type="hidden" {...props} value={$formData.Anmeldeart ?? ''} />
+
 				<Select type="single" bind:value={$formData.Anmeldeart}>
 					<SelectTrigger class="w-full">
 						{#if $formData.Anmeldeart === 'Einschreiben'}
@@ -102,7 +121,7 @@
 		<FormField {form} name="FCFSSlots">
 			<FormControl>
 				{#snippet children({ props })}
-					<FormLabel>Verfügbare Plätze</FormLabel>
+					<RequiredLabel required label="Verfügbare Plätze" />
 					<Input {...props} placeholder="z.B. 20" type="number" bind:value={$formData.FCFSSlots} />
 				{/snippet}
 			</FormControl>
@@ -162,7 +181,7 @@
 			<FormControl>
 				{#snippet children({ props })}
 					<FormLabel>Check-In Beginn</FormLabel>
-					<DateTimePicker {...props} bind:value={$formData.Bewerbungsdeadline} />
+					<DateTimePicker {...props} bind:value={$formData.CheckInBeginn} />
 				{/snippet}
 			</FormControl>
 			<FormFieldErrors />
@@ -190,8 +209,8 @@
 					<FormLabel>Postleitzahl</FormLabel>
 					<Input
 						{...props}
-						placeholder="z.B. München"
-						type="number"
+						placeholder="z.B. 80802"
+						type="text"
 						bind:value={$formData.Postleitzahl}
 					/>
 				{/snippet}
