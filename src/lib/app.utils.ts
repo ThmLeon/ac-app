@@ -3,12 +3,14 @@ import { format, differenceInMinutes, differenceInHours, differenceInDays } from
 import { de } from 'date-fns/locale';
 import { toast } from 'svelte-sonner';
 
-export function formatDate(date: string): string {
+export function formatDate(date: string | null): string {
+	if (!date) return '-';
 	const parsedDate = new Date(date);
 	return format(parsedDate, 'dd.MM.yyyy HH:mm', { locale: de });
 }
 
-export function formatApplicationDeadline(deadline: string): string {
+export function formatApplicationDeadline(deadline: string | null): string {
+	if (!deadline) return 'Keine Frist angegeben';
 	const now = new Date();
 	const deadlineDate = new Date(deadline);
 

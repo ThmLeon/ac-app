@@ -78,12 +78,17 @@ export async function getAllEventsPaginated(formData: FilterEventsSchema, userId
 	}
 	switch (formData.statusFilter) {
 		case 'beworben':
-			query = query.eq('eventBewerbungen.Beworben', true);
+			query = query.not('eventBewerbungen', 'is', null);
+			query = query.eq('eventBewerbungen.Besetzt', false);
+			query = query.eq('eventBewerbungen.Anwesend', false);
 			break;
 		case 'besetzt':
+			query = query.not('eventBewerbungen', 'is', null);
 			query = query.eq('eventBewerbungen.Besetzt', true);
+			query = query.eq('eventBewerbungen.Anwesend', false);
 			break;
 		case 'anwesend':
+			query = query.not('eventBewerbungen', 'is', null);
 			query = query.eq('eventBewerbungen.Anwesend', true);
 			break;
 	}
@@ -93,30 +98,28 @@ export async function getAllEventsPaginated(formData: FilterEventsSchema, userId
 	return data;
 }
 
-export async function getEventDetailsById(eventId: string) {
-	/*let { data, error } = await supabaseServerClient()
-		.from('04_events_events')
+export async function getEventDetailsById(eventId: number) {
+	let { data, error } = await supabaseServerClient()
+		.from('4_Events')
 		.select(
-			`id, titel, beschreibung, start_datum_zeit, ende_datum_zeit, bewerbungs_deadline, ort_strasse_hausnummer, ort_plz_stadt, anhang_benoetigt, anhang_beschreibung, bewerbungstext_benoetigt, bewerbungstext_beschreibung,
-             event_master:04_events_master(master_name),
-             event_verantwortliche:04_events_verantwortliche(mitglieder:01_mitglieder_mitglieder(vorname, nachname))`
+			`ID, Titel, Beschreibung, Beginn, Ende, Bewerbungsdeadline, Ort, StrasseHausnummer, Postleitzahl, BewerbungstextGewuenscht, BewTextVorgabe, AnlageGewuenscht, AnlageInhalte, AngabeEssgewGewuenscht,
+             event_master:4_EventMaster(Titel),
+             event_verantwortliche:4_EventVerantwortliche(mitglieder:1_Mitglieder(Vorname, Nachname))`
 		)
-		.eq('id', eventId)
+		.eq('ID', eventId)
 		.single();
 
 	data = throwFetchErrorIfNeeded(data, error, 'Event konnte nicht geladen werden');
-	return data;*/
-	throw svelteError(404, 'Nicht eingerichtet');
+	return data;
 }
 
-export async function getEventApplicationState(eventId: string, userId: string) {
-	/*let { data, error } = await supabaseServerClient()
-		.from('04_events_bewerbungen')
-		.select('id, besetzt, anwesend')
-		.eq('event_id', eventId)
-		.eq('mitglied_id', userId);
+export async function getEventApplicationState(eventId: number, userId: number) {
+	let { data, error } = await supabaseServerClient()
+		.from('4_EventBewerbungen')
+		.select('ID, Besetzt, Anwesend')
+		.eq('EventID', eventId)
+		.eq('MitgliedID', userId);
 
 	data = throwFetchErrorIfNeeded(data, error, 'Bewerbungsstatus konnte nicht geladen werden');
-	return data;*/
-	throw svelteError(404, 'Nicht eingerichtet');
+	return data;
 }

@@ -66,7 +66,13 @@
 				/>
 
 				<Select type="single" bind:value={$form.dateFilter} onValueChange={() => loadEvents(true)}>
-					<SelectTrigger class="w-48">Datum</SelectTrigger>
+					<SelectTrigger class="w-48"
+						>{$form.dateFilter === 'all'
+							? 'Datum'
+							: $form.dateFilter === 'upcoming'
+								? 'Kommende Events'
+								: 'Vergangene Events'}</SelectTrigger
+					>
 					<SelectContent>
 						<SelectItem value="all">Alle</SelectItem>
 						<SelectItem value="upcoming">Kommende Events</SelectItem>
@@ -79,7 +85,12 @@
 					bind:value={$form.statusFilter}
 					onValueChange={() => loadEvents(true)}
 				>
-					<SelectTrigger class="w-48">Bewerbungsstatus</SelectTrigger>
+					<SelectTrigger class="w-48"
+						>{$form.statusFilter === 'all'
+							? 'Bewerbungsstatus'
+							: $form.statusFilter.charAt(0).toUpperCase() +
+								$form.statusFilter.slice(1)}</SelectTrigger
+					>
 					<SelectContent>
 						<SelectItem value="all">Alle</SelectItem>
 						<SelectItem value="beworben">Beworben</SelectItem>

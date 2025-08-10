@@ -10,6 +10,7 @@
 	import { Button } from '../ui/button';
 	import { Badge } from '../ui/badge'; // Import the ShadCN badge component
 	import { formatApplicationDeadline, formatDate } from '@/app.utils';
+	import type { string } from 'joi';
 
 	type EventCardProps = {
 		ID: number;
@@ -33,13 +34,27 @@
 
 	export let event: EventCardProps;
 	export let imageURL: string;
-
-	let status = () => {
-		if (!event.eventBewerbungen || event.eventBewerbungen.length === 0) return 'Offen';
-		if (event.eventBewerbungen[0].Anwesend) return 'Anwesend';
-		if (event.eventBewerbungen[0].Besetzt) return 'Besetzt';
-		return 'Beworben';
+	const badgeColors = {
+		blue: 'bg-blue-200 text-blue-800',
+		yellow: 'bg-yellow-200 text-yellow-800',
+		green: 'bg-green-200 text-green-800',
+		orange: 'bg-orange-200 text-orange-800',
+		red: 'bg-red-200 text-red-800'
 	};
+	function status(): {
+		text: string;
+		variant: 'blue' | 'green' | 'orange' | 'red' | 'yellow';
+	} {
+		if (!event.eventBewerbungen || event.eventBewerbungen.length === 0) {
+			if (event.Bewerbungsdeadline && new Date(event.Bewerbungsdeadline) < new Date()) {
+				return { text: 'Deadline abgelaufen & nicht Beworben', variant: 'red' };
+			}
+			return { text: 'Offen', variant: 'blue' };
+		}
+		if (event.eventBewerbungen[0].Anwesend) return { text: 'Anwesend', variant: 'green' };
+		if (event.eventBewerbungen[0].Besetzt) return { text: 'Besetzt', variant: 'yellow' };
+		return { text: 'Beworben', variant: 'orange' };
+	}
 </script>
 
 <Card class="flex flex-col md:flex-row gap-4">
@@ -69,8 +84,8 @@
 		<CardFooter class="flex justify-between items-center">
 			<!-- Linke Seite: Badges -->
 			<div class="flex gap-2">
-				<Badge variant="default">
-					{status()}
+				<Badge variant="default" class={badgeColors[status().variant]}>
+					{status().text}
 				</Badge>
 				{#if event.eventMaster?.Titel}
 					<Badge variant="default">

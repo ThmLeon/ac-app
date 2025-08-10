@@ -14,7 +14,7 @@
 	export let eventMaster: EventMaster;
 	export let onEdit: (id: EventMaster['ID']) => void; // Callback for edit action
 
-	const eventArtColors = {
+	const eventStatusColors = {
 		Netzwerk: 'bg-blue-200 text-blue-800',
 		Social: 'bg-green-200 text-green-800',
 		Kuratoren: 'bg-purple-200 text-purple-800',
@@ -26,7 +26,7 @@
 <Card class="w-full" style="width: 350px;">
 	<CardHeader>
 		<CardTitle>{eventMaster.Titel}</CardTitle>
-		<Badge class={eventArtColors[eventMaster.Eventart || 'Sonstiges']}>
+		<Badge class={eventStatusColors[eventMaster.Eventart || 'Sonstiges']}>
 			{eventMaster.Eventart || 'Sonstiges'}
 		</Badge>
 	</CardHeader>

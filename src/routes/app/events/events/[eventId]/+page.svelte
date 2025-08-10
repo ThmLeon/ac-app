@@ -1,4 +1,3 @@
-<!--
 <script lang="ts">
 	import {
 		Card,
@@ -23,8 +22,10 @@
 {:then eventData}
 	<EventDetailsHeader
 		{eventData}
-		eventBewerbung={data.alreadyApplied}
-		bewerbungAktiviert={data.alreadyApplied.length === 0}
+		alreadyApplied={data.alreadyApplied}
+		bewerbungAktiviert={data.alreadyApplied.length === 0 &&
+			!!eventData.Bewerbungsdeadline &&
+			new Date(eventData.Bewerbungsdeadline) > new Date()}
 	/>
 	<Card>
 		<CardHeader>
@@ -32,7 +33,7 @@
 		</CardHeader>
 		<CardContent>
 			<p class="text-gray-700">
-				{@html formatTextWithHTML(eventData.beschreibung)}
+				{@html formatTextWithHTML(eventData.Beschreibung || 'Lädt...')}
 			</p>
 		</CardContent>
 	</Card>
@@ -47,9 +48,9 @@
 					{#each eventData.event_verantwortliche! as verantwortlicher}
 						<div class="shrink-0">
 							<MitgliedCard
-								name={verantwortlicher.mitglieder.vorname +
+								name={verantwortlicher?.mitglieder?.Vorname +
 									' ' +
-									verantwortlicher.mitglieder.nachname}
+									verantwortlicher?.mitglieder?.Nachname}
 								imageUrl=""
 							/>
 						</div>
@@ -63,10 +64,10 @@
 				<CardTitle class="text-xl font-bold">Ort</CardTitle>
 			</CardHeader>
 			<CardContent>
-				{eventData.ort_strasse_hausnummer}<br />
-				{eventData.ort_plz_stadt}
+				{eventData.StrasseHausnummer}<br />
+				{eventData.Postleitzahl}
+				{eventData.Ort}
 			</CardContent>
 		</Card>
 	</div>
 {/await}
--->
