@@ -1,0 +1,49 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Start SvelteKit dev with Node inspector for server-side debugging
+      "type": "node",
+      "request": "launch",
+      "name": "SvelteKit Dev Server (Node Inspect)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "env": {
+        "NODE_OPTIONS": "--inspect=9229 --enable-source-maps"
+      },
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      // Attach to the Node inspector (for SSR, +server.ts, hooks.server.ts)
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to SvelteKit (SSR @9229)",
+      "port": 9229,
+      "restart": true
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Arc: http://localhost:5173",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}",
+      "runtimeExecutable": "/Applications/Arc.app/Contents/MacOS/Arc",
+      "runtimeArgs": [
+        "--user-data-dir=${workspaceFolder}/.vscode/arc-debug-profile",
+        "--no-first-run"
+      ],
+      "sourceMaps": true
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug SvelteKit (Client + Server)",
+      "configurations": [
+        "SvelteKit Dev Server (Node Inspect)",
+        "Attach to SvelteKit (SSR @9229)",
+        "Arc: http://localhost:5173"
+      ]
+    }
+  ]
+}
