@@ -41,17 +41,26 @@ export async function addEventMaster(formData: EventMasterForm, id: number) {
 	return error;
 }
 
-export async function createNewEvent(formData: NewEventForm) {
-	/*const { error } = await supabaseServerClient()
-		.from('04_events_events')
+export async function createNewEvent(formData: NewEventForm, eventId: number) {
+	const { image, ...eventData } = formData;
+	const { error: dataUploadError } = await supabaseServerClient()
+		.from('4_Events')
 		.insert({
-			...formData,
-			start_datum_zeit: formData.start_datum_zeit.toISOString(),
-			ende_datum_zeit: formData.ende_datum_zeit.toISOString(),
-			bewerbungs_deadline: formData.bewerbungs_deadline.toISOString()
+			...eventData,
+			ID: eventId,
+			Beginn: eventData.Beginn.toISOString(),
+			Ende: eventData.Ende.toISOString(),
+			Bewerbungsdeadline: eventData.Bewerbungsdeadline?.toISOString(),
+			CheckInBeginn: eventData.CheckInBeginn?.toISOString(),
+			Postleitzahl: eventData.Postleitzahl?.toString() || null
 		});
-	return error;*/
-	throw svelteError(404, 'Nicht eingerichtet');
+	if (dataUploadError || !image) return dataUploadError;
+	const { error: imageUploadError } = await supabaseServerClient()
+		.storage.from('eventstitelbilder')
+		.upload(`${eventId}.jpg`, image, {
+			contentType: 'image/jpeg'
+		});
+	return imageUploadError;
 }
 
 export async function getAllEventsPaginated(formData: FilterEventsSchema, userId: number) {

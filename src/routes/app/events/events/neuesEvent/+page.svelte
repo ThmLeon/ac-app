@@ -1,4 +1,3 @@
-<!--
 <script lang="ts">
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import NewEventForm from '@/components/pages/events/newEvent/newEventForm.svelte';
@@ -20,7 +19,11 @@
 			console.log(result);
 		}
 	});
+
+	const { form: formData } = form;
 </script>
+
+<SuperDebug data={$formData} />
 
 <div class="container mx-auto py-8 px-4 max-w-2xl">
 	<Card>
@@ -28,8 +31,7 @@
 			<CardTitle class="text-2xl font-bold">Neues Event erstellen</CardTitle>
 		</CardHeader>
 		<CardContent class="space-y-6">
-			<NewEventForm {form} />
+			<NewEventForm {form} eventMasters={data.data} />
 		</CardContent>
 	</Card>
 </div>
--->

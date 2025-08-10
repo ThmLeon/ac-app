@@ -238,7 +238,7 @@ export type Database = {
       }
       "4_Events": {
         Row: {
-          AngabeEssgewGewuenscht: string | null
+          AngabeEssgewGewuenscht: boolean | null
           AnlageGewuenscht: boolean | null
           AnlageInhalte: string | null
           Anmeldeart: Database["public"]["Enums"]["EventAnmeldeart"] | null
@@ -265,7 +265,7 @@ export type Database = {
           Titel: string | null
         }
         Insert: {
-          AngabeEssgewGewuenscht?: string | null
+          AngabeEssgewGewuenscht?: boolean | null
           AnlageGewuenscht?: boolean | null
           AnlageInhalte?: string | null
           Anmeldeart?: Database["public"]["Enums"]["EventAnmeldeart"] | null
@@ -292,7 +292,7 @@ export type Database = {
           Titel?: string | null
         }
         Update: {
-          AngabeEssgewGewuenscht?: string | null
+          AngabeEssgewGewuenscht?: boolean | null
           AnlageGewuenscht?: boolean | null
           AnlageInhalte?: string | null
           Anmeldeart?: Database["public"]["Enums"]["EventAnmeldeart"] | null
