@@ -13,6 +13,8 @@
 	import SuperDebug from 'sveltekit-superforms';
 	import RequiredLabel from '@/components/general/RequiredLabel.svelte';
 	import DateTimePicker from '@/components/general/DateTimePicker.svelte';
+	import MitgliederSelector from '@/components/general/MitgliederSelector.svelte';
+	import type { Database } from '@/database.types';
 
 	const { form, eventMasters } = $props<{
 		form: SuperForm<NewEventForm>;
@@ -32,6 +34,23 @@
 	$effect(() => {
 		if (selectedMasterId != null && selectedMasterId !== '') {
 			$formData.MasterEventID = Number(selectedMasterId);
+		}
+	});
+
+	// Mitglieder-Selector: lokale Auswahl mit vollem Typ (für Anzeige)
+	type Mitglied = {
+		ID: number;
+		Titel: string;
+		Art: Database['public']['Enums']['MitgliedsstatusAktivPassivEhemalig'];
+		Rolle: Database['public']['Enums']['MitgliedsrolleAlumniAnwaerterMitglied'];
+	};
+
+	let selectedMitglieder = $state<Mitglied[]>([]);
+
+	// Sync: lokale Auswahl -> SuperForm Daten in Minimalform
+	$effect(() => {
+		if (selectedMitglieder != null && selectedMitglieder.length > 0) {
+			$formData.EventVerantwortliche = selectedMitglieder.map(({ ID, Titel }) => ({ ID, Titel }));
 		}
 	});
 </script>
@@ -227,6 +246,21 @@
 			<FormFieldErrors />
 		</FormField>
 	</div>
+
+	<h2 class="text-lg mt-4 font-semibold mb-2">
+		Orga Team
+		<p class="text-red-500 inline" aria-label="required">*</p>
+	</h2>
+	<FormField {form} name="EventVerantwortliche">
+		<FormControl>
+			{#snippet children({ props })}
+				<input type="hidden" {...props} value={$formData.EventVerantwortliche} />
+				<MitgliederSelector bind:selected={selectedMitglieder} />
+			{/snippet}
+		</FormControl>
+		<FormFieldErrors />
+	</FormField>
+
 	<h2 class="text-lg mt-4 font-semibold mb-2">Bewerbungsdetails</h2>
 
 	<FormField {form} name="AnlageGewuenscht">

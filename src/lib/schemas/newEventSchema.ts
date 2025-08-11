@@ -121,7 +121,24 @@ export const newEventSchema = z
 		AngabeEssgewGewuenscht: z.boolean({
 			required_error: 'Bitte angeben, ob die Essgewohnheiten angegeben werden sollen.',
 			invalid_type_error: 'Angabe der Essgewohnheiten muss true oder false sein.'
-		})
+		}),
+		EventVerantwortliche: z
+			.array(
+				z.object({
+					Titel: z.string({
+						required_error: 'Titel ist erforderlich.',
+						invalid_type_error: 'Titel muss ein Text sein.'
+					}),
+					ID: z.number({
+						required_error: 'ID ist erforderlich.',
+						invalid_type_error: 'ID muss eine Zahl sein.'
+					})
+				}),
+				{
+					invalid_type_error: 'Event Verantwortliche muss ein Array sein.'
+				}
+			)
+			.min(1, { message: 'Mindestens eine verantwortliche Person auswählen.' })
 	})
 	.superRefine((obj, ctx) => {
 		if (obj.Anmeldeart === 'FCFS' && !obj.FCFSSlots) {
