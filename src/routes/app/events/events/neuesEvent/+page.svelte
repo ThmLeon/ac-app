@@ -11,6 +11,7 @@
 	export let data: PageServerData;
 	const form = superForm(data.form, {
 		validators: zodClient(newEventSchema),
+		dataType: 'json',
 		onSubmit: () => {
 			toast.loading('Eingabe wird verarbeitet', { id: 'new_event_form' });
 		},

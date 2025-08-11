@@ -49,9 +49,7 @@
 
 	// Sync: lokale Auswahl -> SuperForm Daten in Minimalform
 	$effect(() => {
-		if (selectedMitglieder != null && selectedMitglieder.length > 0) {
-			$formData.EventVerantwortliche = selectedMitglieder.map(({ ID, Titel }) => ({ ID, Titel }));
-		}
+		$formData.EventVerantwortliche = selectedMitglieder.map(({ ID, Titel }) => ({ ID, Titel }));
 	});
 </script>
 
@@ -254,7 +252,7 @@
 	<FormField {form} name="EventVerantwortliche">
 		<FormControl>
 			{#snippet children({ props })}
-				<input type="hidden" {...props} value={$formData.EventVerantwortliche} />
+				<input type="hidden" {...props} value={JSON.stringify($formData.EventVerantwortliche)} />
 				<MitgliederSelector bind:selected={selectedMitglieder} />
 			{/snippet}
 		</FormControl>
@@ -317,6 +315,17 @@
 			<FormFieldErrors />
 		</FormField>
 	{/if}
+	<FormField {form} name="AngabeEssgewGewuenscht">
+		<FormControl>
+			{#snippet children({ props })}
+				<div class="flex items-center space-x-2">
+					<Checkbox {...props} bind:checked={$formData.AngabeEssgewGewuenscht} />
+					<RequiredLabel required label="Essensgewohnheiten benötigt" />
+				</div>
+			{/snippet}
+		</FormControl>
+		<FormFieldErrors />
+	</FormField>
 
 	<h2 class="text-lg mt-4 font-semibold mb-2">Bewerbungsdetails</h2>
 	<FormField {form} name="image">

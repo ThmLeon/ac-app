@@ -37,7 +37,6 @@ export async function deleteEventMaster(id: number) {
 
 export async function createNewEvent(data: EventData) {
 	const EventList = new SharepointList('4_Events');
-
 	//transformData
 	let transformedData = { ...data } as any;
 	transformedData['AnlageGew_x00fc_nscht'] = transformedData.AnlageGewuenscht;
@@ -46,10 +45,26 @@ export async function createNewEvent(data: EventData) {
 	delete transformedData.BewerbungstextGewuenscht;
 	transformedData['AngabeEssgewGew_x00fc_nscht'] = transformedData.AngabeEssgewGewuenscht;
 	delete transformedData.AngabeEssgewGewuenscht;
+	delete transformedData.EventVerantwortliche; // Remove this field, as it will be handled separately
 
 	let { Eventart } = await getEventMasterById(transformedData.MasterEventID);
 	transformedData.Eventart = Eventart;
 
-	const result = await EventList.create(transformedData);
-	return result;
+	const EventResult = await EventList.create(transformedData);
+	if (EventResult instanceof Error) return EventResult;
+
+	const eventVerantwortlicheIDs: number[] = [];
+	const EventVerantwortlicheList = new SharepointList('4_EventVerantwortliche');
+	for (const verantwortlicher of data.EventVerantwortliche) {
+		const VerantwortlicherResult = await EventVerantwortlicheList.create({
+			Title: verantwortlicher.Titel,
+			EventID: EventResult,
+			MitgliedID: verantwortlicher.ID,
+			Besetzt: true
+		});
+		if (VerantwortlicherResult instanceof Error) return VerantwortlicherResult;
+		eventVerantwortlicheIDs.push(VerantwortlicherResult);
+	}
+
+	return { EventResult, eventVerantwortlicheIDs };
 }

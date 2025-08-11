@@ -23,14 +23,12 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
 	createNewEvent: async ({ request }) => {
-		console.log('HEELOOO');
 		const form = await superValidate(request, zod(newEventSchema));
-		console.log('VERANTWORTLICHE:' + form.data.EventVerantwortliche);
 
 		return returnCreateActionResultBoth(
 			form,
 			() => createNewEventSharepoint(form.data),
-			(id) => createNewEventSupabase(form.data, id),
+			(sharepointResults) => createNewEventSupabase(form.data, sharepointResults),
 			'Fehler beim Hinzufügen des Events',
 			'Event erfolgreich hinzugefügt'
 		);

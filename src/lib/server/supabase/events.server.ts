@@ -55,23 +55,43 @@ export async function addEventMaster(formData: EventMasterForm, id: number) {
 	return error;
 }
 
-export async function createNewEvent(formData: NewEventForm, eventId: number) {
-	const { image, ...eventData } = formData;
-	const { error: dataUploadError } = await supabaseServerClient()
+export async function createNewEvent(
+	formData: NewEventForm,
+	sharepointResults: { EventResult: number; eventVerantwortlicheIDs: number[] }
+) {
+	const { image, EventVerantwortliche, ...eventData } = formData; // Explicitly exclude EventVerantwortliche
+	const { error: eventError } = await supabaseServerClient()
 		.from('4_Events')
 		.insert({
 			...eventData,
-			ID: eventId,
+			ID: sharepointResults.EventResult,
 			Beginn: eventData.Beginn.toISOString(),
 			Ende: eventData.Ende.toISOString(),
 			Bewerbungsdeadline: eventData.Bewerbungsdeadline?.toISOString(),
 			CheckInBeginn: eventData.CheckInBeginn?.toISOString(),
 			Postleitzahl: eventData.Postleitzahl?.toString() || null
 		});
-	if (dataUploadError || !image) return dataUploadError;
+	if (eventError) return eventError;
+
+	console.log('angekommen');
+	sharepointResults.eventVerantwortlicheIDs.forEach(async (verantwortlicherEintragId, i) => {
+		console.log('HEELOO' + i);
+		const { error: eventVerantwortlicherError } = await supabaseServerClient()
+			.from('4_EventVerantwortliche')
+			.insert({
+				ID: verantwortlicherEintragId,
+				Titel: EventVerantwortliche[i].Titel,
+				EventID: sharepointResults.EventResult,
+				MitgliedID: EventVerantwortliche[i].ID,
+				Besetzt: true
+			});
+		if (eventVerantwortlicherError) return eventVerantwortlicherError;
+	});
+
+	if (!image) return eventError;
 	const { error: imageUploadError } = await supabaseServerClient()
 		.storage.from('eventstitelbilder')
-		.upload(`${eventId}.jpg`, image, {
+		.upload(`${sharepointResults.EventResult}.jpg`, image, {
 			contentType: 'image/jpeg'
 		});
 	return imageUploadError;

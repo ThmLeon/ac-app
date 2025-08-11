@@ -94,24 +94,25 @@ export async function returnDeleteActionResultBoth(
 	return message(form, successMessage);
 }
 
-export async function returnCreateActionResultBoth(
+export async function returnCreateActionResultBoth<T>(
 	form: SuperValidated<any>,
-	actionSharepoint: () => Promise<Error | number>,
-	actionSupabase: (id: number) => Promise<Error | null>,
+	actionSharepoint: () => Promise<Error | T>,
+	actionSupabase: (values: T) => Promise<Error | null>,
 	errorMessage: string = 'Ein Fehler ist aufgetreten',
 	successMessage: string = 'Die Aktion war erfolgreich'
 ) {
 	if (!form.valid) {
 		return fail(400, { form });
 	}
-	const SharepointErrorOrId = await actionSharepoint();
-	if (SharepointErrorOrId instanceof Error) {
-		console.log('Sharepoint Error:', SharepointErrorOrId);
+	const SharepointErrorOrData = await actionSharepoint();
+	if (SharepointErrorOrData instanceof Error) {
+		console.log('Sharepoint Error:', SharepointErrorOrData);
 		return message(form, errorMessage, { status: 500 });
 	}
 
-	const supabaseError = await actionSupabase(SharepointErrorOrId as number);
+	const supabaseError = await actionSupabase(SharepointErrorOrData as T);
 	if (supabaseError) {
+		console.log('Supabase Error:', supabaseError);
 		return message(form, errorMessage, { status: 500 });
 	}
 	return message(form, successMessage);
