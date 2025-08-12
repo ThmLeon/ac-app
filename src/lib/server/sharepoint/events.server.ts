@@ -3,13 +3,23 @@ import SharepointList from './list.server';
 import type z from 'zod';
 import type { newEventSchema } from '@/schemas/newEventSchema';
 import { getEventMasterById } from '../supabase/events.server';
+import type { eventBewerbungSchema } from '@/schemas/eventBewerbungSchema';
 
 type EventMasterData = z.infer<typeof eventMasterSchema>;
 type EventData = z.infer<typeof newEventSchema>;
+type BewerbungData = z.infer<typeof eventBewerbungSchema>;
 
 export async function updateEventMaster(data: EventMasterData) {
 	const EventMasterList = new SharepointList('4_EventMaster');
 	return await EventMasterList.update(data.ID, data);
+}
+
+export async function updateEventApplication(data: BewerbungData) {
+	const BewerbungList = new SharepointList('4_EventBewerbungen');
+	return await BewerbungList.update(data.ID, {
+		BewerbungText: data.BewerbungText,
+		Essgewohnheiten: data.Essgewohnheiten
+	});
 }
 
 export async function addEventMaster(data: EventMasterData) {
@@ -67,4 +77,33 @@ export async function createNewEvent(data: EventData) {
 	}
 
 	return { EventResult, eventVerantwortlicheIDs };
+}
+
+export async function createEventApplication(
+	data: BewerbungData,
+	userTitel: string,
+	eventId: number,
+	userId: number
+) {
+	const BewerbungList = new SharepointList('4_EventBewerbungen');
+
+	let besetzt: boolean = data.Anmeldeart != 'Bewerben';
+
+	const BewerbungResult = await BewerbungList.create({
+		Title: userTitel,
+		EventID: eventId,
+		MitgliedID: userId,
+		BewerbungText: data.BewerbungText,
+		Besetzt: besetzt,
+		Anwesend: false,
+		Essgewohnheiten: data.Essgewohnheiten
+		//Anlage: data.Anlage
+	});
+
+	return BewerbungResult;
+}
+
+export async function deleteEventApplication(id: number) {
+	const BewerbungList = new SharepointList('4_EventBewerbungen');
+	return await BewerbungList.delete(id);
 }

@@ -7,7 +7,7 @@
 	export let name: string;
 	export let imageUrl: string;
 	export let art: Database['public']['Enums']['MitgliedsstatusAktivPassivEhemalig'];
-	export let role: Database['public']['Enums']['MitgliedsrolleAlumniAnwaerterMitglied'];
+	export let rolle: Database['public']['Enums']['MitgliedsrolleAlumniAnwaerterMitglied'];
 </script>
 
 <div class="flex items-center gap-2 pl-2">
@@ -17,6 +17,6 @@
 	</Avatar>
 	<div class="grid text-left text-sm leading-tight">
 		<span class="truncate font-medium">{name}</span>
-		<span class="truncate text-xs">{mitgliederStatusAsText(art, role)}</span>
+		<span class="truncate text-xs">{mitgliederStatusAsText(art, rolle)}</span>
 	</div>
 </div>

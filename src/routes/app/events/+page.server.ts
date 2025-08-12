@@ -1,5 +1,5 @@
 import { returnActionResult, throwMissingErrorIfNeeded } from '@/utils/utils.server';
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './events/$types';
 import { getAllEventsPaginated } from '@/server/supabase/events.server';
 
 export const load: PageServerLoad = async ({ url, locals }: Parameters<PageServerLoad>[0]) => {

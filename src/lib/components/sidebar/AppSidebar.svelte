@@ -40,11 +40,11 @@
 		},
 		{
 			title: 'Events',
-			url: '/app/events/events',
+			url: '/app/events',
 			icon: Calendar,
 			isActive: true,
 			items: [
-				{ title: 'Alle Events', url: '/app/events/events' },
+				{ title: 'Alle Events', url: '/app/events' },
 				{ title: 'Events Master', url: '/app/events/master' }
 			]
 		},

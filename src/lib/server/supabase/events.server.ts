@@ -4,6 +4,7 @@ import type { EventMasterForm } from '@/schemas/eventMasterSchema';
 import type { NewEventForm } from '@/schemas/newEventSchema';
 import { fail, error as svelteError } from '@sveltejs/kit';
 import type { FilterEventsSchema } from '@/schemas/filterEventsSchema';
+import type { EventBewerbungForm } from '@/schemas/eventBewerbungSchema';
 
 export async function getAllEventMasters() {
 	let { data, error } = await supabaseServerClient()
@@ -21,15 +22,17 @@ export async function getEventMasterById(id: number) {
 		.eq('ID', id)
 		.single();
 
-	console.log(id);
-
-	console.log(error, data);
 	data = throwFetchErrorIfNeeded(data, error, 'Event Master konnte nicht geladen werden');
 	return data;
 }
 
 export async function deleteEventMaster(id: number) {
 	const { error } = await supabaseServerClient().from('4_EventMaster').delete().eq('ID', id);
+	return error;
+}
+
+export async function deleteEventApplication(id: number) {
+	const { error } = await supabaseServerClient().from('4_EventBewerbungen').delete().eq('ID', id);
 	return error;
 }
 
@@ -40,6 +43,17 @@ export async function updateEventMaster(formData: EventMasterForm) {
 			Titel: formData.Titel,
 			MasterBeschreibung: formData.MasterBeschreibung,
 			Eventart: formData.Eventart
+		})
+		.eq('ID', formData.ID);
+	return error;
+}
+
+export async function updateEventApplication(formData: EventBewerbungForm) {
+	const { error } = await supabaseServerClient()
+		.from('4_EventBewerbungen')
+		.update({
+			BewerbungText: formData.BewerbungText,
+			Essgewohnheiten: formData.Essgewohnheiten
 		})
 		.eq('ID', formData.ID);
 	return error;
@@ -72,10 +86,7 @@ export async function createNewEvent(
 			Postleitzahl: eventData.Postleitzahl?.toString() || null
 		});
 	if (eventError) return eventError;
-
-	console.log('angekommen');
 	sharepointResults.eventVerantwortlicheIDs.forEach(async (verantwortlicherEintragId, i) => {
-		console.log('HEELOO' + i);
 		const { error: eventVerantwortlicherError } = await supabaseServerClient()
 			.from('4_EventVerantwortliche')
 			.insert({
@@ -87,14 +98,35 @@ export async function createNewEvent(
 			});
 		if (eventVerantwortlicherError) return eventVerantwortlicherError;
 	});
+}
 
-	if (!image) return eventError;
-	const { error: imageUploadError } = await supabaseServerClient()
-		.storage.from('eventstitelbilder')
-		.upload(`${sharepointResults.EventResult}.jpg`, image, {
-			contentType: 'image/jpeg'
-		});
-	return imageUploadError;
+export async function createEventApplication(
+	formData: EventBewerbungForm,
+	id: number,
+	userTitel: string,
+	eventId: number,
+	userId: number
+) {
+	let besetzt: boolean = formData.Anmeldeart != 'Bewerben';
+
+	const { error: bewerbungError } = await supabaseServerClient().from('4_EventBewerbungen').insert({
+		ID: id,
+		Titel: userTitel,
+		EventID: eventId,
+		MitgliedID: userId,
+		BewerbungText: formData.BewerbungText,
+		Besetzt: besetzt,
+		Anwesend: false,
+		Essgewohnheiten: formData.Essgewohnheiten
+	});
+	return bewerbungError;
+	//if (bewerbungError || formData.Anlage) return bewerbungError;
+
+	/*const { error: anlageError } = await supabaseServerClient()
+		.storage
+		.from('events')
+		.upload(`${id}`, formData.Anlage);
+	if (anlageError) return anlageError;*/
 }
 
 export async function getAllEventsPaginated(formData: FilterEventsSchema, userId: number) {
@@ -145,9 +177,9 @@ export async function getEventDetailsById(eventId: number) {
 	let { data, error } = await supabaseServerClient()
 		.from('4_Events')
 		.select(
-			`ID, Titel, Beschreibung, Beginn, Ende, Bewerbungsdeadline, Ort, StrasseHausnummer, Postleitzahl, BewerbungstextGewuenscht, BewTextVorgabe, AnlageGewuenscht, AnlageInhalte, AngabeEssgewGewuenscht,
+			`ID, Titel, Beschreibung, Beginn, Ende, Anmeldeart, Bewerbungsdeadline, Ort, StrasseHausnummer, Postleitzahl, BewerbungstextGewuenscht, BewTextVorgabe, AnlageGewuenscht, AnlageInhalte, AngabeEssgewGewuenscht, FCFSSlots,
              event_master:4_EventMaster(Titel),
-             event_verantwortliche:4_EventVerantwortliche(mitglieder:1_Mitglieder(Vorname, Nachname))`
+             event_verantwortliche:4_EventVerantwortliche(mitglieder:1_Mitglieder(Vorname, Nachname, Art, Rolle))`
 		)
 		.eq('ID', eventId)
 		.single();
@@ -159,10 +191,20 @@ export async function getEventDetailsById(eventId: number) {
 export async function getEventApplicationState(eventId: number, userId: number) {
 	let { data, error } = await supabaseServerClient()
 		.from('4_EventBewerbungen')
-		.select('ID, Besetzt, Anwesend')
+		.select('ID, Besetzt, Anwesend, BewerbungText, Essgewohnheiten')
 		.eq('EventID', eventId)
 		.eq('MitgliedID', userId);
 
 	data = throwFetchErrorIfNeeded(data, error, 'Bewerbungsstatus konnte nicht geladen werden');
 	return data;
+}
+
+export async function getNumberOfEventApplications(eventId: number) {
+	let { data, error } = await supabaseServerClient()
+		.from('4_EventBewerbungen')
+		.select('*', { count: 'exact' })
+		.eq('EventID', eventId);
+
+	data = throwFetchErrorIfNeeded(data, error, 'Anzahl der Bewerbungen konnte nicht geladen werden');
+	return data.length;
 }

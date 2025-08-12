@@ -3,6 +3,7 @@
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 	import { Badge } from '../ui/badge';
 	import { Button } from '../ui/button';
+	import { badgeColors, eventBewerbungMoeglich } from '@/utils/utils';
 
 	export let eventData: {
 		ID: number;
@@ -11,51 +12,39 @@
 		Beginn: string | null;
 		Ende: string | null;
 		Bewerbungsdeadline: string | null;
-		Ort: string | null;
-		StrasseHausnummer: string | null;
-		Postleitzahl: string | null;
-		BewerbungstextGewuenscht: boolean | null;
-		BewTextVorgabe: string | null;
-		AnlageGewuenscht: boolean | null;
-		AnlageInhalte: string | null;
-		AngabeEssgewGewuenscht: boolean | null;
+		Anmeldeart: 'Bewerben' | 'Einschreiben' | 'FCFS' | null;
+		FCFSSlots: number | null;
 		event_master: {
 			Titel: string | null;
 		} | null;
-		event_verantwortliche: {
-			mitglieder: {
-				Vorname: string | null;
-				Nachname: string | null;
-			} | null;
-		}[];
 	};
-	export let alreadyApplied: {
-		ID: number;
+	export let applicationState: {
 		Besetzt: boolean | null;
 		Anwesend: boolean | null;
-	}[];
-	export let bewerbungAktiviert: boolean = false;
+	} | null;
+	export let totalApplications: number;
+	export let showApplyOrEditButton: boolean;
 
-	const badgeColors = {
-		blue: 'bg-blue-200 text-blue-800',
-		yellow: 'bg-yellow-200 text-yellow-800',
-		green: 'bg-green-200 text-green-800',
-		orange: 'bg-orange-200 text-orange-800',
-		red: 'bg-red-200 text-red-800'
-	};
+	$: bewerbungAktiviert = eventBewerbungMoeglich(
+		eventData.Bewerbungsdeadline ? new Date(eventData.Bewerbungsdeadline) : null,
+		new Date(eventData.Beginn!),
+		eventData.Anmeldeart!,
+		!!applicationState,
+		eventData.FCFSSlots !== null && eventData.FCFSSlots <= totalApplications
+	);
 
 	function status(): {
 		text: string;
 		variant: 'blue' | 'green' | 'orange' | 'red' | 'yellow';
 	} {
-		if (!alreadyApplied || alreadyApplied.length === 0) {
+		if (!applicationState) {
 			if (eventData.Bewerbungsdeadline && new Date(eventData.Bewerbungsdeadline) < new Date()) {
 				return { text: 'Deadline abgelaufen & nicht Beworben', variant: 'red' };
 			}
 			return { text: 'Offen', variant: 'blue' };
 		}
-		if (alreadyApplied[0].Anwesend) return { text: 'Anwesend', variant: 'green' };
-		if (alreadyApplied[0].Besetzt) return { text: 'Besetzt', variant: 'yellow' };
+		if (applicationState.Anwesend) return { text: 'Anwesend', variant: 'green' };
+		if (applicationState.Besetzt) return { text: 'Besetzt', variant: 'yellow' };
 		return { text: 'Beworben', variant: 'orange' };
 	}
 </script>
@@ -78,7 +67,13 @@
 				<strong>Ende:</strong>
 				{formatDate(eventData.Ende)}<br />
 				<strong>Bewerbungsdeadline:</strong>
-				{formatApplicationDeadline(eventData.Bewerbungsdeadline)}
+				{formatApplicationDeadline(eventData.Bewerbungsdeadline)}<br />
+				{#if eventData.Anmeldeart === 'FCFS'}
+					<strong>Plätze:</strong>
+					{totalApplications} von {eventData.FCFSSlots !== null
+						? eventData.FCFSSlots
+						: 'unbegrenzt'} belegt
+				{/if}
 			</CardDescription>
 		</CardHeader>
 		<CardContent class="flex gap-2">
@@ -89,12 +84,20 @@
 						eventData.event_master.Titel.slice(1)}
 				</Badge>
 			{/if}
+			<Badge variant="default">
+				{eventData.Anmeldeart}
+			</Badge>
 		</CardContent>
-		<CardContent class="mt-4">
-			{#if bewerbungAktiviert}
-				<a href={`./${eventData.ID}/bewerben`}>
-					<Button variant="default">Jetzt bewerben</Button>
-				</a>
+		<CardContent>
+			{#if showApplyOrEditButton}
+				{#if bewerbungAktiviert.possible || bewerbungAktiviert.modification}
+					<a href={`./${eventData.ID}/bewerben`}>
+						<Button variant="default">{bewerbungAktiviert.message}</Button>
+					</a>
+				{/if}
+				{#if !bewerbungAktiviert.possible && !bewerbungAktiviert.modification}
+					<Button variant="default" disabled>{bewerbungAktiviert.message}</Button>
+				{/if}
 			{/if}
 		</CardContent>
 	</div>
