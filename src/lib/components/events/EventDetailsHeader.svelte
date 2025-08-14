@@ -100,14 +100,15 @@
 				{eventData.Anmeldeart}
 			</Badge>
 		</CardContent>
-		<CardContent class="flex gap-2">
+
+		<!-- Button-Zeile jetzt immer vorhanden, mit fixer Mindesthöhe -->
+		<CardContent class="flex gap-2 items-center" style="min-height:2.5rem;">
 			{#if showApplyOrEditButton}
 				{#if bewerbungAktiviert.possible || bewerbungAktiviert.modification}
 					<a href={`./${eventData.ID}/bewerben`}>
 						<Button variant="default">{bewerbungAktiviert.message}</Button>
 					</a>
-				{/if}
-				{#if !bewerbungAktiviert.possible && !bewerbungAktiviert.modification}
+				{:else}
 					<Button variant="default" disabled>{bewerbungAktiviert.message}</Button>
 				{/if}
 			{/if}
@@ -115,6 +116,12 @@
 				<a href={`./${eventData.ID}/besetzunganwesenheit`}>
 					<Button variant="default">Besetzung & Anwesenheit</Button>
 				</a>
+			{/if}
+			{#if !(showApplyOrEditButton || (isUserEventResponsible && showApplyOrEditButton))}
+				<!-- Unsichtbarer Platzhalter, falls absolut keine Buttons -->
+				<span class="invisible">
+					<Button variant="default">_</Button>
+				</span>
 			{/if}
 		</CardContent>
 	</div>
