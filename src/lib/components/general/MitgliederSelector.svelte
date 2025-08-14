@@ -132,7 +132,7 @@
 								name={mitglied.Titel}
 								imageUrl=""
 								art={mitglied.Art}
-								role={mitglied.Rolle}
+								rolle={mitglied.Rolle}
 							/>
 						</div>
 					</div>

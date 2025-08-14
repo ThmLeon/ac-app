@@ -17,6 +17,13 @@
 		event_master: {
 			Titel: string | null;
 		} | null;
+		event_verantwortliche: {
+			mitglieder: {
+				ID: number;
+				Vorname: string | null;
+				Nachname: string | null;
+			} | null;
+		}[];
 	};
 	export let applicationState: {
 		Besetzt: boolean | null;
@@ -24,6 +31,7 @@
 	} | null;
 	export let totalApplications: number;
 	export let showApplyOrEditButton: boolean;
+	export let userId: number;
 
 	$: bewerbungAktiviert = eventBewerbungMoeglich(
 		eventData.Bewerbungsdeadline ? new Date(eventData.Bewerbungsdeadline) : null,
@@ -31,6 +39,10 @@
 		eventData.Anmeldeart!,
 		!!applicationState,
 		eventData.FCFSSlots !== null && eventData.FCFSSlots <= totalApplications
+	);
+
+	$: isUserEventResponsible = eventData.event_verantwortliche.some(
+		(verantwortlicher) => verantwortlicher.mitglieder?.ID === userId
 	);
 
 	function status(): {
@@ -88,7 +100,7 @@
 				{eventData.Anmeldeart}
 			</Badge>
 		</CardContent>
-		<CardContent>
+		<CardContent class="flex gap-2">
 			{#if showApplyOrEditButton}
 				{#if bewerbungAktiviert.possible || bewerbungAktiviert.modification}
 					<a href={`./${eventData.ID}/bewerben`}>
@@ -98,6 +110,11 @@
 				{#if !bewerbungAktiviert.possible && !bewerbungAktiviert.modification}
 					<Button variant="default" disabled>{bewerbungAktiviert.message}</Button>
 				{/if}
+			{/if}
+			{#if isUserEventResponsible && showApplyOrEditButton}
+				<a href={`./${eventData.ID}/besetzunganwesenheit`}>
+					<Button variant="default">Besetzung & Anwesenheit</Button>
+				</a>
 			{/if}
 		</CardContent>
 	</div>

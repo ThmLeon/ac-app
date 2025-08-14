@@ -7,13 +7,16 @@
 	let { data, children }: { data: LayoutData; children: any } = $props();
 
 	// Dynamically determine if we are on the /bewerben page
-	let isBewerbenPage = $derived($page.url.pathname.endsWith('/bewerben'));
+	let isBewerbenPage = $derived(
+		$page.url.pathname.endsWith('/bewerben') || $page.url.pathname.endsWith('/besetzunganwesenheit')
+	);
 </script>
 
 {#await data.eventData}
 	<PageLoadSkeleton />
 {:then eventData}
 	<EventDetailsHeader
+		userId={data.userId}
 		{eventData}
 		applicationState={data.applicationState}
 		totalApplications={data.totalApplications}

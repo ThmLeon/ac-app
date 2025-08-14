@@ -5,6 +5,7 @@ import type { NewEventForm } from '@/schemas/newEventSchema';
 import { fail, error as svelteError } from '@sveltejs/kit';
 import type { FilterEventsSchema } from '@/schemas/filterEventsSchema';
 import type { EventBewerbungForm } from '@/schemas/eventBewerbungSchema';
+import type { EventBesetzungAnwesenheitSchema } from '@/schemas/eventBesetzungAnwesenheitSchema';
 
 export async function getAllEventMasters() {
 	let { data, error } = await supabaseServerClient()
@@ -83,7 +84,8 @@ export async function createNewEvent(
 			Ende: eventData.Ende.toISOString(),
 			Bewerbungsdeadline: eventData.Bewerbungsdeadline?.toISOString(),
 			CheckInBeginn: eventData.CheckInBeginn?.toISOString(),
-			Postleitzahl: eventData.Postleitzahl?.toString() || null
+			Postleitzahl: eventData.Postleitzahl?.toString() || null,
+			FCFSSlots: eventData.FCFSSlots || null
 		});
 	if (eventError) return eventError;
 	sharepointResults.eventVerantwortlicheIDs.forEach(async (verantwortlicherEintragId, i) => {
@@ -98,6 +100,7 @@ export async function createNewEvent(
 			});
 		if (eventVerantwortlicherError) return eventVerantwortlicherError;
 	});
+	return eventError;
 }
 
 export async function createEventApplication(
@@ -179,7 +182,7 @@ export async function getEventDetailsById(eventId: number) {
 		.select(
 			`ID, Titel, Beschreibung, Beginn, Ende, Anmeldeart, Bewerbungsdeadline, Ort, StrasseHausnummer, Postleitzahl, BewerbungstextGewuenscht, BewTextVorgabe, AnlageGewuenscht, AnlageInhalte, AngabeEssgewGewuenscht, FCFSSlots,
              event_master:4_EventMaster(Titel),
-             event_verantwortliche:4_EventVerantwortliche(mitglieder:1_Mitglieder(Vorname, Nachname, Art, Rolle))`
+             event_verantwortliche:4_EventVerantwortliche(mitglieder:1_Mitglieder(ID, Vorname, Nachname, Art, Rolle))`
 		)
 		.eq('ID', eventId)
 		.single();
@@ -199,6 +202,17 @@ export async function getEventApplicationState(eventId: number, userId: number) 
 	return data;
 }
 
+export async function getEventApplications(eventId: number) {
+	let { data, error } = await supabaseServerClient()
+		.from('4_EventBewerbungen')
+		.select(`ID, MitgliedID, EventID, Besetzt, Anwesend, Titel`)
+		.eq('EventID', eventId)
+		.order('Titel', { ascending: false });
+
+	data = throwFetchErrorIfNeeded(data, error, 'Bewerbungen konnten nicht geladen werden');
+	return data;
+}
+
 export async function getNumberOfEventApplications(eventId: number) {
 	let { data, error } = await supabaseServerClient()
 		.from('4_EventBewerbungen')
@@ -207,4 +221,16 @@ export async function getNumberOfEventApplications(eventId: number) {
 
 	data = throwFetchErrorIfNeeded(data, error, 'Anzahl der Bewerbungen konnte nicht geladen werden');
 	return data.length;
+}
+
+export async function setEventBesetzungAnwesenheit(eventData: EventBesetzungAnwesenheitSchema) {
+	let { error } = await supabaseServerClient()
+		.from('4_EventBewerbungen')
+		.update({
+			Besetzt: eventData.Besetzt,
+			Anwesend: eventData.Anwesend
+		})
+		.eq('ID', eventData.ID);
+
+	return error;
 }

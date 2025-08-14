@@ -17,6 +17,7 @@ export const load: LayoutServerLoad = async ({ locals, params }) => {
 	const totalApplications = await getNumberOfEventApplications(Number(eventId));
 
 	return {
+		userId,
 		eventData: eventData,
 		applicationState: applicationState.length > 0 ? applicationState[0] : null,
 		totalApplications

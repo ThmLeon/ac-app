@@ -4,6 +4,7 @@ import type z from 'zod';
 import type { newEventSchema } from '@/schemas/newEventSchema';
 import { getEventMasterById } from '../supabase/events.server';
 import type { eventBewerbungSchema } from '@/schemas/eventBewerbungSchema';
+import type { EventBesetzungAnwesenheitSchema } from '@/schemas/eventBesetzungAnwesenheitSchema';
 
 type EventMasterData = z.infer<typeof eventMasterSchema>;
 type EventData = z.infer<typeof newEventSchema>;
@@ -106,4 +107,12 @@ export async function createEventApplication(
 export async function deleteEventApplication(id: number) {
 	const BewerbungList = new SharepointList('4_EventBewerbungen');
 	return await BewerbungList.delete(id);
+}
+
+export async function setEventBesetzungAnwesenheit(eventData: EventBesetzungAnwesenheitSchema) {
+	const EventBesetzungAnwesenheitList = new SharepointList('4_EventBewerbungen');
+	return await EventBesetzungAnwesenheitList.update(eventData.ID, {
+		Besetzt: eventData.Besetzt,
+		Anwesend: eventData.Anwesend
+	});
 }
