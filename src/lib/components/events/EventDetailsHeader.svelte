@@ -32,6 +32,7 @@
 	export let totalApplications: number;
 	export let showApplyOrEditButton: boolean;
 	export let userId: number;
+	export let eventImageUrl: string | null;
 
 	$: bewerbungAktiviert = eventBewerbungMoeglich(
 		eventData.Bewerbungsdeadline ? new Date(eventData.Bewerbungsdeadline) : null,
@@ -61,16 +62,16 @@
 	}
 </script>
 
-<Card class="flex flex-col md:flex-row gap-4">
+<Card class="flex flex-col md:flex-row gap-4 p-0">
 	<!-- Image Section -->
 	<img
-		src="https://placehold.co/1600x1000"
+		src={eventImageUrl || 'https://placehold.co/1600x1000?text=Event'}
 		alt={eventData.Titel || 'Event Image'}
 		class="w-full md:w-1/3 object-cover rounded-lg aspect-16/10"
 	/>
 
 	<!-- Content Section -->
-	<div class="flex flex-1 flex-col justify-between">
+	<div class="flex flex-1 flex-col justify-between pt-5 pb-5 h-64">
 		<CardHeader>
 			<CardTitle>{eventData.Titel || 'Kein Titel'}</CardTitle>
 			<CardDescription class="text-sm text-gray-500">

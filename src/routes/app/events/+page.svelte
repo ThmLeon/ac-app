@@ -105,7 +105,7 @@
 
 <div class="container mx-auto p-4 space-y-4">
 	{#each allEvents as event, index}
-		<EventCard imageURL="https://placehold.co/1600x1000" {event} />
+		<EventCard imageURL={event.ImageUrl || 'https://placehold.co/1600x1000?text=Event'} {event} />
 		{#if index === allEvents.length - 4}
 			<div
 				use:inview

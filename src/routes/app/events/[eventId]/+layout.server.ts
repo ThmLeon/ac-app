@@ -5,6 +5,7 @@ import { throwMissingErrorIfNeeded } from '@/utils/utils.server';
 import {
 	getEventApplicationState,
 	getEventDetailsById,
+	getEventTitleImage,
 	getNumberOfEventApplications
 } from '@/server/supabase/events.server';
 
@@ -15,11 +16,13 @@ export const load: LayoutServerLoad = async ({ locals, params }) => {
 	const eventData = await getEventDetailsById(Number(eventId));
 	const applicationState = await getEventApplicationState(Number(eventId), userId);
 	const totalApplications = await getNumberOfEventApplications(Number(eventId));
+	const eventImageUrl = await getEventTitleImage(Number(eventId));
 
 	return {
 		userId,
 		eventData: eventData,
 		applicationState: applicationState.length > 0 ? applicationState[0] : null,
-		totalApplications
+		totalApplications,
+		eventImageUrl
 	};
 };

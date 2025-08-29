@@ -57,12 +57,22 @@
 	}
 </script>
 
-<Card class="flex flex-col md:flex-row gap-4">
-	<!-- Image Section -->
-	<img src={imageURL} alt={event.Titel} class="w-full md:w-1/3 h-auto object-cover rounded-lg" />
+<Card class="flex flex-col md:flex-row gap-4 p-0">
+	<!-- Image Section (fixed height + cover crop) -->
+	<div class="w-full md:w-1/3 h-64">
+		<div class="relative h-full w-full overflow-hidden rounded-lg">
+			<img
+				src={imageURL}
+				alt={event.Titel}
+				class="absolute inset-0 h-full w-full object-cover"
+				loading="lazy"
+				decoding="async"
+			/>
+		</div>
+	</div>
 
 	<!-- Content Section -->
-	<div class="flex flex-1 flex-col justify-between">
+	<div class="flex flex-1 flex-col justify-between pt-5 pb-5">
 		<CardHeader>
 			<CardTitle class="text-lg font-bold">{event.Titel}</CardTitle>
 			<CardDescription class="text-sm text-gray-500">

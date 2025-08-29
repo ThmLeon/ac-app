@@ -58,6 +58,7 @@ export async function createNewEvent(data: EventData) {
 	delete transformedData.AngabeEssgewGewuenscht;
 	delete transformedData.EventVerantwortliche; // Remove this field, as it will be handled separately
 	delete transformedData.IstHSMEvent;
+	delete transformedData.image;
 
 	let { Eventart } = await getEventMasterById(transformedData.MasterEventID);
 	transformedData.Eventart = Eventart;

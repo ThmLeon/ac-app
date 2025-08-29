@@ -1,4 +1,4 @@
-import { throwFetchErrorIfNeeded } from '@/utils/utils.server';
+import { getSignedStorageURL, throwFetchErrorIfNeeded } from '@/utils/utils.server';
 import { supabaseServerClient } from './supabaseServerClient.server';
 import type { EventMasterForm } from '@/schemas/eventMasterSchema';
 import type { NewEventForm } from '@/schemas/newEventSchema';
@@ -100,6 +100,19 @@ export async function createNewEvent(
 			});
 		if (eventVerantwortlicherError) return eventVerantwortlicherError;
 	});
+
+	//upload image
+	if (image && image.size > 0) {
+		const ext = image.name.split('.').pop();
+		const path = `titelbilder/${sharepointResults.EventResult}/${sharepointResults.EventResult}.${ext}`;
+
+		const { error: imageUploadError } = await supabaseServerClient()
+			.storage.from('events')
+			.upload(path, image);
+		console.log(imageUploadError);
+		if (imageUploadError) return imageUploadError;
+	}
+
 	return eventError;
 }
 
@@ -131,6 +144,25 @@ export async function createEventApplication(
 		.upload(`${id}`, formData.Anlage);
 	if (anlageError) return anlageError;*/
 }
+
+type allEventsPaginated = {
+	ID: number;
+	Titel: string | null;
+	Beschreibung: string | null;
+	Beginn: string | null;
+	Ende: string | null;
+	Bewerbungsdeadline: string | null;
+	ImageUrl: string | null;
+	eventMaster: {
+		Titel: string | null;
+	} | null;
+	eventBewerbungen: {
+		ID: number;
+		MitgliedID: number | null;
+		Besetzt: boolean | null;
+		Anwesend: boolean | null;
+	}[];
+}[];
 
 export async function getAllEventsPaginated(formData: FilterEventsSchema, userId: number) {
 	let query = supabaseServerClient()
@@ -173,7 +205,18 @@ export async function getAllEventsPaginated(formData: FilterEventsSchema, userId
 
 	let { data, error } = await query;
 	data = throwFetchErrorIfNeeded(data, error, 'Events konnten nicht geladen werden');
-	return data;
+
+	let returnData: allEventsPaginated = data as allEventsPaginated;
+
+	for (let i = 0; i < returnData.length; i++) {
+		returnData[i].ImageUrl = await getSignedStorageURL(
+			supabaseServerClient(),
+			'events',
+			`titelbilder/${returnData[i].ID}`,
+			returnData[i].ID
+		);
+	}
+	return returnData;
 }
 
 export async function getEventDetailsById(eventId: number) {
@@ -221,6 +264,15 @@ export async function getNumberOfEventApplications(eventId: number) {
 
 	data = throwFetchErrorIfNeeded(data, error, 'Anzahl der Bewerbungen konnte nicht geladen werden');
 	return data.length;
+}
+
+export async function getEventTitleImage(eventId: number) {
+	return await getSignedStorageURL(
+		supabaseServerClient(),
+		'events',
+		`titelbilder/${eventId}`,
+		eventId
+	);
 }
 
 export async function setEventBesetzungAnwesenheit(eventData: EventBesetzungAnwesenheitSchema) {

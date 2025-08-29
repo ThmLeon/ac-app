@@ -21,6 +21,7 @@
 		applicationState={data.applicationState}
 		totalApplications={data.totalApplications}
 		showApplyOrEditButton={!isBewerbenPage}
+		eventImageUrl={data.eventImageUrl}
 	/>
 	{@render children()}
 {/await}

@@ -1,4 +1,5 @@
-import type { PostgrestError } from '@supabase/supabase-js';
+import type { Database } from '@/database.types';
+import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
 import { fail, error as svelteError } from '@sveltejs/kit';
 
 import { message } from 'sveltekit-superforms/server';
@@ -116,6 +117,32 @@ export async function returnCreateActionResultBoth<T>(
 		return message(form, errorMessage, { status: 500 });
 	}
 	return message(form, successMessage);
+}
+
+export async function getSignedStorageURL(
+	supabase: SupabaseClient<Database>,
+	bucketName: string,
+	folderPath: string,
+	id: string | number
+) {
+	// List files in the folder (non-recursive)
+	const { data: files, error: listErr } = await supabase.storage.from(bucketName).list(folderPath);
+
+	if (listErr || !files || files.length === 0) return null;
+
+	// Find a file named "<id>.<ext>"
+	const file = files.find((f) => f.name.startsWith(`${id}.`));
+	if (!file) return null;
+
+	const path = `${folderPath}/${file.name}`;
+
+	// Signed URL for 1 hour
+	const { data: signed, error: signErr } = await supabase.storage
+		.from(bucketName)
+		.createSignedUrl(path, 60 * 60);
+
+	if (signErr) return null;
+	return signed?.signedUrl ?? null;
 }
 
 export function throwMissingErrorIfNeeded<T>(argument: T | undefined): T {
