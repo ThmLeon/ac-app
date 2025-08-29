@@ -7,6 +7,7 @@
 	import { newEventSchema } from '@/schemas/newEventSchema';
 	import { toast } from 'svelte-sonner';
 	import { handleActionResultSonners } from '@/app.utils';
+	import { goto } from '$app/navigation';
 
 	export let data: PageServerData;
 	const form = superForm(data.form, {
@@ -15,13 +16,13 @@
 		onSubmit: () => {
 			toast.loading('Eingabe wird verarbeitet', { id: 'new_event_form' });
 		},
-		onResult: ({ result }) => {
+		onResult: async ({ result }) => {
 			handleActionResultSonners(result, 'new_event_form');
-			console.log(result);
+			if (result.status != 500 && result.type === 'success') {
+				await goto(`../events`, { replaceState: true });
+			}
 		}
 	});
-
-	const { form: formData } = form;
 </script>
 
 <div class="container mx-auto py-8 px-4 max-w-2xl">

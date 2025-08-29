@@ -24,7 +24,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions: Actions = {
 	createNewEvent: async ({ request }) => {
 		const form = await superValidate(request, zod(newEventSchema));
-
 		return returnCreateActionResultBoth(
 			form,
 			() => createNewEventSharepoint(form.data),

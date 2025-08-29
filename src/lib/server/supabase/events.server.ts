@@ -74,7 +74,7 @@ export async function createNewEvent(
 	formData: NewEventForm,
 	sharepointResults: { EventResult: number; eventVerantwortlicheIDs: number[] }
 ) {
-	const { image, EventVerantwortliche, ...eventData } = formData; // Explicitly exclude EventVerantwortliche
+	const { image, IstHSMEvent, EventVerantwortliche, ...eventData } = formData; // Explicitly exclude EventVerantwortliche
 	const { error: eventError } = await supabaseServerClient()
 		.from('4_Events')
 		.insert({

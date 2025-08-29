@@ -10,15 +10,15 @@
 	import { Select, SelectTrigger } from '@/components/ui/select';
 	import SelectContent from '@/components/ui/select/select-content.svelte';
 	import SelectItem from '@/components/ui/select/select-item.svelte';
-	import SuperDebug from 'sveltekit-superforms';
 	import RequiredLabel from '@/components/general/RequiredLabel.svelte';
 	import DateTimePicker from '@/components/general/DateTimePicker.svelte';
 	import MitgliederSelector from '@/components/general/MitgliederSelector.svelte';
 	import type { Database } from '@/database.types';
+	import SuperDebug from 'sveltekit-superforms';
 
 	const { form, eventMasters } = $props<{
 		form: SuperForm<NewEventForm>;
-		eventMasters: Array<{ ID: number; Titel: string | null }>;
+		eventMasters: Array<{ ID: number; Titel: string | null; Eventart?: string | null }>;
 	}>();
 
 	let formData: SuperFormData<NewEventForm> = form.form;
@@ -27,13 +27,35 @@
 	// Use ID as the select value to avoid title matching issues
 	let selectedMasterId = $state<string | undefined>();
 
-	// Remove manual override of MasterEventID to -1
-	// $formData.MasterEventID = -1;
+	// Ensure selectedMasterId is initialized from existing form data (e.g. edit mode)
+	$effect(() => {
+		if (!selectedMasterId && $formData.MasterEventID) {
+			selectedMasterId = String($formData.MasterEventID);
+		}
+	});
 
 	// Keep MasterEventID in sync with the select value
 	$effect(() => {
 		if (selectedMasterId != null && selectedMasterId !== '') {
 			$formData.MasterEventID = Number(selectedMasterId);
+		}
+	});
+
+	// Ableiten, ob ausgewählter Master ein HSM Event ist und Feld setzen
+	$effect(() => {
+		if (selectedMasterId) {
+			const master = eventMasters.find(
+				(m: { ID: number; Titel: string | null; Eventart?: string | null }) =>
+					String(m.ID) === selectedMasterId
+			);
+			$formData.IstHSMEvent = master?.Eventart === 'HSM';
+			// Falls kein HSM Event gewählt wurde, HSM Punkte zurücksetzen
+			if (!$formData.IstHSMEvent) {
+				$formData.HSMPoints = undefined as unknown as number | undefined;
+			}
+		} else {
+			$formData.IstHSMEvent = false;
+			$formData.HSMPoints = undefined as unknown as number | undefined;
 		}
 	});
 
@@ -75,6 +97,8 @@
 				<RequiredLabel required label="Event Master" />
 				<!-- Hidden input ensures MasterEventID is submitted -->
 				<input type="hidden" {...props} value={$formData.MasterEventID} />
+				<!-- Hidden field for IstHSMEvent so it's submitted -->
+				<input type="hidden" name="IstHSMEvent" value={$formData.IstHSMEvent} />
 
 				<Select type="single" bind:value={selectedMasterId}>
 					<SelectTrigger class="w-full">
@@ -96,6 +120,17 @@
 		</FormControl>
 		<FormFieldErrors />
 	</FormField>
+	{#if $formData.IstHSMEvent}
+		<FormField {form} name="HSMPoints">
+			<FormControl>
+				{#snippet children({ props })}
+					<RequiredLabel required label="HSM Punkte" />
+					<Input {...props} type="number" placeholder="z.B. 10" bind:value={$formData.HSMPoints} />
+				{/snippet}
+			</FormControl>
+			<FormFieldErrors />
+		</FormField>
+	{/if}
 	<FormField {form} name="Beschreibung">
 		<FormControl>
 			{#snippet children({ props })}

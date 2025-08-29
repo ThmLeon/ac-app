@@ -10,6 +10,8 @@
 	import SelectTrigger from '@/components/ui/select/select-trigger.svelte';
 	import SelectContent from '@/components/ui/select/select-content.svelte';
 	import SelectItem from '@/components/ui/select/select-item.svelte';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import { buttonVariants } from '$lib/components/ui/button';
 
 	export let form: SuperForm<EventMasterForm>;
 	export let sheetStatus: 'new' | 'edit' | 'hidden';
@@ -27,7 +29,22 @@
 	}}
 >
 	<Sheet.Content side="right" class="min-w-[500px] flex flex-col h-full p-5">
-		<form method="POST" class="flex flex-col h-full" use:form.enhance>
+		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+		<form
+			id="event-master-form"
+			method="POST"
+			class="flex flex-col h-full"
+			use:form.enhance
+			on:keydown={(e) => {
+				if (e.key === 'Enter') {
+					const target = e.target as HTMLElement;
+					// Prevent submit on Enter unless inside a textarea
+					if (!target || target.tagName !== 'TEXTAREA') {
+						e.preventDefault();
+					}
+				}
+			}}
+		>
 			<div class="grow">
 				<Sheet.Header>
 					<Sheet.Title>
@@ -90,9 +107,46 @@
 			</div>
 			<Sheet.Footer class="flex justify-end gap-4 mt-4">
 				{#if sheetStatus === 'edit'}
-					<Button formaction="?/deleteEventMaster" type="submit" variant="destructive"
-						>Löschen</Button
-					>
+					<!-- Delete confirmation dialog -->
+					{#if $formData.ID}
+						<!-- AlertDialog rendered only in edit mode -->
+					{/if}
+
+					<!-- Actual buttons -->
+					<!-- Delete uses AlertDialog for confirmation -->
+					<AlertDialog.Root>
+						<AlertDialog.Trigger type="button" class={buttonVariants({ variant: 'destructive' })}
+							>Löschen</AlertDialog.Trigger
+						>
+						<AlertDialog.Portal>
+							<AlertDialog.Overlay class="fixed inset-0 bg-black/50" />
+							<AlertDialog.Content
+								class="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg bg-background p-6 shadow-lg focus:outline-none"
+							>
+								<AlertDialog.Header class="mb-4">
+									<AlertDialog.Title class="text-lg font-semibold"
+										>Event Master löschen?</AlertDialog.Title
+									>
+									<AlertDialog.Description class="text-sm text-muted-foreground mt-1">
+										Diese Aktion kann nicht rückgängig gemacht werden. Der Event Master und alle
+										abhängigen Daten, die darauf verweisen, könnten verloren gehen.
+									</AlertDialog.Description>
+								</AlertDialog.Header>
+								<AlertDialog.Footer class="flex justify-end gap-2">
+									<AlertDialog.Cancel type="button">Abbrechen</AlertDialog.Cancel>
+									<AlertDialog.Action
+										type="submit"
+										form="event-master-form"
+										formaction="?/deleteEventMaster"
+										class={buttonVariants({ variant: 'destructive' })}
+									>
+										Löschen
+									</AlertDialog.Action>
+								</AlertDialog.Footer>
+							</AlertDialog.Content>
+						</AlertDialog.Portal>
+					</AlertDialog.Root>
+
 					<Button formaction="?/updateEventMaster" type="submit">Speichern</Button>
 				{:else}
 					<Button formaction="?/addEventMaster" type="submit">Hinzufügen</Button>

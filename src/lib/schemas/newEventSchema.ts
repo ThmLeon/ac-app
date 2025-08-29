@@ -138,7 +138,15 @@ export const newEventSchema = z
 					invalid_type_error: 'Event Verantwortliche muss ein Array sein.'
 				}
 			)
-			.min(1, { message: 'Mindestens eine verantwortliche Person auswählen.' })
+			.min(1, { message: 'Mindestens eine verantwortliche Person auswählen.' }),
+		IstHSMEvent: z.boolean({
+			required_error: 'Bitte angeben, ob es sich um ein HSM-Event handelt.',
+			invalid_type_error: 'IstHSMEvent muss true oder false sein.'
+		}),
+		HSMPoints: z.preprocess(
+			(arg) => (arg === 0 ? undefined : arg),
+			z.number({ invalid_type_error: 'HSM Punkte müssen eine Zahl sein.' }).min(1).optional()
+		)
 	})
 	.superRefine((obj, ctx) => {
 		if (obj.Anmeldeart === 'FCFS' && !obj.FCFSSlots) {
@@ -160,6 +168,13 @@ export const newEventSchema = z
 				code: z.ZodIssueCode.custom,
 				path: ['BewTextVorgabe'],
 				message: 'Bewerbungstext Beschreibung erforderlich, wenn Bewerbungstext benötigt ist'
+			});
+		}
+		if (obj.IstHSMEvent && !obj.HSMPoints) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: ['HSMPPoints'],
+				message: 'HSM Punkte erforderlich, wenn es sich um ein HSM-Event handelt'
 			});
 		}
 	});
