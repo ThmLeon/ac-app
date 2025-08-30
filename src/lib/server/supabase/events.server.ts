@@ -206,17 +206,7 @@ export async function getAllEventsPaginated(formData: FilterEventsSchema, userId
 	let { data, error } = await query;
 	data = throwFetchErrorIfNeeded(data, error, 'Events konnten nicht geladen werden');
 
-	let returnData: allEventsPaginated = data as allEventsPaginated;
-
-	for (let i = 0; i < returnData.length; i++) {
-		returnData[i].ImageUrl = await getSignedStorageURL(
-			supabaseServerClient(),
-			'events',
-			`titelbilder/${returnData[i].ID}`,
-			returnData[i].ID
-		);
-	}
-	return returnData;
+	return data;
 }
 
 export async function getEventDetailsById(eventId: number) {

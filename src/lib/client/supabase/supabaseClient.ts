@@ -1,5 +1,9 @@
-import { createClient } from '@supabase/supabase-js';
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+import { getContext } from 'svelte';
+import type { SupabaseClient, Session } from '@supabase/supabase-js';
 import type { Database } from '@/database.types';
 
-export const supabase = createClient<Database>(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY);
+export function useSupabase() {
+	return getContext<{ supabase: SupabaseClient<Database> | null; session: Session | null }>(
+		'supabase'
+	);
+}

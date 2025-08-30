@@ -10,7 +10,8 @@
 	import { Button } from '../ui/button';
 	import { Badge } from '../ui/badge'; // Import the ShadCN badge component
 	import { formatApplicationDeadline, formatDate } from '@/app.utils';
-	import type { string } from 'joi';
+	import { onMount } from 'svelte';
+	import { useSupabase } from '@/client/supabase/supabaseClient';
 
 	type EventCardProps = {
 		ID: number;
@@ -32,8 +33,10 @@
 			| null;
 	};
 
+	const { supabase, session } = useSupabase();
+
 	export let event: EventCardProps;
-	export let imageURL: string;
+	let imageURL: string | null = null;
 	const badgeColors = {
 		blue: 'bg-blue-200 text-blue-800',
 		yellow: 'bg-yellow-200 text-yellow-800',
@@ -55,6 +58,30 @@
 		if (event.eventBewerbungen[0].Besetzt) return { text: 'Besetzt', variant: 'yellow' };
 		return { text: 'Beworben', variant: 'orange' };
 	}
+
+	async function loadEventImage() {
+		const PLACEHOLDER = 'https://placehold.co/1600x1000?text=Event';
+		const imageData = await supabase?.storage
+			.from('events')
+			.createSignedUrls(
+				[
+					`titelbilder/${event.ID}/${event.ID}.jpg`,
+					`titelbilder/${event.ID}/${event.ID}.png`,
+					`titelbilder/${event.ID}/${event.ID}.jpeg`
+				],
+				60 * 60
+			);
+		if (imageData?.error || !imageData?.data) return PLACEHOLDER;
+
+		for (const entry of imageData.data) {
+			if (entry.signedUrl) return entry.signedUrl;
+		}
+		return PLACEHOLDER;
+	}
+
+	onMount(async () => {
+		imageURL = await loadEventImage();
+	});
 </script>
 
 <Card class="flex flex-col md:flex-row gap-4 p-0">
