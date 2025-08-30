@@ -135,14 +135,15 @@ export async function createEventApplication(
 		Anwesend: false,
 		Essgewohnheiten: formData.Essgewohnheiten
 	});
-	return bewerbungError;
-	//if (bewerbungError || formData.Anlage) return bewerbungError;
+	if (bewerbungError || !formData.Anlage) return bewerbungError;
 
-	/*const { error: anlageError } = await supabaseServerClient()
-		.storage
-		.from('events')
-		.upload(`${id}`, formData.Anlage);
-	if (anlageError) return anlageError;*/
+	const { error: anlageError } = await supabaseServerClient()
+		.storage.from('events')
+		.upload(
+			`bewerbungenAnhang/${eventId}/${id}.${formData.Anlage.name.split('.').pop()}`,
+			formData.Anlage
+		);
+	return anlageError;
 }
 
 type allEventsPaginated = {

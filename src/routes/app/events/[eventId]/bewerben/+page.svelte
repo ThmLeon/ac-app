@@ -12,7 +12,7 @@
 	import RequiredLabel from '@/components/general/RequiredLabel.svelte';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { eventBewerbungSchema, type EventBewerbungForm } from '@/schemas/eventBewerbungSchema';
-	import { superForm, type SuperFormData } from 'sveltekit-superforms/client';
+	import { fileProxy, superForm, type SuperFormData } from 'sveltekit-superforms/client';
 	import { eventBewerbungMoeglich } from '@/utils/utils';
 	import { page } from '$app/state';
 
@@ -35,15 +35,11 @@
 	});
 
 	const { form: formData } = form; // Extract formData
-	let fileList: FileList | undefined = undefined; // Initialize as undefined
+	const file = fileProxy(form, 'Anlage');
 
 	if (data.applicationState) {
 		$formData.Essgewohnheiten = data.applicationState.Essgewohnheiten || '';
 		$formData.BewerbungText = data.applicationState.BewerbungText || '';
-	}
-
-	$: if (fileList) {
-		//formData.Anlage = fileList[0] ?? undefined; // Extract the first file
 	}
 </script>
 
@@ -90,7 +86,7 @@
 			<FormControl>
 				{#snippet children({ props })}
 					<RequiredLabel required label="Anhang" />
-					<Input {...props} type="file" bind:files={fileList} />
+					<Input id={props.id} name={props.name} type="file" accept=".pdf" bind:files={$file} />
 				{/snippet}
 			</FormControl>
 			<FormFieldErrors />
