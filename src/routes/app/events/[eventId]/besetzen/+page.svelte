@@ -9,12 +9,15 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { eventBesetzungAnwesenheitSchema } from '@/schemas/eventBesetzungAnwesenheitSchema';
 	import { tick } from 'svelte';
+	import EventApplications from '@/components/events/EventApplications.svelte';
 
 	type EventApplication = {
 		ID: number;
 		Titel: string | null;
 		Besetzt: boolean | null;
 		Anwesend: boolean | null;
+		BewerbungText: string | null;
+		Essgewohnheiten: string | null;
 	};
 
 	export let data: PageServerData;
@@ -120,4 +123,6 @@
 			</CardContent>
 		</Card>
 	</div>
+	<div class="mb-2"></div>
+	<EventApplications applications={data.eventApplications} eventId={Number(data.eventId)} />
 {/await}

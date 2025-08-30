@@ -115,7 +115,7 @@
 			{/if}
 			{#if isUserEventResponsible && showApplyOrEditButton}
 				<a href={`./${eventData.ID}/besetzen`}>
-					<Button variant="default">Besetzung & Anwesenheit</Button>
+					<Button variant="default">Bewerbungen & Besetzung</Button>
 				</a>
 			{/if}
 			{#if !(showApplyOrEditButton || (isUserEventResponsible && showApplyOrEditButton))}

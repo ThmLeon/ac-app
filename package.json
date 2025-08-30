@@ -25,6 +25,7 @@
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
 		"@tailwindcss/vite": "^4.1.11",
 		"@tanstack/table-core": "^8.21.3",
+		"@types/file-saver": "^2.0.7",
 		"@typeschema/class-validator": "^0.2.0",
 		"@vinejs/vine": "^1.8.0",
 		"arktype": "^2.1.20",
@@ -70,7 +71,9 @@
 		"@supabase/supabase-js": "^2.49.9",
 		"@sveltejs/adapter-auto": "^6.0.1",
 		"date-fns": "^4.1.0",
+		"file-saver": "^2.0.5",
 		"isomorphic-fetch": "^3.0.0",
+		"jszip": "^3.10.1",
 		"jwt-decode": "^4.0.0",
 		"svelte-inview": "^4.0.4",
 		"svelte-ux": "^1.0.7"

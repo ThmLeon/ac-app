@@ -239,7 +239,7 @@ export async function getEventApplicationState(eventId: number, userId: number) 
 export async function getEventApplications(eventId: number) {
 	let { data, error } = await supabaseServerClient()
 		.from('4_EventBewerbungen')
-		.select(`ID, MitgliedID, EventID, Besetzt, Anwesend, Titel`)
+		.select(`ID, MitgliedID, EventID, Besetzt, Anwesend, Titel, BewerbungText, Essgewohnheiten`)
 		.eq('EventID', eventId)
 		.order('Titel', { ascending: false });
 
