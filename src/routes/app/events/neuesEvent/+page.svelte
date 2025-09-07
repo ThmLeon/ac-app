@@ -9,7 +9,7 @@
 	import { handleActionResultSonners } from '@/app.utils';
 	import { goto } from '$app/navigation';
 
-	export let data: PageServerData;
+	let { data } = $props();
 	const form = superForm(data.form, {
 		validators: zodClient(newEventSchema),
 		dataType: 'json',
@@ -31,7 +31,7 @@
 			<CardTitle class="text-2xl font-bold">Neues Event erstellen</CardTitle>
 		</CardHeader>
 		<CardContent class="space-y-6">
-			<NewEventForm {form} eventMasters={data.data} />
+			<NewEventForm {form} eventMasters={data.data} supabase={data.supabase} />
 		</CardContent>
 	</Card>
 </div>

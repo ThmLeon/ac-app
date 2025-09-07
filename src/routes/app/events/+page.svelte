@@ -7,7 +7,6 @@
 	import { getEventList } from '@/state/EventList.svelte';
 
 	let { data } = $props();
-	let { session, supabase } = $derived(data);
 	const eventList = $derived(getEventList(data.supabase, data.userId));
 </script>
 
@@ -73,7 +72,7 @@
 		{#if index === eventList.events.length - 4}
 			<div
 				use:inview
-				on:inview_change={(event) => {
+				oninview_change={(event) => {
 					const { inView } = event.detail;
 					if (inView && !eventList.isLoading) {
 						eventList.loadMoreEvents();

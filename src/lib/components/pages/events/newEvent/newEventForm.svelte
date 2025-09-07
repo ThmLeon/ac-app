@@ -14,11 +14,12 @@
 	import DateTimePicker from '@/components/general/DateTimePicker.svelte';
 	import MitgliederSelector from '@/components/general/MitgliederSelector.svelte';
 	import type { Database } from '@/database.types';
-	import SuperDebug from 'sveltekit-superforms';
+	import type { SupabaseClient } from '@supabase/supabase-js';
 
-	const { form, eventMasters } = $props<{
+	const { form, eventMasters, supabase } = $props<{
 		form: SuperForm<NewEventForm>;
 		eventMasters: Array<{ ID: number; Titel: string | null; Eventart?: string | null }>;
+		supabase: SupabaseClient<Database>;
 	}>();
 
 	let formData: SuperFormData<NewEventForm> = form.form;
@@ -288,7 +289,7 @@
 		<FormControl>
 			{#snippet children({ props })}
 				<input type="hidden" {...props} value={JSON.stringify($formData.EventVerantwortliche)} />
-				<MitgliederSelector bind:selected={selectedMitglieder} />
+				<MitgliederSelector bind:selected={selectedMitglieder} {supabase} />
 			{/snippet}
 		</FormControl>
 		<FormFieldErrors />

@@ -12,11 +12,18 @@
 	import { X } from 'lucide-svelte';
 	import MitgliedCard from '$lib/components/general/MitgliedCard.svelte';
 	import { mitgliederStatusAsText } from '@/utils/utils';
-	import { useSupabase } from '@/client/supabase/supabaseClient';
 	import { getMitgliederSelector } from '@/state/MitgliederSelector.svelte';
+	import type { Database } from '@/database.types';
 
-	const mitgliederSelector = getMitgliederSelector(await useSupabase().supabase);
-	let selected = $props();
+	type Mitglied = {
+		ID: number;
+		Titel: string;
+		Art: Database['public']['Enums']['MitgliedsstatusAktivPassivEhemalig'];
+		Rolle: Database['public']['Enums']['MitgliedsrolleAlumniAnwaerterMitglied'];
+	};
+
+	let { supabase, selected = $bindable<Mitglied[]>([]) } = $props();
+	const mitgliederSelector = getMitgliederSelector(supabase);
 	$effect(() => {
 		selected = mitgliederSelector.selected;
 	});
