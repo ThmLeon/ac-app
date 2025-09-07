@@ -68,7 +68,7 @@
 
 <div class="container mx-auto p-4 space-y-4">
 	{#each eventList.events as event, index}
-		<EventCard {event} />
+		<EventCard {event} supabase={data.supabase} />
 		{#if index === eventList.events.length - 4}
 			<div
 				use:inview

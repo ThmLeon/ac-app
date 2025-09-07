@@ -17,6 +17,10 @@
 
 	let { data, children } = $props();
 
+	const fullName = data.user?.user_metadata.full_name ?? 'User';
+	const firstName = fullName.split(' ')[0];
+	const lastName = fullName.split(' ')[1];
+
 	// Map of segmentValue -> override label (e.g. eventId -> Event Name)
 	const overrides = writable<Map<string, string>>(new Map());
 
@@ -75,9 +79,8 @@
 </script>
 
 <Toaster position="top-right" />
-
 <SidebarProvider>
-	<AppSidebar name={data.data.vorname + ' ' + data.data.nachname} avatarUrl="" />
+	<AppSidebar name={firstName + ' ' + lastName} avatarUrl="" />
 	<SidebarInset>
 		<header
 			class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12"

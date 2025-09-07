@@ -6,7 +6,6 @@
 	import KontaktdatenCard from '@/components/mitglieder/profil/KontaktdatenCard.svelte';
 	import SchulungenCard from '@/components/mitglieder/profil/SchulungenCard.svelte';
 	import BankdatenCard from '@/components/mitglieder/profil/BankdatenCard.svelte';
-	import EventCard from '@/components/events/EventCard.svelte';
 	import EventsCard from '@/components/mitglieder/profil/EventsCard.svelte';
 	import ProfilHeader from '@/components/mitglieder/profil/ProfilHeader.svelte';
 	import MitgliedsstatusCard from '@/components/mitglieder/profil/MitgliedsstatusCard.svelte';

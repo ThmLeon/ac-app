@@ -11,7 +11,8 @@
 	import { Badge } from '../ui/badge'; // Import the ShadCN badge component
 	import { formatApplicationDeadline, formatDate } from '@/app.utils';
 	import { onMount } from 'svelte';
-	import { useSupabase } from '@/client/supabase/supabaseClient';
+	import { SupabaseClient } from '@supabase/supabase-js';
+	import type { Database } from '@/database.types';
 
 	type EventCardProps = {
 		ID: number;
@@ -32,11 +33,11 @@
 			  }[]
 			| null;
 	};
-
-	const { supabase, session } = useSupabase();
-
-	export let event: EventCardProps;
-	let imageURL: string | null = null;
+	let { event, supabase } = $props<{
+		event: EventCardProps;
+		supabase: SupabaseClient<Database>;
+	}>();
+	let imageURL: string | null = $state(null);
 	const badgeColors = {
 		blue: 'bg-blue-200 text-blue-800',
 		yellow: 'bg-yellow-200 text-yellow-800',
