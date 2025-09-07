@@ -23,6 +23,7 @@ class MitgliederSelector {
 	addMitglied(mitglied: Mitglied) {
 		if (!this.selected.find((m) => m.ID === mitglied.ID)) {
 			this.selected = [...this.selected, mitglied];
+			this.query = '';
 		}
 	}
 	removeMitglied(mitgliedId: number) {

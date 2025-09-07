@@ -35,6 +35,7 @@
 		<Input
 			placeholder="Mitglieder suchen..."
 			bind:value={mitgliederSelector.query}
+			oninput={() => mitgliederSelector.searchMitglied()}
 			class="w-full"
 		/>
 
@@ -69,11 +70,11 @@
 
 	<!-- Selected -->
 	<div class="rounded-md border p-3">
-		{#if mitgliederSelector.selected.length === 0}
+		{#if selected.length === 0}
 			<p class="text-sm text-muted-foreground">Noch keine Mitglieder ausgewählt.</p>
 		{:else}
 			<div class="grid gap-4">
-				{#each mitgliederSelector.selected as mitglied (mitglied.ID)}
+				{#each selected as mitglied (mitglied.ID)}
 					<div class="flex items-center gap-2">
 						<Button
 							variant="ghost"
