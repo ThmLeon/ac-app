@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -151,6 +151,123 @@ export type Database = {
           Weiblich?: boolean | null
         }
         Relationships: []
+      }
+      "1_Rollen": {
+        Row: {
+          AzureSync: boolean | null
+          Beschreibung: string | null
+          BewerbungOffen: boolean | null
+          created_at: string
+          Email: string | null
+          GroupID: string | null
+          ID: number
+          KernTeam: boolean | null
+          LegacyID: number | null
+          ListIDHistory: string | null
+          TeamsTeamID: string | null
+          Titel: string | null
+          VBBezug: number | null
+          VorgesetzteRolle: number | null
+        }
+        Insert: {
+          AzureSync?: boolean | null
+          Beschreibung?: string | null
+          BewerbungOffen?: boolean | null
+          created_at?: string
+          Email?: string | null
+          GroupID?: string | null
+          ID?: number
+          KernTeam?: boolean | null
+          LegacyID?: number | null
+          ListIDHistory?: string | null
+          TeamsTeamID?: string | null
+          Titel?: string | null
+          VBBezug?: number | null
+          VorgesetzteRolle?: number | null
+        }
+        Update: {
+          AzureSync?: boolean | null
+          Beschreibung?: string | null
+          BewerbungOffen?: boolean | null
+          created_at?: string
+          Email?: string | null
+          GroupID?: string | null
+          ID?: number
+          KernTeam?: boolean | null
+          LegacyID?: number | null
+          ListIDHistory?: string | null
+          TeamsTeamID?: string | null
+          Titel?: string | null
+          VBBezug?: number | null
+          VorgesetzteRolle?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "1_Rollen_VBBezug_fkey"
+            columns: ["VBBezug"]
+            isOneToOne: false
+            referencedRelation: "1_Rollen"
+            referencedColumns: ["ID"]
+          },
+          {
+            foreignKeyName: "1_Rollen_VorgesetzteRolle_fkey"
+            columns: ["VorgesetzteRolle"]
+            isOneToOne: false
+            referencedRelation: "1_Rollen"
+            referencedColumns: ["ID"]
+          },
+        ]
+      }
+      "1_RollenMitglieder": {
+        Row: {
+          BeginnDatum: string | null
+          created_at: string
+          EndeDatum: string | null
+          ID: number
+          LeitendeFunktion: boolean | null
+          MitgliedID: number
+          PrimaryRole: boolean | null
+          RollenID: number
+          Titel: string | null
+        }
+        Insert: {
+          BeginnDatum?: string | null
+          created_at?: string
+          EndeDatum?: string | null
+          ID?: number
+          LeitendeFunktion?: boolean | null
+          MitgliedID: number
+          PrimaryRole?: boolean | null
+          RollenID: number
+          Titel?: string | null
+        }
+        Update: {
+          BeginnDatum?: string | null
+          created_at?: string
+          EndeDatum?: string | null
+          ID?: number
+          LeitendeFunktion?: boolean | null
+          MitgliedID?: number
+          PrimaryRole?: boolean | null
+          RollenID?: number
+          Titel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "1_RollenMitglieder_MitgliedID_fkey"
+            columns: ["MitgliedID"]
+            isOneToOne: false
+            referencedRelation: "1_Mitglieder"
+            referencedColumns: ["ID"]
+          },
+          {
+            foreignKeyName: "1_RollenMitglieder_RollenID_fkey"
+            columns: ["RollenID"]
+            isOneToOne: false
+            referencedRelation: "1_Rollen"
+            referencedColumns: ["ID"]
+          },
+        ]
       }
       "4_EventBewerbungen": {
         Row: {
@@ -429,7 +546,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_mitglied_id: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      get_user_oid: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      has_role: {
+        Args: { roleid: number }
+        Returns: boolean
+      }
     }
     Enums: {
       Beraterstufe:
