@@ -5,24 +5,10 @@
 	import '../app.css';
 
 	let { data, children } = $props();
-	let { session, supabase } = $derived(data);
-
-	// Context object (mutable) so children always see current values
-	const supabaseContext: { supabase: SupabaseClient | null; session: Session | null } = {
-		supabase: null,
-		session: null
-	};
-	setContext('supabase', supabaseContext);
-
-	// Keep context in sync whenever load data updates
-	$effect(() => {
-		supabaseContext.supabase = supabase;
-		supabaseContext.session = session;
-	});
-
+	let { supabase, session } = $derived(data);
 	onMount(() => {
-		const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
-			if (newSession?.expires_at !== session?.expires_at) {
+		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
+			if (_session?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth');
 			}
 		});
