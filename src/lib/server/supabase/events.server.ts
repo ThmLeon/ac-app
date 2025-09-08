@@ -3,7 +3,6 @@ import { supabaseServerClient } from './supabaseServerClient.server';
 import type { EventMasterForm } from '@/schemas/eventMasterSchema';
 import type { NewEventForm } from '@/schemas/newEventSchema';
 import { fail, error as svelteError } from '@sveltejs/kit';
-import type { FilterEventsSchema } from '@/schemas/filterEventsSchema';
 import type { EventBewerbungForm } from '@/schemas/eventBewerbungSchema';
 import type { EventBesetzungAnwesenheitSchema } from '@/schemas/eventBesetzungAnwesenheitSchema';
 
@@ -164,51 +163,6 @@ type allEventsPaginated = {
 		Anwesend: boolean | null;
 	}[];
 }[];
-
-export async function getAllEventsPaginated(formData: FilterEventsSchema, userId: number) {
-	let query = supabaseServerClient()
-		.from('4_Events')
-		.select(
-			`ID, Titel, Beschreibung, Beginn, Ende, Bewerbungsdeadline, 
-			eventMaster:4_EventMaster(Titel),
-			eventBewerbungen:4_EventBewerbungen(ID, MitgliedID, Besetzt, Anwesend)
-			`
-		)
-		.eq('eventBewerbungen.MitgliedID', userId)
-		.order('Beginn', { ascending: false })
-		.range(formData.skip, formData.limit);
-
-	if (formData.textSearch) query = query.ilike('Titel', `%${formData.textSearch}%`);
-	switch (formData.dateFilter) {
-		case 'upcoming':
-			query = query.gte('Beginn', new Date().toISOString());
-			break;
-		case 'past':
-			query = query.lt('Beginn', new Date().toISOString());
-			break;
-	}
-	switch (formData.statusFilter) {
-		case 'beworben':
-			query = query.not('eventBewerbungen', 'is', null);
-			query = query.eq('eventBewerbungen.Besetzt', false);
-			query = query.eq('eventBewerbungen.Anwesend', false);
-			break;
-		case 'besetzt':
-			query = query.not('eventBewerbungen', 'is', null);
-			query = query.eq('eventBewerbungen.Besetzt', true);
-			query = query.eq('eventBewerbungen.Anwesend', false);
-			break;
-		case 'anwesend':
-			query = query.not('eventBewerbungen', 'is', null);
-			query = query.eq('eventBewerbungen.Anwesend', true);
-			break;
-	}
-
-	let { data, error } = await query;
-	data = throwFetchErrorIfNeeded(data, error, 'Events konnten nicht geladen werden');
-
-	return data;
-}
 
 export async function getEventDetailsById(eventId: number) {
 	let { data, error } = await supabaseServerClient()
