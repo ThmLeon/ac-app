@@ -15,6 +15,7 @@
 	import MitgliederSelector from '@/components/general/MitgliederSelector.svelte';
 	import type { Database } from '@/database.types';
 	import type { SupabaseClient } from '@supabase/supabase-js';
+	import SuperDebug from 'sveltekit-superforms';
 
 	const { form, eventMasters, supabase } = $props<{
 		form: SuperForm<NewEventForm>;
@@ -24,42 +25,6 @@
 
 	let formData: SuperFormData<NewEventForm> = form.form;
 	const file = fileProxy(form, 'image');
-
-	// Use ID as the select value to avoid title matching issues
-	let selectedMasterId = $state<string | undefined>();
-
-	// Ensure selectedMasterId is initialized from existing form data (e.g. edit mode)
-	$effect(() => {
-		if (!selectedMasterId && $formData.MasterEventID) {
-			selectedMasterId = String($formData.MasterEventID);
-		}
-	});
-
-	// Keep MasterEventID in sync with the select value
-	$effect(() => {
-		if (selectedMasterId != null && selectedMasterId !== '') {
-			$formData.MasterEventID = Number(selectedMasterId);
-		}
-	});
-
-	// Ableiten, ob ausgewählter Master ein HSM Event ist und Feld setzen
-	$effect(() => {
-		if (selectedMasterId) {
-			const master = eventMasters.find(
-				(m: { ID: number; Titel: string | null; Eventart?: string | null }) =>
-					String(m.ID) === selectedMasterId
-			);
-			$formData.IstHSMEvent = master?.Eventart === 'HSM';
-			// Falls kein HSM Event gewählt wurde, HSM Punkte zurücksetzen
-			if (!$formData.IstHSMEvent) {
-				$formData.HSMPoints = undefined as unknown as number | undefined;
-			}
-		} else {
-			$formData.IstHSMEvent = false;
-			$formData.HSMPoints = undefined as unknown as number | undefined;
-		}
-	});
-
 	// Mitglieder-Selector: lokale Auswahl mit vollem Typ (für Anzeige)
 	type Mitglied = {
 		ID: number;
@@ -74,8 +39,27 @@
 	$effect(() => {
 		$formData.EventVerantwortliche = selectedMitglieder.map(({ ID, Titel }) => ({ ID, Titel }));
 	});
+
+	// MasterEvent Auswahl (UI) als String halten; SuperForm-Daten via Effekt synchronisieren
+	let selectedMasterId = $state<string>(
+		$formData.MasterEventID ? String($formData.MasterEventID) : ''
+	);
+
+	// Wenn sich die Auswahl ändert: MasterEventID (als number) setzen und HSM-Flag ableiten
+	$effect(() => {
+		if (selectedMasterId) {
+			const id = Number(selectedMasterId);
+			$formData.MasterEventID = id; // garantiert number
+			const art = eventMasters.find((m: any) => m.ID === id)?.Eventart ?? null;
+			$formData.IstHSMEvent = (art?.toLowerCase?.() ?? '') === 'hsm';
+		} else {
+			// Nichts ausgewählt: HSM zurücksetzen, MasterEventID unverändert lassen (vermeidet Typkonflikte)
+			$formData.IstHSMEvent = false;
+		}
+	});
 </script>
 
+<SuperDebug data={$formData} />
 <form method="POST" enctype="multipart/form-data" use:form.enhance class="space-y-3">
 	<h2 class="text-lg font-semibold mb-2">Grundlegende Informationen</h2>
 	<FormField {form} name="Titel">
@@ -97,15 +81,15 @@
 			{#snippet children({ props })}
 				<RequiredLabel required label="Event Master" />
 				<!-- Hidden input ensures MasterEventID is submitted -->
-				<input type="hidden" {...props} value={$formData.MasterEventID} />
+				<input type="hidden" {...props} value={$formData.MasterEventID ?? ''} />
 				<!-- Hidden field for IstHSMEvent so it's submitted -->
 				<input type="hidden" name="IstHSMEvent" value={$formData.IstHSMEvent} />
 
 				<Select type="single" bind:value={selectedMasterId}>
 					<SelectTrigger class="w-full">
-						{#if selectedMasterId}
+						{#if $formData.MasterEventID}
 							{eventMasters.find(
-								(m: { ID: number; Titel: string | null }) => String(m.ID) === selectedMasterId
+								(m: { ID: number; Titel: string | null }) => m.ID === $formData.MasterEventID
 							)?.Titel || 'Event Master auswählen'}
 						{:else}
 							Event Master auswählen
