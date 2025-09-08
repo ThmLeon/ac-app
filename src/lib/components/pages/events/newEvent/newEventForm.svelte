@@ -59,7 +59,6 @@
 	});
 </script>
 
-<SuperDebug data={$formData} />
 <form method="POST" enctype="multipart/form-data" use:form.enhance class="space-y-3">
 	<h2 class="text-lg font-semibold mb-2">Grundlegende Informationen</h2>
 	<FormField {form} name="Titel">

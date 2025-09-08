@@ -1,10 +1,11 @@
-import { throwMissingErrorIfNeeded } from '@/utils/utils.server';
-import type { PageServerLoad } from './$types';
+import { returnDeleteActionResultBoth, throwMissingErrorIfNeeded } from '@/utils/utils.server';
+import type { Actions, PageServerLoad } from './$types';
 import {
 	getEventApplicationState,
 	getEventDetailsById,
 	getNumberOfEventApplications
 } from '@/server/supabase/events.server';
+import { error as svelteError } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	const eventId = throwMissingErrorIfNeeded(params.eventId);

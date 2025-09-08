@@ -117,6 +117,9 @@
 				<a href={`./${eventData.ID}/besetzen`}>
 					<Button variant="default">Bewerbungen & Besetzung</Button>
 				</a>
+				<a href={`./`}>
+					<Button variant="destructive">Event löschen</Button>
+				</a>
 			{/if}
 			{#if !(showApplyOrEditButton || (isUserEventResponsible && showApplyOrEditButton))}
 				<!-- Unsichtbarer Platzhalter, falls absolut keine Buttons -->
