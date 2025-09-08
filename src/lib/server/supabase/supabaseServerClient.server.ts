@@ -1,3 +1,4 @@
+// @ts-ignore
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 import { createServerClient } from '@supabase/ssr';
 import type { RequestEvent } from '@sveltejs/kit';

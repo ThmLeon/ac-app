@@ -11,7 +11,7 @@
 	import { Badge } from '../ui/badge'; // Import the ShadCN badge component
 	import { formatApplicationDeadline, formatDate } from '@/app.utils';
 	import { onMount } from 'svelte';
-	import { SupabaseClient } from '@supabase/supabase-js';
+	import type { SupabaseClient } from '@supabase/supabase-js';
 	import type { Database } from '@/database.types';
 
 	type EventCardProps = {

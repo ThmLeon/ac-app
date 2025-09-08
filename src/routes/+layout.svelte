@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import { onMount, setContext } from 'svelte';
-	import type { SupabaseClient, Session } from '@supabase/supabase-js';
 	import '../app.css';
 
 	let { data, children } = $props();

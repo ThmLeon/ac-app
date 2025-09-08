@@ -51,11 +51,14 @@
 						<CommandGroup heading="Vorschläge">
 							<ScrollArea class="max-h-60">
 								{#each mitgliederSelector.mitglieder as m (m.ID)}
-									<CommandItem value={m.Titel!} onclick={() => mitgliederSelector.addMitglied(m)}>
+									<CommandItem
+										value={m.Titel || 'Mitglied Name'}
+										onclick={() => mitgliederSelector.addMitglied(m)}
+									>
 										<div class="flex flex-col">
-											<span class="font-medium">{m.Titel}</span>
+											<span class="font-medium">{m.Titel || 'Mitglied Name'}</span>
 											<span class="text-sm text-muted-foreground"
-												>{mitgliederStatusAsText(m.Art!, m.Rolle!)}</span
+												>{mitgliederStatusAsText(m.Art || 'Aktiv', m.Rolle || 'Mitglied')}</span
 											>
 										</div>
 									</CommandItem>

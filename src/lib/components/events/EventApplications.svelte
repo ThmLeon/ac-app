@@ -2,11 +2,12 @@
 	import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 	import { Button } from '@/components/ui/button';
 	import { toast } from 'svelte-sonner';
-	import { useSupabase } from '@/client/supabase/supabaseClient';
 	import JSZip from 'jszip';
 	// If you have a ScrollArea component you can import it; otherwise remove related markup.
 	// import { ScrollArea } from '@/components/ui/scroll-area';
 	import { saveAs } from 'file-saver';
+	import type { SupabaseClient } from '@supabase/supabase-js';
+	import type { Database } from '@/database.types';
 
 	type EventApplication = {
 		ID: number;
@@ -17,10 +18,11 @@
 		Essgewohnheiten: string | null;
 	};
 
-	const { supabase } = useSupabase();
-
-	export let applications: EventApplication[] = [];
-	export let eventId: number;
+	const { supabase, applications, eventId } = $props<{
+		supabase: SupabaseClient<Database>;
+		applications: EventApplication[];
+		eventId: number;
+	}>();
 
 	async function showAnlage(app: EventApplication) {
 		toast.loading('Anlage wird vorbereitet', { id: 'download_application_' + app.ID });

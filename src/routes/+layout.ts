@@ -2,7 +2,6 @@ import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ss
 // @ts-ignore - Provided by SvelteKit at build/runtime; ignore IDE type resolution here
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
 import type { LayoutLoad } from './$types';
-import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/database.types';
 
 export const load: LayoutLoad = async ({ data, depends, fetch }) => {
