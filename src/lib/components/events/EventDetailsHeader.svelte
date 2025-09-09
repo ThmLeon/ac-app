@@ -3,6 +3,18 @@
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 	import { Badge } from '../ui/badge';
 	import { Button } from '../ui/button';
+	import {
+		Root as AlertDialog,
+		Trigger as AlertDialogTrigger,
+		Content as AlertDialogContent,
+		Header as AlertDialogHeader,
+		Title as AlertDialogTitle,
+		Description as AlertDialogDescription,
+		Footer as AlertDialogFooter,
+		Cancel as AlertDialogCancel,
+		Action as AlertDialogAction
+	} from '../ui/alert-dialog';
+	import { buttonVariants } from '../ui/button/button.svelte';
 	import { badgeColors, eventBewerbungMoeglich } from '@/utils/utils';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -48,7 +60,7 @@
 		onResult: async ({ result }) => {
 			handleActionResultSonners(result, 'delete_event_form');
 			if (result.status !== 500 && result.type === 'success') {
-				await goto('../', { replaceState: true });
+				await goto('../events', { replaceState: true });
 			}
 		}
 	});
@@ -138,10 +150,34 @@
 				<a href={`./${eventData.ID}/besetzen`}>
 					<Button variant="default">Bewerbungen & Besetzung</Button>
 				</a>
-				<form method="POST" use:deleteEventForm.enhance class="inline">
-					<input type="hidden" name="ID" bind:value={$deleteEventFormData.ID} />
-					<Button variant="destructive" formaction="?/deleteEvent">Event löschen</Button>
-				</form>
+				<!-- Delete confirmation dialog -->
+				<AlertDialog>
+					<AlertDialogTrigger class={buttonVariants({ variant: 'destructive' })} type="button">
+						Event löschen
+					</AlertDialogTrigger>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Event wirklich löschen?</AlertDialogTitle>
+							<AlertDialogDescription>
+								Diese Aktion kann nicht rückgängig gemacht werden. Das Event und alle abhängigen
+								Daten (z.B. Bewerbungen, Besetzungen) werden dauerhaft entfernt.
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel>Abbrechen</AlertDialogCancel>
+							<form method="POST" use:deleteEventForm.enhance class="inline">
+								<input type="hidden" name="ID" bind:value={$deleteEventFormData.ID} />
+								<AlertDialogAction
+									class={buttonVariants({ variant: 'destructive' })}
+									type="submit"
+									formaction="?/deleteEvent"
+								>
+									Event löschen
+								</AlertDialogAction>
+							</form>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
 			{/if}
 			{#if !(showApplyOrEditButton || (isUserEventResponsible && showApplyOrEditButton))}
 				<!-- Unsichtbarer Platzhalter, falls absolut keine Buttons -->

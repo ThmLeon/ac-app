@@ -48,7 +48,22 @@ export async function deleteEventMaster(id: number) {
 
 export async function deleteEvent(id: number) {
 	const EventList = new SharepointList('4_Events');
-	return await EventList.delete(id);
+	const EventVerantwortlicheList = new SharepointList('4_EventVerantwortliche');
+	const EventBewerbungenList = new SharepointList('4_EventBewerbungen');
+
+	const eventResult = await EventList.delete(id);
+	if (eventResult instanceof Error) return eventResult;
+
+	const eventVerantwortlicheResult = await EventVerantwortlicheList.deleteAllWhereEquals(
+		'EventID',
+		id
+	);
+	if (eventVerantwortlicheResult instanceof Error) return eventVerantwortlicheResult;
+
+	const eventBewerbungenResult = await EventBewerbungenList.deleteAllWhereEquals('EventID', id);
+	if (eventBewerbungenResult instanceof Error) return eventBewerbungenResult;
+
+	return null;
 }
 
 export async function createNewEvent(data: EventData) {
