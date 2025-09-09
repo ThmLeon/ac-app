@@ -28,6 +28,7 @@
 		totalApplications={data.totalApplications}
 		showApplyOrEditButton={!isBewerbenPage}
 		eventImageUrl={data.eventImageUrl}
+		deleteForm={data.deleteForm}
 	/>
 	{@render children()}
 {/await}

@@ -36,6 +36,22 @@ export async function deleteEventApplication(id: number) {
 	return error;
 }
 
+export async function deleteEvent(id: number) {
+	const { error: eventError } = await supabaseServerClient().from('4_Events').delete().eq('ID', id);
+	if (eventError) return eventError;
+	const { error: eventVerantwortlicheError } = await supabaseServerClient()
+		.from('4_EventVerantwortliche')
+		.delete()
+		.eq('EventID', id);
+	if (eventVerantwortlicheError) return eventVerantwortlicheError;
+	const { error: eventBewerbungenError } = await supabaseServerClient()
+		.from('4_EventBewerbungen')
+		.delete()
+		.eq('EventID', id);
+	if (eventBewerbungenError) return eventBewerbungenError;
+	return null;
+}
+
 export async function updateEventMaster(formData: EventMasterForm) {
 	const { error } = await supabaseServerClient()
 		.from('4_EventMaster')
