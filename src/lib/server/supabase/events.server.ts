@@ -36,6 +36,11 @@ export async function deleteEventApplication(id: number) {
 	return error;
 }
 
+export async function deleteEvent(id: number) {
+	const { error } = await supabaseServerClient().from('4_Events').delete().eq('ID', id);
+	return error;
+}
+
 export async function updateEventMaster(formData: EventMasterForm) {
 	const { error } = await supabaseServerClient()
 		.from('4_EventMaster')

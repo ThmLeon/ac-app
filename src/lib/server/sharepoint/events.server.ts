@@ -46,6 +46,11 @@ export async function deleteEventMaster(id: number) {
 	return await EventMasterList.delete(id);
 }
 
+export async function deleteEvent(id: number) {
+	const EventList = new SharepointList('4_Events');
+	return await EventList.delete(id);
+}
+
 export async function createNewEvent(data: EventData) {
 	const EventList = new SharepointList('4_Events');
 	//transformData

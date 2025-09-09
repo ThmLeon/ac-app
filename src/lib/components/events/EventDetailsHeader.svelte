@@ -1,9 +1,14 @@
 <script lang="ts">
-	import { formatApplicationDeadline, formatDate } from '@/app.utils';
+	import { formatApplicationDeadline, formatDate, handleActionResultSonners } from '@/app.utils';
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 	import { Badge } from '../ui/badge';
 	import { Button } from '../ui/button';
 	import { badgeColors, eventBewerbungMoeglich } from '@/utils/utils';
+	import { superForm } from 'sveltekit-superforms/client';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { eventDeleteSchema } from '@/schemas/eventDeleteSchema';
+	import { toast } from 'svelte-sonner';
+	import { goto } from '$app/navigation';
 
 	export let eventData: {
 		ID: number;
@@ -33,6 +38,22 @@
 	export let showApplyOrEditButton: boolean;
 	export let userId: number;
 	export let eventImageUrl: string | null;
+	export let deleteForm: any;
+
+	const deleteEventForm = superForm(deleteForm, {
+		validators: zodClient(eventDeleteSchema),
+		onSubmit: () => {
+			toast.loading('Event wird gelöscht', { id: 'delete_event_form' });
+		},
+		onResult: async ({ result }) => {
+			handleActionResultSonners(result, 'delete_event_form');
+			if (result.status !== 500 && result.type === 'success') {
+				await goto('../', { replaceState: true });
+			}
+		}
+	});
+
+	const { form: deleteEventFormData } = deleteEventForm;
 
 	$: bewerbungAktiviert = eventBewerbungMoeglich(
 		eventData.Bewerbungsdeadline ? new Date(eventData.Bewerbungsdeadline) : null,
@@ -117,9 +138,10 @@
 				<a href={`./${eventData.ID}/besetzen`}>
 					<Button variant="default">Bewerbungen & Besetzung</Button>
 				</a>
-				<a href={`./`}>
-					<Button variant="destructive">Event löschen</Button>
-				</a>
+				<form method="POST" use:deleteEventForm.enhance class="inline">
+					<input type="hidden" name="ID" bind:value={$deleteEventFormData.ID} />
+					<Button variant="destructive" formaction="?/deleteEvent">Event löschen</Button>
+				</form>
 			{/if}
 			{#if !(showApplyOrEditButton || (isUserEventResponsible && showApplyOrEditButton))}
 				<!-- Unsichtbarer Platzhalter, falls absolut keine Buttons -->
