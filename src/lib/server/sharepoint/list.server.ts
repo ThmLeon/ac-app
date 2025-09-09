@@ -69,6 +69,22 @@ class SharepointList {
 		}
 	}
 
+	public async deleteAllWhereEquals(fieldName: string, value: string | number) {
+		try {
+			const client = await getGraphClient();
+			const response = await client
+				.api(`${this.databaseUrl}${this.listId}/items?$filter=fields/${fieldName} eq '${value}'`)
+				.get();
+			if (response.value && response.value.length > 0) {
+				for (const item of response.value) {
+					await this.delete(item.id);
+				}
+			}
+		} catch (error: any) {
+			return new Error('Sharepoint Delete Error');
+		}
+	}
+
 	// Returns the list's columns (fields). Set includeHidden=false to exclude hidden columns.
 	public async getFields(includeHidden: boolean = true) {
 		try {
