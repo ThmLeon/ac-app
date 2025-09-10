@@ -2,7 +2,7 @@ import type { eventMasterSchema } from '@/schemas/eventMasterSchema';
 import SharepointList from './list.server';
 import type z from 'zod';
 import type { newEventSchema } from '@/schemas/newEventSchema';
-import { getEventMasterById } from '../supabase/events.server';
+import { getEventMasterById, getEventVerantwortlicheIds } from '../supabase/events.server';
 import type { eventBewerbungSchema } from '@/schemas/eventBewerbungSchema';
 import type { EventBesetzungAnwesenheitSchema } from '@/schemas/eventBesetzungAnwesenheitSchema';
 
@@ -80,6 +80,47 @@ export async function createNewEvent(data: EventData) {
 	}
 
 	return { EventResult, eventVerantwortlicheIDs };
+}
+
+export async function updateEvent(eventId: number, data: EventData) {
+	const EventList = new SharepointList('4_Events');
+	let transformedData = { ...data } as any;
+	transformedData['AnlageGew_x00fc_nscht'] = transformedData.AnlageGewuenscht;
+	delete transformedData.AnlageGewuenscht;
+	transformedData['BewerbungstextGew_x00fc_nscht'] = transformedData.BewerbungstextGewuenscht;
+	delete transformedData.BewerbungstextGewuenscht;
+	transformedData['AngabeEssgewGew_x00fc_nscht'] = transformedData.AngabeEssgewGewuenscht;
+	delete transformedData.AngabeEssgewGewuenscht;
+	delete transformedData.EventVerantwortliche;
+	delete transformedData.IstHSMEvent;
+	delete transformedData.image;
+
+	let { Eventart } = await getEventMasterById(transformedData.MasterEventID);
+	transformedData.Eventart = Eventart;
+
+	const updateResult = await EventList.update(eventId, transformedData);
+	if (updateResult instanceof Error) return updateResult;
+
+	const EventVerantwortlicheList = new SharepointList('4_EventVerantwortliche');
+	const existingIds = await getEventVerantwortlicheIds(eventId);
+	for (const id of existingIds) {
+		const delRes = await EventVerantwortlicheList.delete(id);
+		if (delRes instanceof Error) return delRes;
+	}
+
+	const eventVerantwortlicheIDs: number[] = [];
+	for (const verantwortlicher of data.EventVerantwortliche) {
+		const VerantwortlicherResult = await EventVerantwortlicheList.create({
+			Title: verantwortlicher.Titel,
+			EventID: eventId,
+			MitgliedID: verantwortlicher.ID,
+			Besetzt: true
+		});
+		if (VerantwortlicherResult instanceof Error) return VerantwortlicherResult;
+		eventVerantwortlicheIDs.push(VerantwortlicherResult);
+	}
+
+	return { eventVerantwortlicheIDs };
 }
 
 export async function createEventApplication(

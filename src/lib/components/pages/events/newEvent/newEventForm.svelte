@@ -17,10 +17,16 @@
 	import type { SupabaseClient } from '@supabase/supabase-js';
 	import SuperDebug from 'sveltekit-superforms';
 
-	const { form, eventMasters, supabase } = $props<{
+	const {
+		form,
+		eventMasters,
+		supabase,
+		formAction = '?/createNewEvent'
+	} = $props<{
 		form: SuperForm<NewEventForm>;
 		eventMasters: Array<{ ID: number; Titel: string | null; Eventart?: string | null }>;
 		supabase: SupabaseClient<Database>;
+		formAction?: string;
 	}>();
 
 	let formData: SuperFormData<NewEventForm> = form.form;
@@ -363,5 +369,5 @@
 		<FormFieldErrors />
 	</FormField>
 
-	<FormButton formaction="?/createNewEvent">Submit</FormButton>
+	<FormButton formaction={formAction}>Submit</FormButton>
 </form>

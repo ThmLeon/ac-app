@@ -117,6 +117,9 @@
 				<a href={`./${eventData.ID}/besetzen`}>
 					<Button variant="default">Bewerbungen & Besetzung</Button>
 				</a>
+				<a href={`./${eventData.ID}/bearbeiten`}>
+					<Button variant="default">Event bearbeiten</Button>
+				</a>
 				<a href={`./`}>
 					<Button variant="destructive">Event löschen</Button>
 				</a>

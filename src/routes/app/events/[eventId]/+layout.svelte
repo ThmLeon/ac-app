@@ -9,7 +9,9 @@
 
 	// Dynamically determine if we are on the /bewerben page
 	let isBewerbenPage = $derived(
-		$page.url.pathname.endsWith('/bewerben') || $page.url.pathname.endsWith('/besetzen')
+		$page.url.pathname.endsWith('/bewerben') ||
+			$page.url.pathname.endsWith('/besetzen') ||
+			$page.url.pathname.endsWith('/bearbeiten')
 	);
 </script>
 

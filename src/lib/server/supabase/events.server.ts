@@ -145,6 +145,62 @@ export async function createEventApplication(
 	return anlageError;
 }
 
+export async function updateEvent(
+	formData: NewEventForm,
+	eventId: number,
+	sharepointResults: { eventVerantwortlicheIDs: number[] }
+) {
+	const { image, IstHSMEvent, EventVerantwortliche, ...eventData } = formData;
+
+	const { error: eventError } = await supabaseServerClient()
+		.from('4_Events')
+		.update({
+			...eventData,
+			Beginn: eventData.Beginn.toISOString(),
+			Ende: eventData.Ende.toISOString(),
+			Bewerbungsdeadline: eventData.Bewerbungsdeadline?.toISOString(),
+			CheckInBeginn: eventData.CheckInBeginn?.toISOString(),
+			Postleitzahl: eventData.Postleitzahl?.toString() || null,
+			FCFSSlots: eventData.FCFSSlots || null
+		})
+		.eq('ID', eventId);
+	if (eventError) return eventError;
+
+	// Reset Verantwortliche
+	const { error: deleteError } = await supabaseServerClient()
+		.from('4_EventVerantwortliche')
+		.delete()
+		.eq('EventID', eventId);
+	if (deleteError) return deleteError;
+
+	for (const [
+		i,
+		verantwortlicherEintragId
+	] of sharepointResults.eventVerantwortlicheIDs.entries()) {
+		const { error: eventVerantwortlicherError } = await supabaseServerClient()
+			.from('4_EventVerantwortliche')
+			.insert({
+				ID: verantwortlicherEintragId,
+				Titel: EventVerantwortliche[i].Titel,
+				EventID: eventId,
+				MitgliedID: EventVerantwortliche[i].ID,
+				Besetzt: true
+			});
+		if (eventVerantwortlicherError) return eventVerantwortlicherError;
+	}
+
+	if (image && image.size > 0) {
+		const ext = image.name.split('.').pop();
+		const path = `titelbilder/${eventId}/${eventId}.${ext}`;
+		const { error: imageUploadError } = await supabaseServerClient()
+			.storage.from('events')
+			.upload(path, image, { upsert: true });
+		if (imageUploadError) return imageUploadError;
+	}
+
+	return eventError;
+}
+
 type allEventsPaginated = {
 	ID: number;
 	Titel: string | null;
@@ -168,9 +224,9 @@ export async function getEventDetailsById(eventId: number) {
 	let { data, error } = await supabaseServerClient()
 		.from('4_Events')
 		.select(
-			`ID, Titel, Beschreibung, Beginn, Ende, Anmeldeart, Bewerbungsdeadline, Ort, StrasseHausnummer, Postleitzahl, BewerbungstextGewuenscht, BewTextVorgabe, AnlageGewuenscht, AnlageInhalte, AngabeEssgewGewuenscht, FCFSSlots,
+			`ID, Titel, Beschreibung, Beginn, Ende, Anmeldeart, Bewerbungsdeadline, CheckInBeginn, Ort, StrasseHausnummer, Postleitzahl, Semester, KostenString, KostenEUR, BewerbungstextGewuenscht, BewTextVorgabe, AnlageGewuenscht, AnlageInhalte, AngabeEssgewGewuenscht, FCFSSlots, IstHSMEvent, HSMPoints, MasterEventID,
              event_master:4_EventMaster(Titel),
-             event_verantwortliche:4_EventVerantwortliche(mitglieder:1_Mitglieder(ID, Vorname, Nachname, Art, Rolle))`
+             event_verantwortliche:4_EventVerantwortliche(ID, Titel, MitgliedID, mitglieder:1_Mitglieder(ID, Vorname, Nachname, Art, Rolle))`
 		)
 		.eq('ID', eventId)
 		.single();
@@ -230,4 +286,13 @@ export async function setEventBesetzungAnwesenheit(eventData: EventBesetzungAnwe
 		.eq('ID', eventData.ID);
 
 	return error;
+}
+
+export async function getEventVerantwortlicheIds(eventId: number) {
+	let { data, error } = await supabaseServerClient()
+		.from('4_EventVerantwortliche')
+		.select('ID')
+		.eq('EventID', eventId);
+	data = throwFetchErrorIfNeeded(data, error, 'Event Verantwortliche konnten nicht geladen werden');
+	return data.map((v: { ID: number }) => v.ID);
 }
