@@ -5,7 +5,7 @@
 	import { Button } from '../ui/button';
 	import {
 		Root as AlertDialog,
-		Trigger as AlertDialogTrigger,
+		// removed Trigger import to avoid unmount-on-menu-close behavior
 		Content as AlertDialogContent,
 		Header as AlertDialogHeader,
 		Title as AlertDialogTitle,
@@ -69,6 +69,9 @@
 			}
 		}
 	});
+
+	// control the alert dialog outside the dropdown menu
+	let confirmDeleteOpen = false;
 
 	const PLACEHOLDER = EventTitelbildRealistic;
 
@@ -154,37 +157,6 @@
 				{/if}
 			{/if}
 			{#if isUserEventResponsible && showApplyOrEditButton}
-				<a href={`./${eventData.ID}/besetzen`}>
-					<Button variant="default">Bewerbungen & Besetzung</Button>
-				</a>
-				<!-- Delete confirmation dialog -->
-				<AlertDialog>
-					<AlertDialogTrigger class={buttonVariants({ variant: 'destructive' })} type="button">
-						Event löschen
-					</AlertDialogTrigger>
-					<AlertDialogContent>
-						<AlertDialogHeader>
-							<AlertDialogTitle>Event wirklich löschen?</AlertDialogTitle>
-							<AlertDialogDescription>
-								Diese Aktion kann nicht rückgängig gemacht werden. Das Event und alle abhängigen
-								Daten (z.B. Bewerbungen, Besetzungen) werden dauerhaft entfernt.
-							</AlertDialogDescription>
-						</AlertDialogHeader>
-						<AlertDialogFooter>
-							<AlertDialogCancel>Abbrechen</AlertDialogCancel>
-							<form method="POST" use:deleteEventForm.enhance class="inline">
-								<input type="hidden" name="ID" bind:value={$deleteEventFormData.ID} />
-								<AlertDialogAction
-									class={buttonVariants({ variant: 'destructive' })}
-									type="submit"
-									formaction="?/deleteEvent"
-								>
-									Event löschen
-								</AlertDialogAction>
-							</form>
-						</AlertDialogFooter>
-					</AlertDialogContent>
-				</AlertDialog>
 				<DropdownMenu>
 					<DropdownMenuTrigger>
 						{#snippet child({ props })}
@@ -193,23 +165,47 @@
 					</DropdownMenuTrigger>
 					<DropdownMenuContent>
 						<DropdownMenuItem>
-							<a href={`./${eventData.ID}/besetzen`}>
-								<Button variant="default">Bewerbungen & Besetzung</Button>
-							</a>
+							<a href={`./${eventData.ID}/besetzen`}> Bewerbungen & Besetzung </a>
 						</DropdownMenuItem>
 						<DropdownMenuItem>
-							<a href={`./${eventData.ID}/bearbeiten`}>
-								<Button variant="default">Event bearbeiten</Button>
-							</a>
+							<a href={`./${eventData.ID}/bearbeiten`}> Event bearbeiten </a>
 						</DropdownMenuItem>
 						<DropdownMenuItem>
-							<a href={`./`}>
-								<Button variant="destructive">Event löschen</Button>
-							</a>
+							<!-- Open alert dialog via local state to avoid unmount when menu closes -->
+							<button type="button" on:click={() => (confirmDeleteOpen = true)}
+								>Event löschen</button
+							>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			{/if}
+
+			<!-- Dedicated AlertDialog outside the dropdown to prevent auto-close -->
+			<AlertDialog bind:open={confirmDeleteOpen}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Event wirklich löschen?</AlertDialogTitle>
+						<AlertDialogDescription>
+							Diese Aktion kann nicht rückgängig gemacht werden. Das Event und alle abhängigen Daten
+							(z.B. Bewerbungen, Besetzungen) werden dauerhaft entfernt.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Abbrechen</AlertDialogCancel>
+						<form method="POST" use:deleteEventForm.enhance class="inline">
+							<input type="hidden" name="ID" bind:value={$deleteEventFormData.ID} />
+							<AlertDialogAction
+								class={buttonVariants({ variant: 'destructive' })}
+								type="submit"
+								formaction="?/deleteEvent"
+							>
+								Event löschen
+							</AlertDialogAction>
+						</form>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+
 			{#if !(showApplyOrEditButton || (isUserEventResponsible && showApplyOrEditButton))}
 				<!-- Unsichtbarer Platzhalter, falls absolut keine Buttons -->
 				<span class="invisible">
