@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      "0_UserFeedback": {
+        Row: {
+          AppSeite: string | null
+          Beschreibung: string | null
+          created_at: string
+          ID: number
+          Kategorie: string | null
+          Prioritaet: string | null
+          Titel: string | null
+        }
+        Insert: {
+          AppSeite?: string | null
+          Beschreibung?: string | null
+          created_at?: string
+          ID?: number
+          Kategorie?: string | null
+          Prioritaet?: string | null
+          Titel?: string | null
+        }
+        Update: {
+          AppSeite?: string | null
+          Beschreibung?: string | null
+          created_at?: string
+          ID?: number
+          Kategorie?: string | null
+          Prioritaet?: string | null
+          Titel?: string | null
+        }
+        Relationships: []
+      }
       "1_Mitglieder": {
         Row: {
           Anwaertergeneration: string | null

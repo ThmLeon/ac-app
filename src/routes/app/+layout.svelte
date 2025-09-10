@@ -14,6 +14,7 @@
 	import { page } from '$app/stores';
 	import { derived, writable, type Readable } from 'svelte/store';
 	import { setContext } from 'svelte';
+	import FeedbackDialog from '@/components/feedback/FeedbackDialog.svelte';
 
 	let { data, children } = $props();
 
@@ -120,4 +121,5 @@
 			{@render children()}
 		</div>
 	</SidebarInset>
+	<FeedbackDialog supabase={data.supabase} />
 </SidebarProvider>
