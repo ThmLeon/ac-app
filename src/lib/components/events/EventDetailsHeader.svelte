@@ -21,6 +21,7 @@
 	import { eventDeleteSchema } from '@/schemas/eventDeleteSchema';
 	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
+	import EventTitelbildRealistic from '$lib/assets/EventTitelbildRealistic.jpg';
 
 	export let eventData: {
 		ID: number;
@@ -65,6 +66,8 @@
 		}
 	});
 
+	const PLACEHOLDER = EventTitelbildRealistic;
+
 	const { form: deleteEventFormData } = deleteEventForm;
 
 	$: bewerbungAktiviert = eventBewerbungMoeglich(
@@ -98,7 +101,7 @@
 <Card class="flex flex-col md:flex-row gap-4 p-0">
 	<!-- Image Section -->
 	<img
-		src={eventImageUrl || 'https://placehold.co/1600x1000?text=Event'}
+		src={eventImageUrl || PLACEHOLDER}
 		alt={eventData.Titel || 'Event Image'}
 		class="w-full md:w-1/3 object-cover rounded-lg aspect-16/10"
 	/>
