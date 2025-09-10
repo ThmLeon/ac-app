@@ -14,6 +14,7 @@
 	import { page } from '$app/stores';
 	import { derived, writable, type Readable } from 'svelte/store';
 	import { setContext } from 'svelte';
+	import FeedbackDialog from '@/components/feedback/FeedbackDialog.svelte';
 
 	let { data, children } = $props();
 
@@ -121,3 +122,5 @@
 		</div>
 	</SidebarInset>
 </SidebarProvider>
+
+<FeedbackDialog form={(data as any).feedbackForm} />
