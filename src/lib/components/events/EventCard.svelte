@@ -7,6 +7,7 @@
 		CardTitle,
 		CardDescription
 	} from '../ui/card';
+	import EventTitelbildRealistic from '$lib/assets/EventTitelbildRealistic.jpg';
 	import { Button } from '../ui/button';
 	import { Badge } from '../ui/badge'; // Import the ShadCN badge component
 	import { formatApplicationDeadline, formatDate } from '@/app.utils';
@@ -61,7 +62,7 @@
 	}
 
 	async function loadEventImage() {
-		const PLACEHOLDER = 'https://placehold.co/1600x1000?text=Event';
+		const PLACEHOLDER = EventTitelbildRealistic;
 		const imageData = await supabase?.storage
 			.from('events')
 			.createSignedUrls(

@@ -1,9 +1,27 @@
 <script lang="ts">
-	import { formatApplicationDeadline, formatDate } from '@/app.utils';
+	import { formatApplicationDeadline, formatDate, handleActionResultSonners } from '@/app.utils';
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 	import { Badge } from '../ui/badge';
 	import { Button } from '../ui/button';
+	import {
+		Root as AlertDialog,
+		Trigger as AlertDialogTrigger,
+		Content as AlertDialogContent,
+		Header as AlertDialogHeader,
+		Title as AlertDialogTitle,
+		Description as AlertDialogDescription,
+		Footer as AlertDialogFooter,
+		Cancel as AlertDialogCancel,
+		Action as AlertDialogAction
+	} from '../ui/alert-dialog';
+	import { buttonVariants } from '../ui/button/button.svelte';
 	import { badgeColors, eventBewerbungMoeglich } from '@/utils/utils';
+	import { superForm } from 'sveltekit-superforms/client';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { eventDeleteSchema } from '@/schemas/eventDeleteSchema';
+	import { toast } from 'svelte-sonner';
+	import { goto } from '$app/navigation';
+	import EventTitelbildRealistic from '$lib/assets/EventTitelbildRealistic.jpg';
 	import { DropdownMenu } from '../ui/dropdown-menu';
 	import DropdownMenuTrigger from '../ui/dropdown-menu/dropdown-menu-trigger.svelte';
 	import DropdownMenuContent from '../ui/dropdown-menu/dropdown-menu-content.svelte';
@@ -37,6 +55,24 @@
 	export let showApplyOrEditButton: boolean;
 	export let userId: number;
 	export let eventImageUrl: string | null;
+	export let deleteForm: any;
+
+	const deleteEventForm = superForm(deleteForm, {
+		validators: zodClient(eventDeleteSchema),
+		onSubmit: () => {
+			toast.loading('Event wird gelöscht', { id: 'delete_event_form' });
+		},
+		onResult: async ({ result }) => {
+			handleActionResultSonners(result, 'delete_event_form');
+			if (result.status !== 500 && result.type === 'success') {
+				await goto('../events', { replaceState: true });
+			}
+		}
+	});
+
+	const PLACEHOLDER = EventTitelbildRealistic;
+
+	const { form: deleteEventFormData } = deleteEventForm;
 
 	$: bewerbungAktiviert = eventBewerbungMoeglich(
 		eventData.Bewerbungsdeadline ? new Date(eventData.Bewerbungsdeadline) : null,
@@ -69,7 +105,7 @@
 <Card class="flex flex-col md:flex-row gap-4 p-0">
 	<!-- Image Section -->
 	<img
-		src={eventImageUrl || 'https://placehold.co/1600x1000?text=Event'}
+		src={eventImageUrl || PLACEHOLDER}
 		alt={eventData.Titel || 'Event Image'}
 		class="w-full md:w-1/3 object-cover rounded-lg aspect-16/10"
 	/>
@@ -118,6 +154,37 @@
 				{/if}
 			{/if}
 			{#if isUserEventResponsible && showApplyOrEditButton}
+				<a href={`./${eventData.ID}/besetzen`}>
+					<Button variant="default">Bewerbungen & Besetzung</Button>
+				</a>
+				<!-- Delete confirmation dialog -->
+				<AlertDialog>
+					<AlertDialogTrigger class={buttonVariants({ variant: 'destructive' })} type="button">
+						Event löschen
+					</AlertDialogTrigger>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Event wirklich löschen?</AlertDialogTitle>
+							<AlertDialogDescription>
+								Diese Aktion kann nicht rückgängig gemacht werden. Das Event und alle abhängigen
+								Daten (z.B. Bewerbungen, Besetzungen) werden dauerhaft entfernt.
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel>Abbrechen</AlertDialogCancel>
+							<form method="POST" use:deleteEventForm.enhance class="inline">
+								<input type="hidden" name="ID" bind:value={$deleteEventFormData.ID} />
+								<AlertDialogAction
+									class={buttonVariants({ variant: 'destructive' })}
+									type="submit"
+									formaction="?/deleteEvent"
+								>
+									Event löschen
+								</AlertDialogAction>
+							</form>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
 				<DropdownMenu>
 					<DropdownMenuTrigger>
 						{#snippet child({ props })}

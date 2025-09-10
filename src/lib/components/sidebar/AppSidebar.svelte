@@ -14,7 +14,8 @@
 		Banknote,
 		Wallet,
 		Wallet2,
-		User
+		User,
+		Clock
 	} from 'lucide-svelte';
 	import SidebarFooter from '../ui/sidebar/sidebar-footer.svelte';
 	import NavFooter from './NavFooter.svelte';
@@ -26,7 +27,7 @@
 	export let avatarUrl: string;
 
 	const navItems = [
-		{
+		/*{
 			title: 'Mitglieder',
 			url: '/app/mitglieder/meinProfil',
 			icon: User,
@@ -37,7 +38,7 @@
 				{ title: 'Vereinsrollen', url: '/app/mitglieder/vereinsrollen' },
 				{ title: 'Teamwahl', url: '/app/mitglieder/teamwahl' }
 			]
-		},
+		},*/
 		{
 			title: 'Events',
 			url: '/app/events',
@@ -49,6 +50,13 @@
 			]
 		},
 		{
+			title: 'More coming soon...',
+			url: '#',
+			icon: Clock,
+			isActive: false,
+			items: []
+		}
+		/*{
 			title: 'Finanzen',
 			url: '/app/finanzen',
 			icon: Wallet,
@@ -66,7 +74,7 @@
 				{ title: 'Persönlich', url: '#' },
 				{ title: 'Organisation', url: '#' }
 			]
-		}
+		}*/
 	];
 </script>
 
