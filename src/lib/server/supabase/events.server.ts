@@ -224,7 +224,7 @@ export async function getEventDetailsById(eventId: number) {
 	let { data, error } = await supabaseServerClient()
 		.from('4_Events')
 		.select(
-			`ID, Titel, Beschreibung, Beginn, Ende, Anmeldeart, Bewerbungsdeadline, CheckInBeginn, Ort, StrasseHausnummer, Postleitzahl, Semester, KostenString, KostenEUR, BewerbungstextGewuenscht, BewTextVorgabe, AnlageGewuenscht, AnlageInhalte, AngabeEssgewGewuenscht, FCFSSlots, IstHSMEvent, HSMPoints, MasterEventID,
+			`ID, Titel, Beschreibung, Beginn, Ende, Anmeldeart, Bewerbungsdeadline, CheckInBeginn, Ort, StrasseHausnummer, Postleitzahl, Semester, KostenString, KostenEUR, BewerbungstextGewuenscht, BewTextVorgabe, AnlageGewuenscht, AnlageInhalte, AngabeEssgewGewuenscht, FCFSSlots, HSMPoints, MasterEventID,
              event_master:4_EventMaster(Titel),
              event_verantwortliche:4_EventVerantwortliche(ID, Titel, MitgliedID, mitglieder:1_Mitglieder(ID, Vorname, Nachname, Art, Rolle))`
 		)

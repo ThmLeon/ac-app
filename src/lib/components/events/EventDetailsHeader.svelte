@@ -4,6 +4,10 @@
 	import { Badge } from '../ui/badge';
 	import { Button } from '../ui/button';
 	import { badgeColors, eventBewerbungMoeglich } from '@/utils/utils';
+	import { DropdownMenu } from '../ui/dropdown-menu';
+	import DropdownMenuTrigger from '../ui/dropdown-menu/dropdown-menu-trigger.svelte';
+	import DropdownMenuContent from '../ui/dropdown-menu/dropdown-menu-content.svelte';
+	import DropdownMenuItem from '../ui/dropdown-menu/dropdown-menu-item.svelte';
 
 	export let eventData: {
 		ID: number;
@@ -114,15 +118,30 @@
 				{/if}
 			{/if}
 			{#if isUserEventResponsible && showApplyOrEditButton}
-				<a href={`./${eventData.ID}/besetzen`}>
-					<Button variant="default">Bewerbungen & Besetzung</Button>
-				</a>
-				<a href={`./${eventData.ID}/bearbeiten`}>
-					<Button variant="default">Event bearbeiten</Button>
-				</a>
-				<a href={`./`}>
-					<Button variant="destructive">Event löschen</Button>
-				</a>
+				<DropdownMenu>
+					<DropdownMenuTrigger>
+						{#snippet child({ props })}
+							<Button {...props} variant="outline">Event Optionen</Button>
+						{/snippet}
+					</DropdownMenuTrigger>
+					<DropdownMenuContent>
+						<DropdownMenuItem>
+							<a href={`./${eventData.ID}/besetzen`}>
+								<Button variant="default">Bewerbungen & Besetzung</Button>
+							</a>
+						</DropdownMenuItem>
+						<DropdownMenuItem>
+							<a href={`./${eventData.ID}/bearbeiten`}>
+								<Button variant="default">Event bearbeiten</Button>
+							</a>
+						</DropdownMenuItem>
+						<DropdownMenuItem>
+							<a href={`./`}>
+								<Button variant="destructive">Event löschen</Button>
+							</a>
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
 			{/if}
 			{#if !(showApplyOrEditButton || (isUserEventResponsible && showApplyOrEditButton))}
 				<!-- Unsichtbarer Platzhalter, falls absolut keine Buttons -->

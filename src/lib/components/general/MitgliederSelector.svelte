@@ -24,8 +24,20 @@
 
 	let { supabase, selected = $bindable<Mitglied[]>([]) } = $props();
 	const mitgliederSelector = getMitgliederSelector(supabase);
+	// Initialize internal state from incoming bound value once, then keep syncing state -> prop.
+	let initialized = $state(false);
 	$effect(() => {
-		selected = mitgliederSelector.selected;
+		if (!initialized) {
+			if (selected?.length && mitgliederSelector.selected.length === 0) {
+				// Seed selector state with incoming selection (preserve parent-provided values)
+				mitgliederSelector.selected = [...selected];
+			}
+			initialized = true;
+		}
+		// After init, reflect internal state to bound prop (avoids clobbering non-empty incoming selection)
+		if (selected !== mitgliederSelector.selected) {
+			selected = mitgliederSelector.selected;
+		}
 	});
 </script>
 

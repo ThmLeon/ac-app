@@ -17,21 +17,7 @@
 	import type { SupabaseClient } from '@supabase/supabase-js';
 	import SuperDebug from 'sveltekit-superforms';
 
-	const {
-		form,
-		eventMasters,
-		supabase,
-		formAction = '?/createNewEvent'
-	} = $props<{
-		form: SuperForm<NewEventForm>;
-		eventMasters: Array<{ ID: number; Titel: string | null; Eventart?: string | null }>;
-		supabase: SupabaseClient<Database>;
-		formAction?: string;
-	}>();
-
-	let formData: SuperFormData<NewEventForm> = form.form;
-	const file = fileProxy(form, 'image');
-	// Mitglieder-Selector: lokale Auswahl mit vollem Typ (für Anzeige)
+	// Mitglieder-Selector: Typ vor Verwendung deklarieren
 	type Mitglied = {
 		ID: number;
 		Titel: string;
@@ -39,11 +25,31 @@
 		Rolle: Database['public']['Enums']['MitgliedsrolleAlumniAnwaerterMitglied'];
 	};
 
-	let selectedMitglieder = $state<Mitglied[]>([]);
+	const {
+		form,
+		eventMasters,
+		supabase,
+		formAction = '?/createNewEvent',
+		// Default to empty array to avoid runtime errors when mapping
+		eventVerantwortliche = []
+	} = $props<{
+		form: SuperForm<NewEventForm>;
+		eventMasters: Array<{ ID: number; Titel: string | null; Eventart?: string | null }>;
+		supabase: SupabaseClient<Database>;
+		formAction?: string;
+		eventVerantwortliche?: Mitglied[];
+	}>();
+
+	let formData: SuperFormData<NewEventForm> = form.form;
+	const file = fileProxy(form, 'image');
+
+	// Lokale Auswahl mit sicherem Default initialisieren
+	let selectedMitglieder = $state<Mitglied[]>(eventVerantwortliche ?? []);
 
 	// Sync: lokale Auswahl -> SuperForm Daten in Minimalform
 	$effect(() => {
-		$formData.EventVerantwortliche = selectedMitglieder.map(({ ID, Titel }) => ({ ID, Titel }));
+		const list = selectedMitglieder ?? [];
+		$formData.EventVerantwortliche = list.map(({ ID, Titel }) => ({ ID, Titel }));
 	});
 
 	// MasterEvent Auswahl (UI) als String halten; SuperForm-Daten via Effekt synchronisieren

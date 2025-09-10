@@ -55,7 +55,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	const formData = toFormData(eventData);
 	const form = await superValidate(formData, zod(newEventSchema));
-	return { form, eventMasters };
+	return { form, eventMasters, eventData };
 };
 
 export const actions: Actions = {

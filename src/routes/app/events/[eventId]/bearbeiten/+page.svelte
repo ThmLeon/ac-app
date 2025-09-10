@@ -35,6 +35,12 @@
 				eventMasters={data.eventMasters}
 				supabase={data.supabase}
 				formAction="?/updateEvent"
+				eventVerantwortliche={data.eventData.event_verantwortliche.map((ev) => ({
+					ID: ev.MitgliedID || -1,
+					Titel: ev.Titel || '',
+					Art: ev.mitglieder?.Art || 'Aktiv',
+					Rolle: ev.mitglieder?.Rolle || 'Mitglied'
+				}))}
 			/>
 		</CardContent>
 	</Card>
