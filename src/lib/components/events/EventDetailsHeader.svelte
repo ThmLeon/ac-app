@@ -22,6 +22,10 @@
 	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
 	import EventTitelbildRealistic from '$lib/assets/EventTitelbildRealistic.jpg';
+	import { DropdownMenu } from '../ui/dropdown-menu';
+	import DropdownMenuTrigger from '../ui/dropdown-menu/dropdown-menu-trigger.svelte';
+	import DropdownMenuContent from '../ui/dropdown-menu/dropdown-menu-content.svelte';
+	import DropdownMenuItem from '../ui/dropdown-menu/dropdown-menu-item.svelte';
 
 	export let eventData: {
 		ID: number;
@@ -181,6 +185,30 @@
 						</AlertDialogFooter>
 					</AlertDialogContent>
 				</AlertDialog>
+				<DropdownMenu>
+					<DropdownMenuTrigger>
+						{#snippet child({ props })}
+							<Button {...props} variant="outline">Event Optionen</Button>
+						{/snippet}
+					</DropdownMenuTrigger>
+					<DropdownMenuContent>
+						<DropdownMenuItem>
+							<a href={`./${eventData.ID}/besetzen`}>
+								<Button variant="default">Bewerbungen & Besetzung</Button>
+							</a>
+						</DropdownMenuItem>
+						<DropdownMenuItem>
+							<a href={`./${eventData.ID}/bearbeiten`}>
+								<Button variant="default">Event bearbeiten</Button>
+							</a>
+						</DropdownMenuItem>
+						<DropdownMenuItem>
+							<a href={`./`}>
+								<Button variant="destructive">Event löschen</Button>
+							</a>
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
 			{/if}
 			{#if !(showApplyOrEditButton || (isUserEventResponsible && showApplyOrEditButton))}
 				<!-- Unsichtbarer Platzhalter, falls absolut keine Buttons -->
