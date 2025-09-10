@@ -1,7 +1,7 @@
 import { superValidate } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types';
 import { zod } from 'sveltekit-superforms/adapters';
-import { newEventSchema } from '@/schemas/newEventSchema';
+import { newEventSchema, type NewEventForm } from '@/schemas/newEventSchema';
 import {
 	getAllEventMasters,
 	getEventDetailsById,
@@ -9,44 +9,51 @@ import {
 } from '@/server/supabase/events.server';
 import { updateEvent as updateEventSharepoint } from '@/server/sharepoint/events.server';
 import { returnCreateActionResultBoth, throwMissingErrorIfNeeded } from '@/utils/utils.server';
+type EventDetails = Awaited<ReturnType<typeof getEventDetailsById>>;
+
+function toFormData(eventData: EventDetails): NewEventForm {
+	const defaults: Partial<NewEventForm> = {
+		Titel: '',
+		Beschreibung: '',
+		Semester: '',
+		KostenEUR: 0,
+		AnlageGewuenscht: false,
+		BewerbungstextGewuenscht: false,
+		AngabeEssgewGewuenscht: false,
+		IstHSMEvent: false
+	};
+
+	const base: Record<string, unknown> = Object.fromEntries(
+		Object.entries({ ...defaults, ...eventData }).map(([key, value]) => [
+			key,
+			value ?? (defaults as Record<string, unknown>)[key] ?? undefined
+		])
+	);
+
+	return {
+		...(base as Record<string, unknown>),
+		Beginn: base.Beginn ? new Date(base.Beginn as string | number | Date) : new Date(),
+		Ende: base.Ende ? new Date(base.Ende as string | number | Date) : new Date(),
+		Bewerbungsdeadline: base.Bewerbungsdeadline
+			? new Date(base.Bewerbungsdeadline as string | number | Date)
+			: undefined,
+		CheckInBeginn: base.CheckInBeginn
+			? new Date(base.CheckInBeginn as string | number | Date)
+			: undefined,
+		EventVerantwortliche: eventData.event_verantwortliche.map((v) => ({
+			ID: v.MitgliedID,
+			Titel: v.Titel
+		})),
+		image: undefined
+	} as NewEventForm;
+}
 
 export const load: PageServerLoad = async ({ params }) => {
 	const eventId = Number(throwMissingErrorIfNeeded(params.eventId));
 	const eventData = await getEventDetailsById(eventId);
 	const eventMasters = await getAllEventMasters();
 
-	const formData = {
-		Titel: eventData.Titel ?? '',
-		Beschreibung: eventData.Beschreibung ?? '',
-		MasterEventID: eventData.MasterEventID!,
-		Beginn: eventData.Beginn ? new Date(eventData.Beginn) : new Date(),
-		Ende: eventData.Ende ? new Date(eventData.Ende) : new Date(),
-		Anmeldeart: eventData.Anmeldeart,
-		FCFSSlots: eventData.FCFSSlots ?? undefined,
-		Bewerbungsdeadline: eventData.Bewerbungsdeadline
-			? new Date(eventData.Bewerbungsdeadline)
-			: undefined,
-		CheckInBeginn: eventData.CheckInBeginn ? new Date(eventData.CheckInBeginn) : undefined,
-		Semester: eventData.Semester ?? '',
-		Postleitzahl: eventData.Postleitzahl ?? undefined,
-		Ort: eventData.Ort ?? undefined,
-		StrasseHausnummer: eventData.StrasseHausnummer ?? undefined,
-		KostenString: eventData.KostenString ?? undefined,
-		KostenEUR: eventData.KostenEUR ?? 0,
-		image: undefined,
-		AnlageGewuenscht: eventData.AnlageGewuenscht ?? false,
-		AnlageInhalte: eventData.AnlageInhalte ?? undefined,
-		BewerbungstextGewuenscht: eventData.BewerbungstextGewuenscht ?? false,
-		BewTextVorgabe: eventData.BewTextVorgabe ?? undefined,
-		AngabeEssgewGewuenscht: eventData.AngabeEssgewGewuenscht ?? false,
-		EventVerantwortliche: eventData.event_verantwortliche.map((v: any) => ({
-			ID: v.MitgliedID,
-			Titel: v.Titel
-		})),
-		IstHSMEvent: eventData.IstHSMEvent ?? false,
-		HSMPoints: eventData.HSMPoints ?? undefined
-	};
-
+	const formData = toFormData(eventData);
 	const form = await superValidate(formData, zod(newEventSchema));
 	return { form, eventMasters };
 };
