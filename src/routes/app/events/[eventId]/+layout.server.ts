@@ -10,7 +10,7 @@ import { superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { eventDeleteSchema } from '@/schemas/eventDeleteSchema';
 
-export const load: LayoutServerLoad = async ({ locals, params }) => {
+export const load: LayoutServerLoad = async ({ locals, params, parent }) => {
 	const eventId = throwMissingErrorIfNeeded(params.eventId);
 	const userId = Number(throwMissingErrorIfNeeded(locals.userDetails?.ID));
 

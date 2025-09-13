@@ -7,8 +7,21 @@
 	import { toast } from 'svelte-sonner';
 	import { handleActionResultSonners } from '@/app.utils';
 	import { goto } from '$app/navigation';
+	import { isVorstand } from '@/utils/rollen.utils.js';
 
 	let { data } = $props();
+
+	$effect(() => {
+		if (
+			data &&
+			!data.isAdmin &&
+			!isVorstand(data.roles) &&
+			!data.eventData.event_verantwortliche.some((ev: any) => ev.ID === data.userId)
+		) {
+			goto(`../${data.eventData.ID}`, { replaceState: true });
+		}
+	});
+
 	const form = superForm(data.form, {
 		validators: zodClient(newEventSchema),
 		dataType: 'json',

@@ -16,6 +16,8 @@
 	export let form: SuperForm<EventMasterForm>;
 	export let sheetStatus: 'new' | 'edit' | 'hidden';
 	let formData: SuperFormData<EventMasterForm> = form.form;
+	export let canEdit: boolean;
+	export let canDelete: boolean;
 
 	let sheetOpen = sheetStatus !== 'hidden';
 	$: sheetOpen = sheetStatus !== 'hidden';
@@ -115,9 +117,11 @@
 					<!-- Actual buttons -->
 					<!-- Delete uses AlertDialog for confirmation -->
 					<AlertDialog.Root>
-						<AlertDialog.Trigger type="button" class={buttonVariants({ variant: 'destructive' })}
-							>Löschen</AlertDialog.Trigger
-						>
+						{#if canDelete}
+							<AlertDialog.Trigger type="button" class={buttonVariants({ variant: 'destructive' })}
+								>Löschen</AlertDialog.Trigger
+							>
+						{/if}
 						<AlertDialog.Portal>
 							<AlertDialog.Overlay class="fixed inset-0 bg-black/50" />
 							<AlertDialog.Content
@@ -147,7 +151,9 @@
 						</AlertDialog.Portal>
 					</AlertDialog.Root>
 
-					<Button formaction="?/updateEventMaster" type="submit">Speichern</Button>
+					{#if canEdit}
+						<Button formaction="?/updateEventMaster" type="submit">Speichern</Button>
+					{/if}
 				{:else}
 					<Button formaction="?/addEventMaster" type="submit">Hinzufügen</Button>
 				{/if}

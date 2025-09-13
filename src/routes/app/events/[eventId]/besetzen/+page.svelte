@@ -10,6 +10,8 @@
 	import { eventBesetzungAnwesenheitSchema } from '@/schemas/eventBesetzungAnwesenheitSchema';
 	import { tick } from 'svelte';
 	import EventApplications from '@/components/events/EventApplications.svelte';
+	import { isVorstand } from '@/utils/rollen.utils';
+	import { goto } from '$app/navigation';
 
 	type EventApplication = {
 		ID: number;
@@ -20,8 +22,22 @@
 		Essgewohnheiten: string | null;
 	};
 
-	export let data: PageServerData;
-	let besetzteMitglieder: EventApplication[] = data.eventApplications.filter((a) => a.Besetzt); // initial snapshot
+	let { data } = $props();
+
+	$effect(() => {
+		if (
+			data &&
+			!data.isAdmin &&
+			!isVorstand(data.roles) &&
+			!data.eventData.event_verantwortliche.some((ev: any) => ev.ID === data.userId)
+		) {
+			goto(`../${data.eventData.ID}`, { replaceState: true });
+		}
+	});
+
+	let besetzteMitglieder: EventApplication[] = $state(
+		data.eventApplications.filter((a) => a.Besetzt)
+	); // initial snapshot
 
 	const form = superForm(data.form, {
 		validators: zodClient(eventBesetzungAnwesenheitSchema),
@@ -124,5 +140,9 @@
 		</Card>
 	</div>
 	<div class="mb-2"></div>
-	<EventApplications applications={data.eventApplications} eventId={Number(data.eventId)} />
+	<EventApplications
+		supabase={data.supabase}
+		applications={data.eventApplications}
+		eventId={Number(data.eventId)}
+	/>
 {/await}

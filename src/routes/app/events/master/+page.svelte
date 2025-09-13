@@ -8,9 +8,12 @@
 	import { toast } from 'svelte-sonner';
 	import { handleActionResultSonners } from '@/app.utils';
 	import { eventMasterSchema } from '@/schemas/eventMasterSchema';
+	import { onMount } from 'svelte';
+	import { isVorstand } from '@/utils/rollen.utils';
 
-	export let data: PageServerData;
-	let sheetStatus: 'new' | 'edit' | 'hidden' = 'hidden';
+	let { data } = $props();
+
+	let sheetStatus: 'new' | 'edit' | 'hidden' = $state('hidden');
 	const form = superForm(data.form, {
 		validators: zodClient(eventMasterSchema),
 		onSubmit: () => {
@@ -24,6 +27,9 @@
 		}
 	});
 	const { form: formData } = form;
+	let canEdit = data.isAdmin || isVorstand(data.roles);
+	let canCreate = data.isAdmin || isVorstand(data.roles);
+	let canDelete = data.isAdmin || isVorstand(data.roles);
 
 	function onEdit(id: number) {
 		const current = data.data.find((eventMaster: { ID: number }) => eventMaster.ID === id);
@@ -48,7 +54,14 @@
 	<PageLoadSkeleton />
 {:then data}
 	<div class="container mx-auto p-4">
-		<EventMasterList eventMasters={data.data} {onAddNew} {onEdit} />
-		<EventMasterSheet bind:sheetStatus {form} />
+		<EventMasterList
+			eventMasters={data.data}
+			{onAddNew}
+			{onEdit}
+			{canCreate}
+			{canEdit}
+			{canDelete}
+		/>
+		<EventMasterSheet bind:sheetStatus {form} {canDelete} {canEdit} />
 	</div>
 {/await}

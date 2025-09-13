@@ -2,11 +2,8 @@ import type { Database } from '@/database.types';
 import type { LayoutLoad } from './$types';
 import { error } from '@sveltejs/kit';
 
-type RoleListKey = {
-	RolleID: number;
-	Rolle: string;
-};
-type RoleListValue = Database['public']['Tables']['1_RollenMitglieder']['Row'];
+type RoleListKey = number;
+type RoleListValue = { Rolle: string } & Database['public']['Tables']['1_RollenMitglieder']['Row'];
 type RoleMap = Map<RoleListKey, RoleListValue>;
 
 export const load: LayoutLoad = async ({ parent, depends }) => {
@@ -37,15 +34,14 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 			.eq('MitgliedID', userId)
 			.is('EndeDatum', null);
 		if (rolesError) throw error(401, 'Rollen konnten nicht geladen werden');
-		const makeKey = (r: (typeof rolesData)[number]): RoleListKey => ({
-			RolleID: r.RollenID,
-			Rolle: r.rollen.Titel ?? '' // or throw/skip if null isn't allowed
-		});
+
+		const makeKey = (r: (typeof rolesData)[number]): RoleListKey => r.RollenID;
 
 		for (const r of rolesData ?? []) {
-			if (!r.rollen.Titel) continue; // decide how you want to handle null titles
-			const { RollenID, rollen, ...value } = r; // remove ID & Titel
-			roles.set(makeKey(r), value as RoleListValue);
+			if (!r.rollen?.Titel) continue;
+			const { rollen, ...row } = r;
+			const value: RoleListValue = { Rolle: rollen.Titel || '', ...row };
+			roles.set(makeKey(r), value);
 		}
 
 		const { data: isAdminData, error: isAdminError } = await supabase
@@ -54,7 +50,8 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 			.eq('Titel', 'AppAdmin')
 			.eq('Key', 'MitgliedID')
 			.eq('Value', userId.toString());
+		if (isAdminError) isAdmin = false;
+		else isAdmin = isAdminData.length === 1 ? true : false;
 	}
-
 	return { userId, roles, isAdmin };
 };

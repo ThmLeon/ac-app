@@ -21,6 +21,7 @@ import {
 	deleteEventApplication as deleteEventApplicationSharepoint,
 	updateEventApplication as updateEventApplicationSharepoint
 } from '@/server/sharepoint/events.server';
+import { redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	const eventId = throwMissingErrorIfNeeded(params.eventId);
@@ -30,6 +31,10 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	const eventData = await getEventDetailsById(Number(eventId));
 	const applicationState = await getEventApplicationState(Number(eventId), userId);
 	const totalApplications = await getNumberOfEventApplications(Number(eventId));
+
+	if (eventData.Bewerbungsdeadline && new Date(eventData.Bewerbungsdeadline) < new Date()) {
+		throw redirect(302, `../${eventId}`);
+	}
 
 	return {
 		form,

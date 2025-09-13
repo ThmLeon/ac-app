@@ -13,6 +13,8 @@
 
 	export let eventMaster: EventMaster;
 	export let onEdit: (id: EventMaster['ID']) => void; // Callback for edit action
+	export let canDelete: boolean; // Permission to delete
+	export let canEdit: boolean; // Permission to edit
 
 	const eventStatusColors = {
 		Netzwerk: 'bg-blue-200 text-blue-800',
@@ -34,6 +36,8 @@
 		{eventMaster.MasterBeschreibung}
 	</CardContent>
 	<CardFooter class="mt-auto flex justify-end pb-4">
-		<Button variant="outline" onclick={() => onEdit(eventMaster.ID)}>Bearbeiten</Button>
+		{#if canEdit || canDelete}
+			<Button variant="outline" onclick={() => onEdit(eventMaster.ID)}>Bearbeiten</Button>
+		{/if}
 	</CardFooter>
 </Card>

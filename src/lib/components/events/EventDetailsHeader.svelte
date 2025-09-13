@@ -56,6 +56,7 @@
 	export let userId: number;
 	export let eventImageUrl: string | null;
 	export let deleteForm: any;
+	export let isAdmin: boolean;
 
 	const deleteEventForm = superForm(deleteForm, {
 		validators: zodClient(eventDeleteSchema),
@@ -156,7 +157,7 @@
 					<Button variant="default" disabled>{bewerbungAktiviert.message}</Button>
 				{/if}
 			{/if}
-			{#if isUserEventResponsible && showApplyOrEditButton}
+			{#if (isUserEventResponsible || isAdmin) && showApplyOrEditButton}
 				<DropdownMenu>
 					<DropdownMenuTrigger>
 						{#snippet child({ props })}

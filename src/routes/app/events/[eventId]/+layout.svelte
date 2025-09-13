@@ -4,6 +4,7 @@
 	import EventDetailsHeader from '@/components/events/EventDetailsHeader.svelte';
 	import { page } from '$app/stores';
 	import BreadcrumbOverride from '$lib/components/general/BreadcrumbOverride.svelte';
+	import { isVorstand } from '@/utils/rollen.utils';
 
 	let { data, children }: { data: LayoutData; children: any } = $props();
 
@@ -13,6 +14,9 @@
 			$page.url.pathname.endsWith('/besetzen') ||
 			$page.url.pathname.endsWith('/bearbeiten')
 	);
+	const isAdmin = () => {
+		return data.isAdmin || isVorstand(data.roles);
+	};
 </script>
 
 <!-- Provide breadcrumb override (renders nothing) -->
@@ -31,6 +35,7 @@
 		showApplyOrEditButton={!isBewerbenPage}
 		eventImageUrl={data.eventImageUrl}
 		deleteForm={data.deleteForm}
+		isAdmin={isAdmin()}
 	/>
 	{@render children()}
 {/await}

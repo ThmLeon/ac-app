@@ -15,16 +15,21 @@
 	export let eventMasters: EventMasters;
 	export let onAddNew: () => void;
 	export let onEdit: (id: EventMaster['ID']) => void;
+	export let canEdit: boolean;
+	export let canCreate: boolean;
+	export let canDelete: boolean;
 </script>
 
 <div class="flex flex-wrap justify-start gap-4">
-	<button
-		class="flex justify-center items-center border-2 border-dashed border-gray-400 rounded-lg w-[350px] cursor-pointer"
-		title="Neuen Event Master hinzufügen"
-		on:click={onAddNew}
-	>
-		<span class="text-4xl text-gray-400">+</span>
-	</button>
+	{#if canCreate}
+		<button
+			class="flex justify-center items-center border-2 border-dashed border-gray-400 rounded-lg w-[350px] cursor-pointer"
+			title="Neuen Event Master hinzufügen"
+			on:click={onAddNew}
+		>
+			<span class="text-4xl text-gray-400">+</span>
+		</button>
+	{/if}
 
 	{#each eventMasters as eventMaster (eventMaster.ID)}
 		<div class="flex justify-center">
@@ -33,6 +38,8 @@
 					onEdit(eventMaster.ID);
 				}}
 				{eventMaster}
+				{canDelete}
+				{canEdit}
 			/>
 		</div>
 	{/each}

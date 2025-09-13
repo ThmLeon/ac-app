@@ -1,18 +1,15 @@
 import type { Database } from '@/database.types';
 
-type RoleListKey = {
-	RolleID: number;
-	Rolle: string;
-};
-type RoleListValue = Database['public']['Tables']['1_RollenMitglieder']['Row'];
+type RoleListKey = number;
+type RoleListValue = { Rolle: string } & Database['public']['Tables']['1_RollenMitglieder']['Row'];
 type RoleMap = Map<RoleListKey, RoleListValue>;
 
 function hasRole(roles: RoleMap, RolleID: number, Rolle: string): boolean {
-	return roles.has({ RolleID, Rolle });
+	return roles.has(RolleID) && roles.get(RolleID)?.Rolle === Rolle;
 }
 
 function isTeamleiter(roles: RoleMap, RolleID: number, Rolle: string): boolean {
-	return roles.has({ RolleID, Rolle }) && roles.get({ RolleID, Rolle })?.LeitendeFunktion === true;
+	return hasRole(roles, RolleID, Rolle) && roles.get(RolleID)?.LeitendeFunktion === true;
 }
 
 export function isVorstand(roles: RoleMap): boolean {
