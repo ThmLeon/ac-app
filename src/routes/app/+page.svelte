@@ -6,5 +6,3 @@
 		goto('/app/events', { replaceState: true });
 	});
 </script>
-
-<h1>Hello world</h1>
