@@ -1,0 +1,314 @@
+import { getSignedStorageURL, throwFetchErrorIfNeeded } from '@/utils/utils.server';
+import { supabaseServerClient } from './supabaseServerClient.server';
+import type { EventMasterForm } from '@/schemas/eventMasterSchema';
+import type { NewEventForm } from '@/schemas/newEventSchema';
+import { fail, error as svelteError } from '@sveltejs/kit';
+import type { EventBewerbungForm } from '@/schemas/eventBewerbungSchema';
+import type { EventBesetzungAnwesenheitSchema } from '@/schemas/eventBesetzungAnwesenheitSchema';
+
+export async function getAllEventMasters() {
+	let { data, error } = await supabaseServerClient()
+		.from('4_EventMaster')
+		.select('ID, Titel, MasterBeschreibung, Eventart')
+		.order('Eventart', { ascending: true });
+	data = throwFetchErrorIfNeeded(data, error, 'Events Master konnten nicht geladen werden');
+	return data;
+}
+
+export async function getEventMasterById(id: number) {
+	let { data, error } = await supabaseServerClient()
+		.from('4_EventMaster')
+		.select('Eventart')
+		.eq('ID', id)
+		.single();
+
+	data = throwFetchErrorIfNeeded(data, error, 'Event Master konnte nicht geladen werden');
+	return data;
+}
+
+export async function deleteEventMaster(id: number) {
+	const { error } = await supabaseServerClient().from('4_EventMaster').delete().eq('ID', id);
+	return error;
+}
+
+export async function deleteEventApplication(id: number) {
+	const { error } = await supabaseServerClient().from('4_EventBewerbungen').delete().eq('ID', id);
+	return error;
+}
+
+export async function deleteEvent(id: number) {
+	const { error: eventError } = await supabaseServerClient().from('4_Events').delete().eq('ID', id);
+	if (eventError) return eventError;
+	const { error: eventVerantwortlicheError } = await supabaseServerClient()
+		.from('4_EventVerantwortliche')
+		.delete()
+		.eq('EventID', id);
+	if (eventVerantwortlicheError) return eventVerantwortlicheError;
+	const { error: eventBewerbungenError } = await supabaseServerClient()
+		.from('4_EventBewerbungen')
+		.delete()
+		.eq('EventID', id);
+	if (eventBewerbungenError) return eventBewerbungenError;
+	return null;
+}
+
+export async function updateEventMaster(formData: EventMasterForm) {
+	const { error } = await supabaseServerClient()
+		.from('4_EventMaster')
+		.update({
+			Titel: formData.Titel,
+			MasterBeschreibung: formData.MasterBeschreibung,
+			Eventart: formData.Eventart
+		})
+		.eq('ID', formData.ID);
+	return error;
+}
+
+export async function updateEventApplication(formData: EventBewerbungForm) {
+	const { error } = await supabaseServerClient()
+		.from('4_EventBewerbungen')
+		.update({
+			BewerbungText: formData.BewerbungText,
+			Essgewohnheiten: formData.Essgewohnheiten
+		})
+		.eq('ID', formData.ID);
+	return error;
+}
+
+export async function addEventMaster(formData: EventMasterForm, id: number) {
+	const { error } = await supabaseServerClient().from('4_EventMaster').insert({
+		ID: id,
+		Titel: formData.Titel,
+		MasterBeschreibung: formData.MasterBeschreibung,
+		Eventart: formData.Eventart
+	});
+	return error;
+}
+
+export async function createNewEvent(
+	formData: NewEventForm,
+	sharepointResults: { EventResult: number; eventVerantwortlicheIDs: number[] }
+) {
+	const { image, IstHSMEvent, EventVerantwortliche, ...eventData } = formData; // Explicitly exclude EventVerantwortliche
+	const { error: eventError } = await supabaseServerClient()
+		.from('4_Events')
+		.insert({
+			...eventData,
+			ID: sharepointResults.EventResult,
+			Beginn: eventData.Beginn.toISOString(),
+			Ende: eventData.Ende.toISOString(),
+			Bewerbungsdeadline: eventData.Bewerbungsdeadline?.toISOString(),
+			CheckInBeginn: eventData.CheckInBeginn?.toISOString(),
+			Postleitzahl: eventData.Postleitzahl?.toString() || null,
+			FCFSSlots: eventData.FCFSSlots || null
+		});
+	if (eventError) return eventError;
+	sharepointResults.eventVerantwortlicheIDs.forEach(async (verantwortlicherEintragId, i) => {
+		const { error: eventVerantwortlicherError } = await supabaseServerClient()
+			.from('4_EventVerantwortliche')
+			.insert({
+				ID: verantwortlicherEintragId,
+				Titel: EventVerantwortliche[i].Titel,
+				EventID: sharepointResults.EventResult,
+				MitgliedID: EventVerantwortliche[i].ID,
+				Besetzt: true
+			});
+		if (eventVerantwortlicherError) return eventVerantwortlicherError;
+	});
+
+	//upload image
+	if (image && image.size > 0) {
+		const ext = image.name.split('.').pop();
+		const path = `titelbilder/${sharepointResults.EventResult}/${sharepointResults.EventResult}.${ext}`;
+
+		const { error: imageUploadError } = await supabaseServerClient()
+			.storage.from('events')
+			.upload(path, image);
+		console.log(imageUploadError);
+		if (imageUploadError) return imageUploadError;
+	}
+
+	return eventError;
+}
+
+export async function createEventApplication(
+	formData: EventBewerbungForm,
+	id: number,
+	userTitel: string,
+	eventId: number,
+	userId: number
+) {
+	let besetzt: boolean = formData.Anmeldeart != 'Bewerben';
+
+	const { error: bewerbungError } = await supabaseServerClient().from('4_EventBewerbungen').insert({
+		ID: id,
+		Titel: userTitel,
+		EventID: eventId,
+		MitgliedID: userId,
+		BewerbungText: formData.BewerbungText,
+		Besetzt: besetzt,
+		Anwesend: false,
+		Essgewohnheiten: formData.Essgewohnheiten
+	});
+	if (bewerbungError || !formData.Anlage) return bewerbungError;
+
+	const { error: anlageError } = await supabaseServerClient()
+		.storage.from('events')
+		.upload(
+			`bewerbungenAnhang/${eventId}/${id}.${formData.Anlage.name.split('.').pop()}`,
+			formData.Anlage
+		);
+	return anlageError;
+}
+
+export async function updateEvent(
+	formData: NewEventForm,
+	eventId: number,
+	sharepointResults: { eventVerantwortlicheIDs: number[] }
+) {
+	const { image, IstHSMEvent, EventVerantwortliche, ...eventData } = formData;
+
+	const { error: eventError } = await supabaseServerClient()
+		.from('4_Events')
+		.update({
+			...eventData,
+			Beginn: eventData.Beginn.toISOString(),
+			Ende: eventData.Ende.toISOString(),
+			Bewerbungsdeadline: eventData.Bewerbungsdeadline?.toISOString(),
+			CheckInBeginn: eventData.CheckInBeginn?.toISOString(),
+			Postleitzahl: eventData.Postleitzahl?.toString() || null,
+			FCFSSlots: eventData.FCFSSlots || null
+		})
+		.eq('ID', eventId);
+	if (eventError) return eventError;
+
+	// Reset Verantwortliche
+	const { error: deleteError } = await supabaseServerClient()
+		.from('4_EventVerantwortliche')
+		.delete()
+		.eq('EventID', eventId);
+	if (deleteError) return deleteError;
+
+	for (const [
+		i,
+		verantwortlicherEintragId
+	] of sharepointResults.eventVerantwortlicheIDs.entries()) {
+		const { error: eventVerantwortlicherError } = await supabaseServerClient()
+			.from('4_EventVerantwortliche')
+			.insert({
+				ID: verantwortlicherEintragId,
+				Titel: EventVerantwortliche[i].Titel,
+				EventID: eventId,
+				MitgliedID: EventVerantwortliche[i].ID,
+				Besetzt: true
+			});
+		if (eventVerantwortlicherError) return eventVerantwortlicherError;
+	}
+
+	if (image && image.size > 0) {
+		const ext = image.name.split('.').pop();
+		const path = `titelbilder/${eventId}/${eventId}.${ext}`;
+		const { error: imageUploadError } = await supabaseServerClient()
+			.storage.from('events')
+			.upload(path, image, { upsert: true });
+		if (imageUploadError) return imageUploadError;
+	}
+
+	return eventError;
+}
+
+type allEventsPaginated = {
+	ID: number;
+	Titel: string | null;
+	Beschreibung: string | null;
+	Beginn: string | null;
+	Ende: string | null;
+	Bewerbungsdeadline: string | null;
+	ImageUrl: string | null;
+	eventMaster: {
+		Titel: string | null;
+	} | null;
+	eventBewerbungen: {
+		ID: number;
+		MitgliedID: number | null;
+		Besetzt: boolean | null;
+		Anwesend: boolean | null;
+	}[];
+}[];
+
+export async function getEventDetailsById(eventId: number) {
+	let { data, error } = await supabaseServerClient()
+		.from('4_Events')
+		.select(
+			`ID, Titel, Beschreibung, Beginn, Ende, Anmeldeart, Bewerbungsdeadline, CheckInBeginn, Ort, StrasseHausnummer, Postleitzahl, Semester, KostenString, KostenEUR, BewerbungstextGewuenscht, BewTextVorgabe, AnlageGewuenscht, AnlageInhalte, AngabeEssgewGewuenscht, FCFSSlots, HSMPoints, MasterEventID,
+             event_master:4_EventMaster(Titel),
+             event_verantwortliche:4_EventVerantwortliche(ID, Titel, MitgliedID, mitglieder:1_Mitglieder(ID, Vorname, Nachname, Art, Rolle))`
+		)
+		.eq('ID', eventId)
+		.single();
+
+	data = throwFetchErrorIfNeeded(data, error, 'Event konnte nicht geladen werden');
+	return data;
+}
+
+export async function getEventApplicationState(eventId: number, userId: number) {
+	let { data, error } = await supabaseServerClient()
+		.from('4_EventBewerbungen')
+		.select('ID, Besetzt, Anwesend, BewerbungText, Essgewohnheiten')
+		.eq('EventID', eventId)
+		.eq('MitgliedID', userId);
+
+	data = throwFetchErrorIfNeeded(data, error, 'Bewerbungsstatus konnte nicht geladen werden');
+	return data;
+}
+
+export async function getEventApplications(eventId: number) {
+	let { data, error } = await supabaseServerClient()
+		.from('4_EventBewerbungen')
+		.select(`ID, MitgliedID, EventID, Besetzt, Anwesend, Titel, BewerbungText, Essgewohnheiten`)
+		.eq('EventID', eventId)
+		.order('Titel', { ascending: false });
+
+	data = throwFetchErrorIfNeeded(data, error, 'Bewerbungen konnten nicht geladen werden');
+	return data;
+}
+
+export async function getNumberOfEventApplications(eventId: number) {
+	let { data, error } = await supabaseServerClient()
+		.from('4_EventBewerbungen')
+		.select('*', { count: 'exact' })
+		.eq('EventID', eventId);
+
+	data = throwFetchErrorIfNeeded(data, error, 'Anzahl der Bewerbungen konnte nicht geladen werden');
+	return data.length;
+}
+
+export async function getEventTitleImage(eventId: number) {
+	return await getSignedStorageURL(
+		supabaseServerClient(),
+		'events',
+		`titelbilder/${eventId}`,
+		eventId
+	);
+}
+
+export async function setEventBesetzungAnwesenheit(eventData: EventBesetzungAnwesenheitSchema) {
+	let { error } = await supabaseServerClient()
+		.from('4_EventBewerbungen')
+		.update({
+			Besetzt: eventData.Besetzt,
+			Anwesend: eventData.Anwesend
+		})
+		.eq('ID', eventData.ID);
+
+	return error;
+}
+
+export async function getEventVerantwortlicheIds(eventId: number) {
+	let { data, error } = await supabaseServerClient()
+		.from('4_EventVerantwortliche')
+		.select('ID')
+		.eq('EventID', eventId);
+	data = throwFetchErrorIfNeeded(data, error, 'Event Verantwortliche konnten nicht geladen werden');
+	return data.map((v: { ID: number }) => v.ID);
+}

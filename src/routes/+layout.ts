@@ -1,6 +1,8 @@
 import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ssr';
+// @ts-ignore - Provided by SvelteKit at build/runtime; ignore IDE type resolution here
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
 import type { LayoutLoad } from './$types';
+import type { Database } from '@/database.types';
 
 export const load: LayoutLoad = async ({ data, depends, fetch }) => {
 	/**
@@ -10,26 +12,18 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
 	depends('supabase:auth');
 
 	const supabase = isBrowser()
-		? createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
-				global: {
-					fetch
-				},
-				auth: {
-					flowType: 'pkce'
-				}
+		? createBrowserClient<Database>(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+				global: { fetch },
+				auth: { flowType: 'pkce' }
 			})
-		: createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
-				global: {
-					fetch
-				},
+		: createServerClient<Database>(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+				global: { fetch },
 				cookies: {
 					getAll() {
 						return data.cookies;
 					}
 				},
-				auth: {
-					flowType: 'pkce'
-				}
+				auth: { flowType: 'pkce' }
 			});
 
 	/**

@@ -13,27 +13,50 @@
 		PiggyBank,
 		Banknote,
 		Wallet,
-		Wallet2
+		Wallet2,
+		User,
+		Clock
 	} from 'lucide-svelte';
 	import SidebarFooter from '../ui/sidebar/sidebar-footer.svelte';
 	import NavFooter from './NavFooter.svelte';
+	import { url } from 'valibot';
+	import { is } from 'superstruct';
 
 	export let props = {};
 	export let name: string;
 	export let avatarUrl: string;
 
 	const navItems = [
+		/*{
+			title: 'Mitglieder',
+			url: '/app/mitglieder/meinProfil',
+			icon: User,
+			isActive: true,
+			items: [
+				{ title: 'Mein Profil', url: '/app/mitglieder/meinProfil' },
+				{ title: 'Mitglieder', url: '/app/mitglieder/mitglieder' },
+				{ title: 'Vereinsrollen', url: '/app/mitglieder/vereinsrollen' },
+				{ title: 'Teamwahl', url: '/app/mitglieder/teamwahl' }
+			]
+		},*/
 		{
 			title: 'Events',
-			url: '/app/events/events',
+			url: '/app/events',
 			icon: Calendar,
 			isActive: true,
 			items: [
-				{ title: 'Alle Events', url: '/app/events/events' },
+				{ title: 'Alle Events', url: '/app/events' },
 				{ title: 'Events Master', url: '/app/events/master' }
 			]
 		},
 		{
+			title: 'More coming soon...',
+			url: '#',
+			icon: Clock,
+			isActive: false,
+			items: []
+		}
+		/*{
 			title: 'Finanzen',
 			url: '/app/finanzen',
 			icon: Wallet,
@@ -51,7 +74,7 @@
 				{ title: 'Persönlich', url: '#' },
 				{ title: 'Organisation', url: '#' }
 			]
-		}
+		}*/
 	];
 </script>
 

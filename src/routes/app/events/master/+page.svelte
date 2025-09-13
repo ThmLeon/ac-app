@@ -5,44 +5,48 @@
 	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { eventMasterSchema } from '@/schemas/eventMaster';
 	import { toast } from 'svelte-sonner';
 	import { handleActionResultSonners } from '@/app.utils';
+	import { eventMasterSchema } from '@/schemas/eventMasterSchema';
+	import { onMount } from 'svelte';
+	import { isVorstand } from '@/utils/rollen.utils';
 
-	export let data: PageServerData;
+	let { data } = $props();
 
-	const eventFormHandler = superForm(data.form, {
+	let sheetStatus: 'new' | 'edit' | 'hidden' = $state('hidden');
+	const form = superForm(data.form, {
 		validators: zodClient(eventMasterSchema),
 		onSubmit: () => {
 			toast.loading('Eingabe wird verarbeitet', { id: 'event_master_form' });
 		},
 		onResult: ({ result }) => {
 			handleActionResultSonners(result, 'event_master_form');
-			if (result.type === 'success') {
-				showSheet = false;
+			if (result.type != 'failure' && result.status != 500) {
+				sheetStatus = 'hidden';
 			}
 		}
 	});
+	const { form: formData } = form;
+	let canEdit = data.isAdmin || isVorstand(data.roles);
+	let canCreate = data.isAdmin || isVorstand(data.roles);
+	let canDelete = data.isAdmin || isVorstand(data.roles);
 
-	const { form, enhance } = eventFormHandler;
-
-	let showSheet = false;
-
-	function onEdit(id: string) {
-		const current = data.data.find((eventMaster) => eventMaster.id === id);
+	function onEdit(id: number) {
+		const current = data.data.find((eventMaster: { ID: number }) => eventMaster.ID === id);
 		if (current) {
-			eventFormHandler.form.set({
-				id: current.id,
-				master_name: current.master_name,
-				beschreibung: current.beschreibung
+			formData.set({
+				ID: current.ID,
+				Titel: current.Titel!,
+				MasterBeschreibung: current.MasterBeschreibung!,
+				Eventart: current.Eventart!
 			});
-			showSheet = true;
+			sheetStatus = 'edit';
 		}
 	}
 
 	function onAddNew() {
-		eventFormHandler.form.set({ id: '', master_name: '', beschreibung: '' });
-		showSheet = true;
+		formData.set({ ID: 0, Titel: '', MasterBeschreibung: '', Eventart: 'Sonstiges' });
+		sheetStatus = 'new';
 	}
 </script>
 
@@ -50,9 +54,14 @@
 	<PageLoadSkeleton />
 {:then data}
 	<div class="container mx-auto p-4">
-		<EventMasterList events={data.data} {onAddNew} {onEdit} />
-		{#if showSheet}
-			<EventMasterSheet bind:open={showSheet} {form} {enhance} />
-		{/if}
+		<EventMasterList
+			eventMasters={data.data}
+			{onAddNew}
+			{onEdit}
+			{canCreate}
+			{canEdit}
+			{canDelete}
+		/>
+		<EventMasterSheet bind:sheetStatus {form} {canDelete} {canEdit} />
 	</div>
 {/await}

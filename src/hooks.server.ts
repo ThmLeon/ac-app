@@ -1,8 +1,7 @@
-import { createServerClient } from '@supabase/ssr';
 import { type Handle, redirect } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
-
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+import SupabaseServerClient from '@/server/supabase/supabaseServerClient.server';
+import { fail, error as svelteError } from '@sveltejs/kit';
 
 const supabase: Handle = async ({ event, resolve }) => {
 	if (event.url.pathname.startsWith('/.well-known/appspecific/com.chrome.devtools')) {
@@ -14,21 +13,7 @@ const supabase: Handle = async ({ event, resolve }) => {
 	 *
 	 * The Supabase client gets the Auth token from the request cookies.
 	 */
-	event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
-		cookies: {
-			getAll: () => event.cookies.getAll(),
-			/**
-			 * SvelteKit's cookies API requires `path` to be explicitly set in
-			 * the cookie options. Setting `path` to `/` replicates previous/
-			 * standard behavior.
-			 */
-			setAll: (cookiesToSet) => {
-				cookiesToSet.forEach(({ name, value, options }) => {
-					event.cookies.set(name, value, { ...options, path: '/' });
-				});
-			}
-		}
-	});
+	event.locals.supabase = SupabaseServerClient.setInstance(event);
 
 	/**
 	 * Unlike `supabase.auth.getSession()`, which returns the session _without_
@@ -78,6 +63,27 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	if (event.locals.session && event.url.pathname === '/auth') {
 		redirect(303, '/private');
 	}
+
+	const userDetailsCookie = event.cookies.get('userDetails');
+	const oid = event.locals.user?.user_metadata?.custom_claims.oid;
+	if (!userDetailsCookie && oid) {
+		const { error: userDetailsError, data: userDetails } = await event.locals.supabase
+			.from('1_Mitglieder')
+			.select('ID, Vorname, Nachname, Titel')
+			.eq('UserID', oid)
+			.single();
+
+		if (userDetailsError) {
+			svelteError(500, 'Error fetching user details');
+		} else {
+			event.cookies.set('userDetails', JSON.stringify(userDetails), {
+				httpOnly: true,
+				path: '/',
+				maxAge: 60 * 60 // 1 hour
+			});
+		}
+	}
+	event.locals.userDetails = JSON.parse(event.cookies.get('userDetails') || '{}');
 
 	return resolve(event);
 };

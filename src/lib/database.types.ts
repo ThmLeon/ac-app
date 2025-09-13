@@ -1,867 +1,773 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
-	graphql_public: {
-		Tables: {
-			[_ in never]: never;
-		};
-		Views: {
-			[_ in never]: never;
-		};
-		Functions: {
-			graphql: {
-				Args: {
-					operationName?: string;
-					query?: string;
-					variables?: Json;
-					extensions?: Json;
-				};
-				Returns: Json;
-			};
-		};
-		Enums: {
-			[_ in never]: never;
-		};
-		CompositeTypes: {
-			[_ in never]: never;
-		};
-	};
-	pgbouncer: {
-		Tables: {
-			[_ in never]: never;
-		};
-		Views: {
-			[_ in never]: never;
-		};
-		Functions: {
-			get_auth: {
-				Args: { p_usename: string };
-				Returns: {
-					username: string;
-					password: string;
-				}[];
-			};
-		};
-		Enums: {
-			[_ in never]: never;
-		};
-		CompositeTypes: {
-			[_ in never]: never;
-		};
-	};
-	public: {
-		Tables: {
-			'01_mitglieder_mitglieder': {
-				Row: {
-					created_at: string;
-					id: string;
-					nachname: string;
-					vorname: string;
-				};
-				Insert: {
-					created_at?: string;
-					id?: string;
-					nachname?: string;
-					vorname?: string;
-				};
-				Update: {
-					created_at?: string;
-					id?: string;
-					nachname?: string;
-					vorname?: string;
-				};
-				Relationships: [];
-			};
-			'04_events_bewerbungen': {
-				Row: {
-					anwesend: boolean;
-					besetzt: boolean;
-					bewerbungs_datei_name: string | null;
-					bewerbungstext: string | null;
-					created_at: string;
-					event_id: string;
-					id: string;
-					mitglied_id: string;
-				};
-				Insert: {
-					anwesend: boolean;
-					besetzt: boolean;
-					bewerbungs_datei_name?: string | null;
-					bewerbungstext?: string | null;
-					created_at?: string;
-					event_id?: string;
-					id?: string;
-					mitglied_id: string;
-				};
-				Update: {
-					anwesend?: boolean;
-					besetzt?: boolean;
-					bewerbungs_datei_name?: string | null;
-					bewerbungstext?: string | null;
-					created_at?: string;
-					event_id?: string;
-					id?: string;
-					mitglied_id?: string;
-				};
-				Relationships: [
-					{
-						foreignKeyName: '04_events_bewerbungen_event_id_fkey';
-						columns: ['event_id'];
-						referencedRelation: '04_events_events';
-						referencedColumns: ['id'];
-					},
-					{
-						foreignKeyName: '04_events_bewerbungen_mitglied_id_fkey';
-						columns: ['mitglied_id'];
-						referencedRelation: '01_mitglieder_mitglieder';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			'04_events_events': {
-				Row: {
-					anhang_benoetigt: boolean;
-					anhang_beschreibung: string | null;
-					beschreibung: string;
-					bewerbungs_deadline: string;
-					bewerbungstext_benoetigt: boolean;
-					bewerbungstext_beschreibung: string | null;
-					created_at: string;
-					ende_datum_zeit: string;
-					event_master_id: string;
-					id: string;
-					ort_plz_stadt: string;
-					ort_strasse_hausnummer: string;
-					start_datum_zeit: string;
-					titel: string;
-					titelbild_datei_name: string | null;
-				};
-				Insert: {
-					anhang_benoetigt: boolean;
-					anhang_beschreibung?: string | null;
-					beschreibung: string;
-					bewerbungs_deadline: string;
-					bewerbungstext_benoetigt: boolean;
-					bewerbungstext_beschreibung?: string | null;
-					created_at?: string;
-					ende_datum_zeit: string;
-					event_master_id?: string;
-					id?: string;
-					ort_plz_stadt: string;
-					ort_strasse_hausnummer: string;
-					start_datum_zeit: string;
-					titel?: string;
-					titelbild_datei_name?: string | null;
-				};
-				Update: {
-					anhang_benoetigt?: boolean;
-					anhang_beschreibung?: string | null;
-					beschreibung?: string;
-					bewerbungs_deadline?: string;
-					bewerbungstext_benoetigt?: boolean;
-					bewerbungstext_beschreibung?: string | null;
-					created_at?: string;
-					ende_datum_zeit?: string;
-					event_master_id?: string;
-					id?: string;
-					ort_plz_stadt?: string;
-					ort_strasse_hausnummer?: string;
-					start_datum_zeit?: string;
-					titel?: string;
-					titelbild_datei_name?: string | null;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 'events_events_event_master_id_fkey';
-						columns: ['event_master_id'];
-						referencedRelation: '04_events_master';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			'04_events_master': {
-				Row: {
-					beschreibung: string;
-					created_at: string;
-					id: string;
-					master_name: string;
-					titelbild_datei_name: string | null;
-				};
-				Insert: {
-					beschreibung?: string;
-					created_at?: string;
-					id?: string;
-					master_name?: string;
-					titelbild_datei_name?: string | null;
-				};
-				Update: {
-					beschreibung?: string;
-					created_at?: string;
-					id?: string;
-					master_name?: string;
-					titelbild_datei_name?: string | null;
-				};
-				Relationships: [];
-			};
-			'04_events_verantwortliche': {
-				Row: {
-					created_at: string;
-					event_id: string;
-					id: string;
-					user_id: string;
-				};
-				Insert: {
-					created_at?: string;
-					event_id?: string;
-					id?: string;
-					user_id?: string;
-				};
-				Update: {
-					created_at?: string;
-					event_id?: string;
-					id?: string;
-					user_id?: string;
-				};
-				Relationships: [
-					{
-						foreignKeyName: '04_events_verantwortliche_event_id_fkey';
-						columns: ['event_id'];
-						referencedRelation: '04_events_events';
-						referencedColumns: ['id'];
-					},
-					{
-						foreignKeyName: '04_events_verantwortliche_user_id_fkey';
-						columns: ['user_id'];
-						referencedRelation: '01_mitglieder_mitglieder';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			SalesAktivitaeten: {
-				Row: {
-					aktivitaetArt: number | null;
-					archiviert: boolean | null;
-					datum: string | null;
-					id: number;
-					pt: number | null;
-					salesTeamID: number | null;
-					titel: string;
-				};
-				Insert: {
-					aktivitaetArt?: number | null;
-					archiviert?: boolean | null;
-					datum?: string | null;
-					id?: number;
-					pt?: number | null;
-					salesTeamID?: number | null;
-					titel: string;
-				};
-				Update: {
-					aktivitaetArt?: number | null;
-					archiviert?: boolean | null;
-					datum?: string | null;
-					id?: number;
-					pt?: number | null;
-					salesTeamID?: number | null;
-					titel?: string;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 'SalesAktivitaeten_salesTeamID_fkey';
-						columns: ['salesTeamID'];
-						referencedRelation: 'SalesTeams';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			SalesTeamMitglieder: {
-				Row: {
-					archiviert: boolean;
-					id: number;
-					mitgliedID: number | null;
-					name: string;
-					salesTeam: number | null;
-				};
-				Insert: {
-					archiviert?: boolean;
-					id?: number;
-					mitgliedID?: number | null;
-					name: string;
-					salesTeam?: number | null;
-				};
-				Update: {
-					archiviert?: boolean;
-					id?: number;
-					mitgliedID?: number | null;
-					name?: string;
-					salesTeam?: number | null;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 'SalesTeamMitglieder_salesTeam_fkey';
-						columns: ['salesTeam'];
-						referencedRelation: 'SalesTeams';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			SalesTeams: {
-				Row: {
-					archiviert: boolean;
-					id: number;
-					name: string;
-				};
-				Insert: {
-					archiviert?: boolean;
-					id?: number;
-					name: string;
-				};
-				Update: {
-					archiviert?: boolean;
-					id?: number;
-					name?: string;
-				};
-				Relationships: [];
-			};
-		};
-		Views: {
-			[_ in never]: never;
-		};
-		Functions: {
-			[_ in never]: never;
-		};
-		Enums: {
-			[_ in never]: never;
-		};
-		CompositeTypes: {
-			[_ in never]: never;
-		};
-	};
-	storage: {
-		Tables: {
-			buckets: {
-				Row: {
-					allowed_mime_types: string[] | null;
-					avif_autodetection: boolean | null;
-					created_at: string | null;
-					file_size_limit: number | null;
-					id: string;
-					name: string;
-					owner: string | null;
-					owner_id: string | null;
-					public: boolean | null;
-					updated_at: string | null;
-				};
-				Insert: {
-					allowed_mime_types?: string[] | null;
-					avif_autodetection?: boolean | null;
-					created_at?: string | null;
-					file_size_limit?: number | null;
-					id: string;
-					name: string;
-					owner?: string | null;
-					owner_id?: string | null;
-					public?: boolean | null;
-					updated_at?: string | null;
-				};
-				Update: {
-					allowed_mime_types?: string[] | null;
-					avif_autodetection?: boolean | null;
-					created_at?: string | null;
-					file_size_limit?: number | null;
-					id?: string;
-					name?: string;
-					owner?: string | null;
-					owner_id?: string | null;
-					public?: boolean | null;
-					updated_at?: string | null;
-				};
-				Relationships: [];
-			};
-			migrations: {
-				Row: {
-					executed_at: string | null;
-					hash: string;
-					id: number;
-					name: string;
-				};
-				Insert: {
-					executed_at?: string | null;
-					hash: string;
-					id: number;
-					name: string;
-				};
-				Update: {
-					executed_at?: string | null;
-					hash?: string;
-					id?: number;
-					name?: string;
-				};
-				Relationships: [];
-			};
-			objects: {
-				Row: {
-					bucket_id: string | null;
-					created_at: string | null;
-					id: string;
-					last_accessed_at: string | null;
-					level: number | null;
-					metadata: Json | null;
-					name: string | null;
-					owner: string | null;
-					owner_id: string | null;
-					path_tokens: string[] | null;
-					updated_at: string | null;
-					user_metadata: Json | null;
-					version: string | null;
-				};
-				Insert: {
-					bucket_id?: string | null;
-					created_at?: string | null;
-					id?: string;
-					last_accessed_at?: string | null;
-					level?: number | null;
-					metadata?: Json | null;
-					name?: string | null;
-					owner?: string | null;
-					owner_id?: string | null;
-					path_tokens?: string[] | null;
-					updated_at?: string | null;
-					user_metadata?: Json | null;
-					version?: string | null;
-				};
-				Update: {
-					bucket_id?: string | null;
-					created_at?: string | null;
-					id?: string;
-					last_accessed_at?: string | null;
-					level?: number | null;
-					metadata?: Json | null;
-					name?: string | null;
-					owner?: string | null;
-					owner_id?: string | null;
-					path_tokens?: string[] | null;
-					updated_at?: string | null;
-					user_metadata?: Json | null;
-					version?: string | null;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 'objects_bucketId_fkey';
-						columns: ['bucket_id'];
-						referencedRelation: 'buckets';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			prefixes: {
-				Row: {
-					bucket_id: string;
-					created_at: string | null;
-					level: number;
-					name: string;
-					updated_at: string | null;
-				};
-				Insert: {
-					bucket_id: string;
-					created_at?: string | null;
-					level?: number;
-					name: string;
-					updated_at?: string | null;
-				};
-				Update: {
-					bucket_id?: string;
-					created_at?: string | null;
-					level?: number;
-					name?: string;
-					updated_at?: string | null;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 'prefixes_bucketId_fkey';
-						columns: ['bucket_id'];
-						referencedRelation: 'buckets';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			s3_multipart_uploads: {
-				Row: {
-					bucket_id: string;
-					created_at: string;
-					id: string;
-					in_progress_size: number;
-					key: string;
-					owner_id: string | null;
-					upload_signature: string;
-					user_metadata: Json | null;
-					version: string;
-				};
-				Insert: {
-					bucket_id: string;
-					created_at?: string;
-					id: string;
-					in_progress_size?: number;
-					key: string;
-					owner_id?: string | null;
-					upload_signature: string;
-					user_metadata?: Json | null;
-					version: string;
-				};
-				Update: {
-					bucket_id?: string;
-					created_at?: string;
-					id?: string;
-					in_progress_size?: number;
-					key?: string;
-					owner_id?: string | null;
-					upload_signature?: string;
-					user_metadata?: Json | null;
-					version?: string;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 's3_multipart_uploads_bucket_id_fkey';
-						columns: ['bucket_id'];
-						referencedRelation: 'buckets';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-			s3_multipart_uploads_parts: {
-				Row: {
-					bucket_id: string;
-					created_at: string;
-					etag: string;
-					id: string;
-					key: string;
-					owner_id: string | null;
-					part_number: number;
-					size: number;
-					upload_id: string;
-					version: string;
-				};
-				Insert: {
-					bucket_id: string;
-					created_at?: string;
-					etag: string;
-					id?: string;
-					key: string;
-					owner_id?: string | null;
-					part_number: number;
-					size?: number;
-					upload_id: string;
-					version: string;
-				};
-				Update: {
-					bucket_id?: string;
-					created_at?: string;
-					etag?: string;
-					id?: string;
-					key?: string;
-					owner_id?: string | null;
-					part_number?: number;
-					size?: number;
-					upload_id?: string;
-					version?: string;
-				};
-				Relationships: [
-					{
-						foreignKeyName: 's3_multipart_uploads_parts_bucket_id_fkey';
-						columns: ['bucket_id'];
-						referencedRelation: 'buckets';
-						referencedColumns: ['id'];
-					},
-					{
-						foreignKeyName: 's3_multipart_uploads_parts_upload_id_fkey';
-						columns: ['upload_id'];
-						referencedRelation: 's3_multipart_uploads';
-						referencedColumns: ['id'];
-					}
-				];
-			};
-		};
-		Views: {
-			[_ in never]: never;
-		};
-		Functions: {
-			add_prefixes: {
-				Args: { _bucket_id: string; _name: string };
-				Returns: undefined;
-			};
-			can_insert_object: {
-				Args: { bucketid: string; name: string; owner: string; metadata: Json };
-				Returns: undefined;
-			};
-			delete_prefix: {
-				Args: { _bucket_id: string; _name: string };
-				Returns: boolean;
-			};
-			extension: {
-				Args: { name: string };
-				Returns: string;
-			};
-			filename: {
-				Args: { name: string };
-				Returns: string;
-			};
-			foldername: {
-				Args: { name: string };
-				Returns: string[];
-			};
-			get_level: {
-				Args: { name: string };
-				Returns: number;
-			};
-			get_prefix: {
-				Args: { name: string };
-				Returns: string;
-			};
-			get_prefixes: {
-				Args: { name: string };
-				Returns: string[];
-			};
-			get_size_by_bucket: {
-				Args: Record<PropertyKey, never>;
-				Returns: {
-					size: number;
-					bucket_id: string;
-				}[];
-			};
-			list_multipart_uploads_with_delimiter: {
-				Args: {
-					bucket_id: string;
-					prefix_param: string;
-					delimiter_param: string;
-					max_keys?: number;
-					next_key_token?: string;
-					next_upload_token?: string;
-				};
-				Returns: {
-					key: string;
-					id: string;
-					created_at: string;
-				}[];
-			};
-			list_objects_with_delimiter: {
-				Args: {
-					bucket_id: string;
-					prefix_param: string;
-					delimiter_param: string;
-					max_keys?: number;
-					start_after?: string;
-					next_token?: string;
-				};
-				Returns: {
-					name: string;
-					id: string;
-					metadata: Json;
-					updated_at: string;
-				}[];
-			};
-			operation: {
-				Args: Record<PropertyKey, never>;
-				Returns: string;
-			};
-			search: {
-				Args: {
-					prefix: string;
-					bucketname: string;
-					limits?: number;
-					levels?: number;
-					offsets?: number;
-					search?: string;
-					sortcolumn?: string;
-					sortorder?: string;
-				};
-				Returns: {
-					name: string;
-					id: string;
-					updated_at: string;
-					created_at: string;
-					last_accessed_at: string;
-					metadata: Json;
-				}[];
-			};
-			search_legacy_v1: {
-				Args: {
-					prefix: string;
-					bucketname: string;
-					limits?: number;
-					levels?: number;
-					offsets?: number;
-					search?: string;
-					sortcolumn?: string;
-					sortorder?: string;
-				};
-				Returns: {
-					name: string;
-					id: string;
-					updated_at: string;
-					created_at: string;
-					last_accessed_at: string;
-					metadata: Json;
-				}[];
-			};
-			search_v1_optimised: {
-				Args: {
-					prefix: string;
-					bucketname: string;
-					limits?: number;
-					levels?: number;
-					offsets?: number;
-					search?: string;
-					sortcolumn?: string;
-					sortorder?: string;
-				};
-				Returns: {
-					name: string;
-					id: string;
-					updated_at: string;
-					created_at: string;
-					last_accessed_at: string;
-					metadata: Json;
-				}[];
-			};
-			search_v2: {
-				Args: {
-					prefix: string;
-					bucket_name: string;
-					limits?: number;
-					levels?: number;
-					start_after?: string;
-				};
-				Returns: {
-					key: string;
-					name: string;
-					id: string;
-					updated_at: string;
-					created_at: string;
-					metadata: Json;
-				}[];
-			};
-		};
-		Enums: {
-			[_ in never]: never;
-		};
-		CompositeTypes: {
-			[_ in never]: never;
-		};
-	};
-};
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.3 (519615d)"
+  }
+  public: {
+    Tables: {
+      "0_Metadata": {
+        Row: {
+          created_at: string
+          ID: number
+          Key: string
+          Titel: string
+          Value: string
+        }
+        Insert: {
+          created_at?: string
+          ID?: number
+          Key: string
+          Titel: string
+          Value: string
+        }
+        Update: {
+          created_at?: string
+          ID?: number
+          Key?: string
+          Titel?: string
+          Value?: string
+        }
+        Relationships: []
+      }
+      "0_UserFeedback": {
+        Row: {
+          AppSeite: string | null
+          Beschreibung: string | null
+          created_at: string
+          ID: number
+          Kategorie: string | null
+          Prioritaet: string | null
+          Titel: string | null
+        }
+        Insert: {
+          AppSeite?: string | null
+          Beschreibung?: string | null
+          created_at?: string
+          ID?: number
+          Kategorie?: string | null
+          Prioritaet?: string | null
+          Titel?: string | null
+        }
+        Update: {
+          AppSeite?: string | null
+          Beschreibung?: string | null
+          created_at?: string
+          ID?: number
+          Kategorie?: string | null
+          Prioritaet?: string | null
+          Titel?: string | null
+        }
+        Relationships: []
+      }
+      "1_Mitglieder": {
+        Row: {
+          Anwaertergeneration: string | null
+          Art:
+            | Database["public"]["Enums"]["MitgliedsstatusAktivPassivEhemalig"]
+            | null
+          Aufnahmedatum: string | null
+          AusnahmeMVs: boolean | null
+          AusnahmeVBTs: boolean | null
+          AzureSync: boolean | null
+          Beraterstufe: Database["public"]["Enums"]["Beraterstufe"] | null
+          BIC: string | null
+          CollmexID: number | null
+          created_at: string
+          EmailAC: string | null
+          EmailPrivat: string | null
+          Geburtstag: string | null
+          Generation: number | null
+          Handy: string | null
+          Hausnummer: string | null
+          IBAN: string | null
+          ID: number
+          IstWechsler: boolean | null
+          Kleinunternehmerregelung: boolean | null
+          Legacy_ID: number | null
+          LinkedInJSON: string | null
+          LinkedInProfile: string | null
+          Mandatsreferenz: string | null
+          MandatUnterzeichnetAm: string | null
+          Nachname: string | null
+          PassivScoreAusnahme: boolean | null
+          Postleitzahl: string | null
+          Rolle:
+            | Database["public"]["Enums"]["MitgliedsrolleAlumniAnwaerterMitglied"]
+            | null
+          Rueckkehrdatum: string | null
+          Stadt: string | null
+          Steuernummer: string | null
+          Strasse: string | null
+          Titel: string | null
+          Traineegeneration: string | null
+          TransponderID: string | null
+          UserID: string | null
+          Vorname: string | null
+          Weiblich: boolean | null
+        }
+        Insert: {
+          Anwaertergeneration?: string | null
+          Art?:
+            | Database["public"]["Enums"]["MitgliedsstatusAktivPassivEhemalig"]
+            | null
+          Aufnahmedatum?: string | null
+          AusnahmeMVs?: boolean | null
+          AusnahmeVBTs?: boolean | null
+          AzureSync?: boolean | null
+          Beraterstufe?: Database["public"]["Enums"]["Beraterstufe"] | null
+          BIC?: string | null
+          CollmexID?: number | null
+          created_at?: string
+          EmailAC?: string | null
+          EmailPrivat?: string | null
+          Geburtstag?: string | null
+          Generation?: number | null
+          Handy?: string | null
+          Hausnummer?: string | null
+          IBAN?: string | null
+          ID?: number
+          IstWechsler?: boolean | null
+          Kleinunternehmerregelung?: boolean | null
+          Legacy_ID?: number | null
+          LinkedInJSON?: string | null
+          LinkedInProfile?: string | null
+          Mandatsreferenz?: string | null
+          MandatUnterzeichnetAm?: string | null
+          Nachname?: string | null
+          PassivScoreAusnahme?: boolean | null
+          Postleitzahl?: string | null
+          Rolle?:
+            | Database["public"]["Enums"]["MitgliedsrolleAlumniAnwaerterMitglied"]
+            | null
+          Rueckkehrdatum?: string | null
+          Stadt?: string | null
+          Steuernummer?: string | null
+          Strasse?: string | null
+          Titel?: string | null
+          Traineegeneration?: string | null
+          TransponderID?: string | null
+          UserID?: string | null
+          Vorname?: string | null
+          Weiblich?: boolean | null
+        }
+        Update: {
+          Anwaertergeneration?: string | null
+          Art?:
+            | Database["public"]["Enums"]["MitgliedsstatusAktivPassivEhemalig"]
+            | null
+          Aufnahmedatum?: string | null
+          AusnahmeMVs?: boolean | null
+          AusnahmeVBTs?: boolean | null
+          AzureSync?: boolean | null
+          Beraterstufe?: Database["public"]["Enums"]["Beraterstufe"] | null
+          BIC?: string | null
+          CollmexID?: number | null
+          created_at?: string
+          EmailAC?: string | null
+          EmailPrivat?: string | null
+          Geburtstag?: string | null
+          Generation?: number | null
+          Handy?: string | null
+          Hausnummer?: string | null
+          IBAN?: string | null
+          ID?: number
+          IstWechsler?: boolean | null
+          Kleinunternehmerregelung?: boolean | null
+          Legacy_ID?: number | null
+          LinkedInJSON?: string | null
+          LinkedInProfile?: string | null
+          Mandatsreferenz?: string | null
+          MandatUnterzeichnetAm?: string | null
+          Nachname?: string | null
+          PassivScoreAusnahme?: boolean | null
+          Postleitzahl?: string | null
+          Rolle?:
+            | Database["public"]["Enums"]["MitgliedsrolleAlumniAnwaerterMitglied"]
+            | null
+          Rueckkehrdatum?: string | null
+          Stadt?: string | null
+          Steuernummer?: string | null
+          Strasse?: string | null
+          Titel?: string | null
+          Traineegeneration?: string | null
+          TransponderID?: string | null
+          UserID?: string | null
+          Vorname?: string | null
+          Weiblich?: boolean | null
+        }
+        Relationships: []
+      }
+      "1_Rollen": {
+        Row: {
+          AzureSync: boolean | null
+          Beschreibung: string | null
+          BewerbungOffen: boolean | null
+          created_at: string
+          Email: string | null
+          GroupID: string | null
+          ID: number
+          KernTeam: boolean | null
+          LegacyID: number | null
+          ListIDHistory: string | null
+          TeamsTeamID: string | null
+          Titel: string | null
+          VBBezug: number | null
+          VorgesetzteRolle: number | null
+        }
+        Insert: {
+          AzureSync?: boolean | null
+          Beschreibung?: string | null
+          BewerbungOffen?: boolean | null
+          created_at?: string
+          Email?: string | null
+          GroupID?: string | null
+          ID?: number
+          KernTeam?: boolean | null
+          LegacyID?: number | null
+          ListIDHistory?: string | null
+          TeamsTeamID?: string | null
+          Titel?: string | null
+          VBBezug?: number | null
+          VorgesetzteRolle?: number | null
+        }
+        Update: {
+          AzureSync?: boolean | null
+          Beschreibung?: string | null
+          BewerbungOffen?: boolean | null
+          created_at?: string
+          Email?: string | null
+          GroupID?: string | null
+          ID?: number
+          KernTeam?: boolean | null
+          LegacyID?: number | null
+          ListIDHistory?: string | null
+          TeamsTeamID?: string | null
+          Titel?: string | null
+          VBBezug?: number | null
+          VorgesetzteRolle?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "1_Rollen_VBBezug_fkey"
+            columns: ["VBBezug"]
+            isOneToOne: false
+            referencedRelation: "1_Rollen"
+            referencedColumns: ["ID"]
+          },
+          {
+            foreignKeyName: "1_Rollen_VorgesetzteRolle_fkey"
+            columns: ["VorgesetzteRolle"]
+            isOneToOne: false
+            referencedRelation: "1_Rollen"
+            referencedColumns: ["ID"]
+          },
+        ]
+      }
+      "1_RollenMitglieder": {
+        Row: {
+          BeginnDatum: string | null
+          created_at: string
+          EndeDatum: string | null
+          ID: number
+          LeitendeFunktion: boolean | null
+          MitgliedID: number
+          PrimaryRole: boolean | null
+          RollenID: number
+          Titel: string | null
+        }
+        Insert: {
+          BeginnDatum?: string | null
+          created_at?: string
+          EndeDatum?: string | null
+          ID?: number
+          LeitendeFunktion?: boolean | null
+          MitgliedID: number
+          PrimaryRole?: boolean | null
+          RollenID: number
+          Titel?: string | null
+        }
+        Update: {
+          BeginnDatum?: string | null
+          created_at?: string
+          EndeDatum?: string | null
+          ID?: number
+          LeitendeFunktion?: boolean | null
+          MitgliedID?: number
+          PrimaryRole?: boolean | null
+          RollenID?: number
+          Titel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "1_RollenMitglieder_MitgliedID_fkey"
+            columns: ["MitgliedID"]
+            isOneToOne: false
+            referencedRelation: "1_Mitglieder"
+            referencedColumns: ["ID"]
+          },
+          {
+            foreignKeyName: "1_RollenMitglieder_RollenID_fkey"
+            columns: ["RollenID"]
+            isOneToOne: false
+            referencedRelation: "1_Rollen"
+            referencedColumns: ["ID"]
+          },
+        ]
+      }
+      "4_EventBewerbungen": {
+        Row: {
+          Anwesend: boolean | null
+          Besetzt: boolean | null
+          BewerbungText: string | null
+          created_at: string
+          Essgewohnheiten: string | null
+          EventID: number | null
+          HSMScore: number | null
+          ID: number
+          MitgliedID: number | null
+          SEPAMandat: boolean | null
+          Titel: string | null
+        }
+        Insert: {
+          Anwesend?: boolean | null
+          Besetzt?: boolean | null
+          BewerbungText?: string | null
+          created_at?: string
+          Essgewohnheiten?: string | null
+          EventID?: number | null
+          HSMScore?: number | null
+          ID?: number
+          MitgliedID?: number | null
+          SEPAMandat?: boolean | null
+          Titel?: string | null
+        }
+        Update: {
+          Anwesend?: boolean | null
+          Besetzt?: boolean | null
+          BewerbungText?: string | null
+          created_at?: string
+          Essgewohnheiten?: string | null
+          EventID?: number | null
+          HSMScore?: number | null
+          ID?: number
+          MitgliedID?: number | null
+          SEPAMandat?: boolean | null
+          Titel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "4_EventBewerbungen_EventID_fkey"
+            columns: ["EventID"]
+            isOneToOne: false
+            referencedRelation: "4_Events"
+            referencedColumns: ["ID"]
+          },
+          {
+            foreignKeyName: "4_EventBewerbungen_MitgliedID_fkey"
+            columns: ["MitgliedID"]
+            isOneToOne: false
+            referencedRelation: "1_Mitglieder"
+            referencedColumns: ["ID"]
+          },
+        ]
+      }
+      "4_EventMaster": {
+        Row: {
+          created_at: string
+          Eventart: Database["public"]["Enums"]["Eventart"] | null
+          ID: number
+          MasterBeschreibung: string | null
+          TeamsWorkspaceURL: string | null
+          Titel: string | null
+        }
+        Insert: {
+          created_at?: string
+          Eventart?: Database["public"]["Enums"]["Eventart"] | null
+          ID?: number
+          MasterBeschreibung?: string | null
+          TeamsWorkspaceURL?: string | null
+          Titel?: string | null
+        }
+        Update: {
+          created_at?: string
+          Eventart?: Database["public"]["Enums"]["Eventart"] | null
+          ID?: number
+          MasterBeschreibung?: string | null
+          TeamsWorkspaceURL?: string | null
+          Titel?: string | null
+        }
+        Relationships: []
+      }
+      "4_Events": {
+        Row: {
+          AngabeEssgewGewuenscht: boolean | null
+          AnlageGewuenscht: boolean | null
+          AnlageInhalte: string | null
+          Anmeldeart: Database["public"]["Enums"]["EventAnmeldeart"] | null
+          Beginn: string | null
+          Beschreibung: string | null
+          Bewerbungsdeadline: string | null
+          BewerbungstextGewuenscht: boolean | null
+          BewTextVorgabe: string | null
+          CheckInBeginn: string | null
+          created_at: string
+          Ende: string | null
+          FCFSSlots: number | null
+          HSMPoints: number | null
+          ID: number
+          IsVisible: boolean | null
+          KostenEUR: number | null
+          KostenString: string | null
+          LinkOnlineDokument: string | null
+          MasterEventID: number | null
+          Ort: string | null
+          Postleitzahl: string | null
+          Semester: string | null
+          StrasseHausnummer: string | null
+          Titel: string | null
+        }
+        Insert: {
+          AngabeEssgewGewuenscht?: boolean | null
+          AnlageGewuenscht?: boolean | null
+          AnlageInhalte?: string | null
+          Anmeldeart?: Database["public"]["Enums"]["EventAnmeldeart"] | null
+          Beginn?: string | null
+          Beschreibung?: string | null
+          Bewerbungsdeadline?: string | null
+          BewerbungstextGewuenscht?: boolean | null
+          BewTextVorgabe?: string | null
+          CheckInBeginn?: string | null
+          created_at?: string
+          Ende?: string | null
+          FCFSSlots?: number | null
+          HSMPoints?: number | null
+          ID?: number
+          IsVisible?: boolean | null
+          KostenEUR?: number | null
+          KostenString?: string | null
+          LinkOnlineDokument?: string | null
+          MasterEventID?: number | null
+          Ort?: string | null
+          Postleitzahl?: string | null
+          Semester?: string | null
+          StrasseHausnummer?: string | null
+          Titel?: string | null
+        }
+        Update: {
+          AngabeEssgewGewuenscht?: boolean | null
+          AnlageGewuenscht?: boolean | null
+          AnlageInhalte?: string | null
+          Anmeldeart?: Database["public"]["Enums"]["EventAnmeldeart"] | null
+          Beginn?: string | null
+          Beschreibung?: string | null
+          Bewerbungsdeadline?: string | null
+          BewerbungstextGewuenscht?: boolean | null
+          BewTextVorgabe?: string | null
+          CheckInBeginn?: string | null
+          created_at?: string
+          Ende?: string | null
+          FCFSSlots?: number | null
+          HSMPoints?: number | null
+          ID?: number
+          IsVisible?: boolean | null
+          KostenEUR?: number | null
+          KostenString?: string | null
+          LinkOnlineDokument?: string | null
+          MasterEventID?: number | null
+          Ort?: string | null
+          Postleitzahl?: string | null
+          Semester?: string | null
+          StrasseHausnummer?: string | null
+          Titel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "4_Events_MasterEventID_fkey"
+            columns: ["MasterEventID"]
+            isOneToOne: false
+            referencedRelation: "4_EventMaster"
+            referencedColumns: ["ID"]
+          },
+        ]
+      }
+      "4_EventVerantwortliche": {
+        Row: {
+          Besetzt: boolean | null
+          BewerbungText: string | null
+          created_at: string
+          Essgewohnheiten: string | null
+          EventID: number | null
+          ID: number
+          MitgliedID: number | null
+          Titel: string | null
+        }
+        Insert: {
+          Besetzt?: boolean | null
+          BewerbungText?: string | null
+          created_at?: string
+          Essgewohnheiten?: string | null
+          EventID?: number | null
+          ID?: number
+          MitgliedID?: number | null
+          Titel?: string | null
+        }
+        Update: {
+          Besetzt?: boolean | null
+          BewerbungText?: string | null
+          created_at?: string
+          Essgewohnheiten?: string | null
+          EventID?: number | null
+          ID?: number
+          MitgliedID?: number | null
+          Titel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "4_EventVerantwortliche_EventID_fkey"
+            columns: ["EventID"]
+            isOneToOne: false
+            referencedRelation: "4_Events"
+            referencedColumns: ["ID"]
+          },
+          {
+            foreignKeyName: "4_EventVerantwortliche_MitgliedID_fkey"
+            columns: ["MitgliedID"]
+            isOneToOne: false
+            referencedRelation: "1_Mitglieder"
+            referencedColumns: ["ID"]
+          },
+        ]
+      }
+      gocardless_tokens: {
+        Row: {
+          access_token: string | null
+          id: number
+          refresh_token: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          id?: number
+          refresh_token?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          id?: number
+          refresh_token?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      kontobewegungen: {
+        Row: {
+          beguenstiger: string
+          betrag: number
+          buchungsdatum: string
+          id: string
+          konto: string
+          verwendungszweck: string
+        }
+        Insert: {
+          beguenstiger: string
+          betrag: number
+          buchungsdatum: string
+          id: string
+          konto: string
+          verwendungszweck: string
+        }
+        Update: {
+          beguenstiger?: string
+          betrag?: number
+          buchungsdatum?: string
+          id?: string
+          konto?: string
+          verwendungszweck?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      get_mitglied_id: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      get_user_oid: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      has_role: {
+        Args: { roleid: number }
+        Returns: boolean
+      }
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+    }
+    Enums: {
+      Beraterstufe:
+        | "Junior Consultant"
+        | "Consultant"
+        | "Senior Consultant"
+        | "Managing Consultant"
+        | "Director"
+        | "Senior Director"
+      EventAnmeldeart: "Bewerben" | "Einschreiben" | "FCFS"
+      Eventart: "Netzwerk" | "Social" | "Kuratoren" | "HSM" | "Sonstiges"
+      MitgliedsrolleAlumniAnwaerterMitglied: "Mitglied" | "Anwärter" | "Alumni"
+      MitgliedsstatusAktivPassivEhemalig: "Aktiv" | "Passiv" | "Ehemalig"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
 
-type DefaultSchema = Database[Extract<keyof Database, 'public'>];
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
-	DefaultSchemaTableNameOrOptions extends
-		| keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
-		| { schema: keyof Database },
-	TableName extends DefaultSchemaTableNameOrOptions extends {
-		schema: keyof Database;
-	}
-		? keyof (Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-				Database[DefaultSchemaTableNameOrOptions['schema']]['Views'])
-		: never = never
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-	? (Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-			Database[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
-			Row: infer R;
-		}
-		? R
-		: never
-	: DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
-		? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
-				Row: infer R;
-			}
-			? R
-			: never
-		: never;
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
 
 export type TablesInsert<
-	DefaultSchemaTableNameOrOptions extends
-		| keyof DefaultSchema['Tables']
-		| { schema: keyof Database },
-	TableName extends DefaultSchemaTableNameOrOptions extends {
-		schema: keyof Database;
-	}
-		? keyof Database[DefaultSchemaTableNameOrOptions['schema']]['Tables']
-		: never = never
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-	? Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
-			Insert: infer I;
-		}
-		? I
-		: never
-	: DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-		? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
-				Insert: infer I;
-			}
-			? I
-			: never
-		: never;
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
 
 export type TablesUpdate<
-	DefaultSchemaTableNameOrOptions extends
-		| keyof DefaultSchema['Tables']
-		| { schema: keyof Database },
-	TableName extends DefaultSchemaTableNameOrOptions extends {
-		schema: keyof Database;
-	}
-		? keyof Database[DefaultSchemaTableNameOrOptions['schema']]['Tables']
-		: never = never
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-	? Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
-			Update: infer U;
-		}
-		? U
-		: never
-	: DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-		? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
-				Update: infer U;
-			}
-			? U
-			: never
-		: never;
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
 
 export type Enums<
-	DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums'] | { schema: keyof Database },
-	EnumName extends DefaultSchemaEnumNameOrOptions extends {
-		schema: keyof Database;
-	}
-		? keyof Database[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
-		: never = never
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-	? Database[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
-	: DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
-		? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
-		: never;
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
-	PublicCompositeTypeNameOrOptions extends
-		| keyof DefaultSchema['CompositeTypes']
-		| { schema: keyof Database },
-	CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-		schema: keyof Database;
-	}
-		? keyof Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
-		: never = never
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-	? Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-	: PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
-		? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
-		: never;
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
-	graphql_public: {
-		Enums: {}
-	},
-	pgbouncer: {
-		Enums: {}
-	},
-	public: {
-		Enums: {}
-	},
-	storage: {
-		Enums: {}
-	}
-} as const;
+  public: {
+    Enums: {
+      Beraterstufe: [
+        "Junior Consultant",
+        "Consultant",
+        "Senior Consultant",
+        "Managing Consultant",
+        "Director",
+        "Senior Director",
+      ],
+      EventAnmeldeart: ["Bewerben", "Einschreiben", "FCFS"],
+      Eventart: ["Netzwerk", "Social", "Kuratoren", "HSM", "Sonstiges"],
+      MitgliedsrolleAlumniAnwaerterMitglied: ["Mitglied", "Anwärter", "Alumni"],
+      MitgliedsstatusAktivPassivEhemalig: ["Aktiv", "Passiv", "Ehemalig"],
+    },
+  },
+} as const

@@ -1,0 +1,57 @@
+import type { Database } from '@/database.types';
+import type { LayoutLoad } from './$types';
+import { error } from '@sveltejs/kit';
+
+type RoleListKey = number;
+type RoleListValue = { Rolle: string } & Database['public']['Tables']['1_RollenMitglieder']['Row'];
+type RoleMap = Map<RoleListKey, RoleListValue>;
+
+export const load: LayoutLoad = async ({ parent, depends }) => {
+	// Invalidate when auth state changes so userId is refreshed
+	depends('supabase:auth');
+	// Get supabase and user from the root layout
+	const { supabase, user } = await parent();
+
+	let userId: number = -1;
+	let roles: RoleMap = new Map();
+	let isAdmin: boolean = false;
+
+	if (user) {
+		const { data: userIdData, error: userIdError } = await supabase
+			.from('1_Mitglieder')
+			.select('ID')
+			.eq('UserID', user.user_metadata?.custom_claims?.oid)
+			.single();
+		if (userIdError || !userIdData || !userIdData.ID) {
+			throw error(401, 'Benutzer nicht gefunden oder Zugriff nicht erlaubt');
+		} else {
+			userId = userIdData.ID;
+		}
+
+		const { data: rolesData, error: rolesError } = await supabase
+			.from('1_RollenMitglieder')
+			.select('*, rollen:1_Rollen(Titel)')
+			.eq('MitgliedID', userId)
+			.is('EndeDatum', null);
+		if (rolesError) throw error(401, 'Rollen konnten nicht geladen werden');
+
+		const makeKey = (r: (typeof rolesData)[number]): RoleListKey => r.RollenID;
+
+		for (const r of rolesData ?? []) {
+			if (!r.rollen?.Titel) continue;
+			const { rollen, ...row } = r;
+			const value: RoleListValue = { Rolle: rollen.Titel || '', ...row };
+			roles.set(makeKey(r), value);
+		}
+
+		const { data: isAdminData, error: isAdminError } = await supabase
+			.from('0_Metadata')
+			.select('ID')
+			.eq('Titel', 'AppAdmin')
+			.eq('Key', 'MitgliedID')
+			.eq('Value', userId.toString());
+		if (isAdminError) isAdmin = false;
+		else isAdmin = isAdminData.length === 1 ? true : false;
+	}
+	return { userId, roles, isAdmin };
+};
