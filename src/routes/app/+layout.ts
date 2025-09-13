@@ -17,6 +17,7 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 
 	let userId: number = -1;
 	let roles: RoleMap = new Map();
+	let isAdmin: boolean = false;
 
 	if (user) {
 		const { data: userIdData, error: userIdError } = await supabase
@@ -46,7 +47,14 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 			const { RollenID, rollen, ...value } = r; // remove ID & Titel
 			roles.set(makeKey(r), value as RoleListValue);
 		}
+
+		const { data: isAdminData, error: isAdminError } = await supabase
+			.from('0_Metadata')
+			.select('ID')
+			.eq('Titel', 'AppAdmin')
+			.eq('Key', 'MitgliedID')
+			.eq('Value', userId.toString());
 	}
 
-	return { userId, roles };
+	return { userId, roles, isAdmin };
 };

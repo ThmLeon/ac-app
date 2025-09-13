@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      "0_Metadata": {
+        Row: {
+          created_at: string
+          ID: number
+          Key: string
+          Titel: string
+          Value: string
+        }
+        Insert: {
+          created_at?: string
+          ID?: number
+          Key: string
+          Titel: string
+          Value: string
+        }
+        Update: {
+          created_at?: string
+          ID?: number
+          Key?: string
+          Titel?: string
+          Value?: string
+        }
+        Relationships: []
+      }
       "0_UserFeedback": {
         Row: {
           AppSeite: string | null
@@ -586,6 +610,10 @@ export type Database = {
       }
       has_role: {
         Args: { roleid: number }
+        Returns: boolean
+      }
+      is_admin: {
+        Args: Record<PropertyKey, never>
         Returns: boolean
       }
     }
