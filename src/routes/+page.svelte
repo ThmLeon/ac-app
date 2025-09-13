@@ -7,7 +7,8 @@
 		const { error } = await supabase.auth.signInWithOAuth({
 			provider: 'azure',
 			options: {
-				redirectTo: 'http://localhost:3000/auth/callback',
+				// use environment variable in production
+				redirectTo: process.env.BASE_URL + '/auth/callback',
 				scopes: 'openid email profile User.Read'
 			}
 		});

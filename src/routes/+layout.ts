@@ -1,10 +1,11 @@
 import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ssr';
+import { redirect } from '@sveltejs/kit';
 // @ts-ignore - Provided by SvelteKit at build/runtime; ignore IDE type resolution here
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
 import type { LayoutLoad } from './$types';
 import type { Database } from '@/database.types';
 
-export const load: LayoutLoad = async ({ data, depends, fetch }) => {
+export const load: LayoutLoad = async ({ data, depends, fetch, url }) => {
 	/**
 	 * Declare a dependency so the layout can be invalidated, for example, on
 	 * session refresh.
@@ -38,6 +39,11 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
 	const {
 		data: { user }
 	} = await supabase.auth.getUser();
+
+	// If user is signed in and on the root path, redirect to the app dashboard
+	if (user && url.pathname === '/') {
+		throw redirect(302, '/app');
+	}
 
 	return { session, supabase, user };
 };
