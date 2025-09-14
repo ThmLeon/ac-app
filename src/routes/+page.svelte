@@ -1,14 +1,14 @@
 <script>
+	import { PUBLIC_BASE_URL } from '$env/static/public';
 	export let data; // Use the `data` prop passed from the load function
 
 	async function signInWithAzure() {
 		const { supabase } = data; // Access supabase from the `data` prop
-
 		const { error } = await supabase.auth.signInWithOAuth({
 			provider: 'azure',
 			options: {
 				// use environment variable in production
-				redirectTo: process.env.BASE_URL + '/auth/callback',
+				redirectTo: PUBLIC_BASE_URL + '/auth/callback',
 				scopes: 'openid email profile User.Read'
 			}
 		});
