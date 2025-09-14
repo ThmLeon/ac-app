@@ -218,6 +218,8 @@ export type Database = {
           KernTeam: boolean | null
           LegacyID: number | null
           ListIDHistory: string | null
+          OrgChartZeigen: boolean | null
+          RolleAktiv: boolean | null
           TeamsTeamID: string | null
           Titel: string | null
           VBBezug: number | null
@@ -234,6 +236,8 @@ export type Database = {
           KernTeam?: boolean | null
           LegacyID?: number | null
           ListIDHistory?: string | null
+          OrgChartZeigen?: boolean | null
+          RolleAktiv?: boolean | null
           TeamsTeamID?: string | null
           Titel?: string | null
           VBBezug?: number | null
@@ -250,6 +254,8 @@ export type Database = {
           KernTeam?: boolean | null
           LegacyID?: number | null
           ListIDHistory?: string | null
+          OrgChartZeigen?: boolean | null
+          RolleAktiv?: boolean | null
           TeamsTeamID?: string | null
           Titel?: string | null
           VBBezug?: number | null
