@@ -13,11 +13,10 @@
 	import EventMasterCard from '$lib/components/events/EventMasterCard.svelte';
 
 	export let eventMasters: EventMasters;
-	export let onAddNew: () => void;
-	export let onEdit: (id: EventMaster['ID']) => void;
 	export let canEdit: boolean;
 	export let canCreate: boolean;
 	export let canDelete: boolean;
+	export let prepareForm: (ID: EventMaster['ID'], action: 'edit' | 'new') => void;
 </script>
 
 <div class="flex flex-wrap justify-start gap-4">
@@ -25,7 +24,7 @@
 		<button
 			class="flex justify-center items-center border-2 border-dashed border-gray-400 rounded-lg w-[350px] cursor-pointer"
 			title="Neuen Event Master hinzufügen"
-			on:click={onAddNew}
+			on:click={() => prepareForm(0, 'new')}
 		>
 			<span class="text-4xl text-gray-400">+</span>
 		</button>
@@ -35,7 +34,7 @@
 		<div class="flex justify-center">
 			<EventMasterCard
 				onEdit={() => {
-					onEdit(eventMaster.ID);
+					prepareForm(eventMaster.ID, 'edit');
 				}}
 				{eventMaster}
 				{canDelete}

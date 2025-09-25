@@ -1,6 +1,7 @@
 import type { Database } from '@/database.types';
 import type { PostgrestError } from '@supabase/supabase-js';
-import { fail, error as svelteError } from '@sveltejs/kit';
+import { error as svelteError } from '@sveltejs/kit';
+import type { QueryClient, QueryKey } from '@sveltestack/svelte-query';
 
 export function formatEuro(amount: number, locale = 'de-DE'): string {
 	return new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' }).format(amount);
@@ -13,7 +14,7 @@ export function throwFetchErrorIfNeeded<T>(
 	emptyArrayIsError: boolean = false
 ): NonNullable<T> {
 	if (error || !data || (Array.isArray(data) && data.length === 0 && emptyArrayIsError)) {
-		throw svelteError(404, errorMessage);
+		svelteError(404, errorMessage);
 	}
 	return data;
 }
@@ -23,11 +24,17 @@ type Rolle = Database['public']['Enums']['MitgliedsrolleAlumniAnwaerterMitglied'
 export function mitgliederStatusAsText(art: Art, rolle: Rolle): string {
 	switch (rolle) {
 		case 'Mitglied':
-			return art === 'Aktiv' ? 'Aktives Mitglied' : 'Passives Mitglied';
+			if (art === 'Aktiv') return 'Aktives Mitglied';
+			if (art === 'Passiv') return 'Passives Mitglied';
+			if (art === 'Ehemalig') return 'Ehemaliges Mitglied';
 		case 'Alumni':
-			return art === 'Aktiv' ? 'Aktiver Alumni' : 'Passiver Alumni';
+			if (art === 'Aktiv') return 'Aktiver Alumni';
+			if (art === 'Passiv') return 'Passiver Alumni';
+			if (art === 'Ehemalig') return 'Ehemaliger Alumni';
 		case 'Anwärter':
-			return art === 'Aktiv' ? 'Aktiver Trainee' : 'Passiver Trainee';
+			if (art === 'Aktiv') return 'Aktiver Trainee';
+			if (art === 'Passiv') return 'Passiver Trainee';
+			if (art === 'Ehemalig') return 'Ehemaliger Trainee';
 		default:
 			return 'Unbekannter Status';
 	}
@@ -89,3 +96,83 @@ export const badgeColors = {
 	orange: 'bg-orange-200 text-orange-800',
 	red: 'bg-red-200 text-red-800'
 };
+
+export const rollenIDToVB = (ID: number | null, kurz: boolean) => {
+	if (ID === null) return 'N/A';
+	switch (ID) {
+		case 9:
+			return kurz ? 'F&R' : 'Finanzen & Recht';
+		case 12:
+			return kurz ? 'Internes' : 'Internes';
+		case 11:
+			return kurz ? 'KB' : 'Kundenbetreuung';
+		case 13:
+			return kurz ? 'MPR' : 'Marketing & PR';
+		case 10:
+			return kurz ? 'TPM' : 'Technologie & Prozessmanagement';
+		case 16:
+			return 'Sonstige';
+		default:
+			return 'N/A';
+	}
+};
+
+export function throwSupabaseErrorIfNeeded<T>(
+	data: T,
+	error: PostgrestError | null,
+	errorMessage: string = 'Ein unbekannter Fehler ist aufgetreten',
+	emptyArrayIsError: boolean = false
+): NonNullable<T> {
+	if (error || !data || (Array.isArray(data) && data.length === 0 && emptyArrayIsError)) {
+		throw new Error(errorMessage);
+	}
+	return data;
+}
+
+export function throwSupabaseActionErrorIfNeeded(
+	error: PostgrestError | null,
+	errorMessage: string = 'Ein unbekannter Fehler ist aufgetreten'
+): void {
+	if (error) {
+		throw new Error(errorMessage);
+	}
+}
+
+export function svelteQuerySnapshotToDataArray<T>(snapshot: [QueryKey, T[]][]) {
+	return snapshot.flatMap(([, data]) => data ?? []);
+}
+
+export async function optimisticUpdateArray<T extends { ID: number }>(
+	queryClient: QueryClient,
+	queryKey: QueryKey,
+	updatedItem: T,
+	sortFunction?: (a: T, b: T) => number
+) {
+	await queryClient.cancelQueries({ queryKey: queryKey });
+	let snapshot = svelteQuerySnapshotToDataArray(
+		queryClient.getQueriesData<T[]>({
+			queryKey: queryKey
+		})
+	);
+	snapshot = snapshot.filter((item) => item.ID !== updatedItem.ID);
+	const optimistic: T[] = [...snapshot, updatedItem];
+	if (sortFunction) optimistic.sort(sortFunction);
+	queryClient.setQueryData(queryKey, optimistic);
+}
+
+export async function optimisticDeleteArray<T extends { ID: number }>(
+	queryClient: QueryClient,
+	queryKey: QueryKey,
+	deletedID: number,
+	sortFunction?: (a: T, b: T) => number
+) {
+	await queryClient.cancelQueries({ queryKey: queryKey });
+	const snapshot = queryClient.getQueriesData<T[]>({
+		queryKey: queryKey
+	});
+	const optimistic: T[] = svelteQuerySnapshotToDataArray(snapshot).filter(
+		(item) => item.ID !== deletedID
+	);
+	if (sortFunction) optimistic.sort(sortFunction);
+	queryClient.setQueryData(queryKey, optimistic);
+}

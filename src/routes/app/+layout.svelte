@@ -15,8 +15,10 @@
 	import { derived, writable, type Readable } from 'svelte/store';
 	import { setContext } from 'svelte';
 	import FeedbackDialog from '@/components/feedback/FeedbackDialog.svelte';
+	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 
 	let { data, children } = $props();
+	const queryClient = new QueryClient();
 
 	const fullName = data.user?.user_metadata.full_name ?? 'User';
 	const firstName = fullName.split(' ')[0];
@@ -80,46 +82,48 @@
 </script>
 
 <Toaster position="top-right" />
-<SidebarProvider>
-	<AppSidebar name={firstName + ' ' + lastName} avatarUrl="" />
-	<SidebarInset>
-		<header
-			class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12"
-		>
-			<div class="flex items-center gap-2 px-4">
-				<SidebarTrigger class="-ml-1" />
-				<Separator orientation="vertical" class="mr-2 data-[orientation=vertical]:h-4" />
-				<Breadcrumb>
-					<BreadcrumbList>
-						{#each $breadcrumbs as crumb, i}
-							<BreadcrumbItem class={i === 0 ? 'hidden md:block' : ''}>
-								{#if i < $breadcrumbs.length - 1}
-									<BreadcrumbLink
-										href={crumb.href}
-										class="max-w-[160px] truncate inline-block align-middle"
-										title={crumb.label}>{crumb.label}</BreadcrumbLink
-									>
-								{:else}
-									<BreadcrumbPage>
-										<span
-											class="max-w-[200px] truncate inline-block align-middle"
-											title={crumb.label}>{crumb.label}</span
+<QueryClientProvider client={queryClient}>
+	<SidebarProvider>
+		<AppSidebar name={firstName + ' ' + lastName} avatarUrl="" />
+		<SidebarInset>
+			<header
+				class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12"
+			>
+				<div class="flex items-center gap-2 px-4">
+					<SidebarTrigger class="-ml-1" />
+					<Separator orientation="vertical" class="mr-2 data-[orientation=vertical]:h-4" />
+					<Breadcrumb>
+						<BreadcrumbList>
+							{#each $breadcrumbs as crumb, i}
+								<BreadcrumbItem class={i === 0 ? 'hidden md:block' : ''}>
+									{#if i < $breadcrumbs.length - 1}
+										<BreadcrumbLink
+											href={crumb.href}
+											class="max-w-[160px] truncate inline-block align-middle"
+											title={crumb.label}>{crumb.label}</BreadcrumbLink
 										>
-									</BreadcrumbPage>
+									{:else}
+										<BreadcrumbPage>
+											<span
+												class="max-w-[200px] truncate inline-block align-middle"
+												title={crumb.label}>{crumb.label}</span
+											>
+										</BreadcrumbPage>
+									{/if}
+								</BreadcrumbItem>
+								{#if i < $breadcrumbs.length - 1}
+									<BreadcrumbSeparator class={i === 0 ? 'hidden md:block' : ''} />
 								{/if}
-							</BreadcrumbItem>
-							{#if i < $breadcrumbs.length - 1}
-								<BreadcrumbSeparator class={i === 0 ? 'hidden md:block' : ''} />
-							{/if}
-						{/each}
-					</BreadcrumbList>
-				</Breadcrumb>
-			</div>
-		</header>
+							{/each}
+						</BreadcrumbList>
+					</Breadcrumb>
+				</div>
+			</header>
 
-		<div class="flex flex-1 flex-col gap-4 p-4">
-			{@render children()}
-		</div>
-	</SidebarInset>
-	<FeedbackDialog supabase={data.supabase} />
-</SidebarProvider>
+			<div class="flex flex-1 flex-col gap-4 p-4">
+				{@render children()}
+			</div>
+		</SidebarInset>
+		<FeedbackDialog supabase={data.supabase} />
+	</SidebarProvider>
+</QueryClientProvider>

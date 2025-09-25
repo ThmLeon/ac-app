@@ -140,8 +140,9 @@
 									<AlertDialog.Cancel type="button">Abbrechen</AlertDialog.Cancel>
 									<AlertDialog.Action
 										type="submit"
+										name="Action"
+										value="delete"
 										form="event-master-form"
-										formaction="?/deleteEventMaster"
 										class={buttonVariants({ variant: 'destructive' })}
 									>
 										Löschen
@@ -152,10 +153,10 @@
 					</AlertDialog.Root>
 
 					{#if canEdit}
-						<Button formaction="?/updateEventMaster" type="submit">Speichern</Button>
+						<Button type="submit" name="Action" value="update">Speichern</Button>
 					{/if}
 				{:else}
-					<Button formaction="?/addEventMaster" type="submit">Hinzufügen</Button>
+					<Button type="submit" name="Action" value="add">Hinzufügen</Button>
 				{/if}
 			</Sheet.Footer>
 		</form>

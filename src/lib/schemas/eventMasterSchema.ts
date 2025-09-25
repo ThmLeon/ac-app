@@ -5,14 +5,15 @@ export type EventArt = Database['public']['Enums']['Eventart'];
 const eventArtEnumValues: EventArt[] = ['HSM', 'Kuratoren', 'Netzwerk', 'Social', 'Sonstiges'];
 
 export const eventMasterSchema = z.object({
-	ID: z.number(),
+	ID: z.number().min(0),
 	Titel: z
 		.string({ required_error: 'Name darf nicht leer sein' })
 		.min(1, 'Name darf nicht leer sein'),
 	MasterBeschreibung: z
 		.string({ required_error: 'Beschreibung darf nicht leer sein' })
 		.min(1, 'Beschreibung darf nicht leer sein'),
-	Eventart: z.enum(eventArtEnumValues as [EventArt, ...EventArt[]])
+	Eventart: z.enum(eventArtEnumValues as [EventArt, ...EventArt[]]),
+	Action: z.enum(['update', 'delete', 'add'])
 });
 
 export type EventMasterForm = z.infer<typeof eventMasterSchema>;

@@ -68,6 +68,152 @@ export type Database = {
         }
         Relationships: []
       }
+      "1_BueroDienstAufgaben": {
+        Row: {
+          AufgabeErledigt: boolean | null
+          AufgabeMasterID: number | null
+          BueroDienstID: number | null
+          created_at: string
+          ID: number
+          Titel: string | null
+        }
+        Insert: {
+          AufgabeErledigt?: boolean | null
+          AufgabeMasterID?: number | null
+          BueroDienstID?: number | null
+          created_at?: string
+          ID?: number
+          Titel?: string | null
+        }
+        Update: {
+          AufgabeErledigt?: boolean | null
+          AufgabeMasterID?: number | null
+          BueroDienstID?: number | null
+          created_at?: string
+          ID?: number
+          Titel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "1_BueroDienstAufgaben_AufgabeMasterID_fkey"
+            columns: ["AufgabeMasterID"]
+            isOneToOne: false
+            referencedRelation: "1_BueroDiensteAufgabenMaster"
+            referencedColumns: ["ID"]
+          },
+          {
+            foreignKeyName: "1_BueroDienstAufgaben_BueroDienstID_fkey"
+            columns: ["BueroDienstID"]
+            isOneToOne: false
+            referencedRelation: "1_BueroDienste"
+            referencedColumns: ["ID"]
+          },
+        ]
+      }
+      "1_BueroDienste": {
+        Row: {
+          Abgenommen: boolean | null
+          AbgenommenVonMitgliedID: number | null
+          created_at: string
+          Datum: string | null
+          ID: number
+          TeilnehmerAnzahl: number | null
+          TeilnehmerEingetragen: number | null
+          Titel: string | null
+        }
+        Insert: {
+          Abgenommen?: boolean | null
+          AbgenommenVonMitgliedID?: number | null
+          created_at?: string
+          Datum?: string | null
+          ID?: number
+          TeilnehmerAnzahl?: number | null
+          TeilnehmerEingetragen?: number | null
+          Titel?: string | null
+        }
+        Update: {
+          Abgenommen?: boolean | null
+          AbgenommenVonMitgliedID?: number | null
+          created_at?: string
+          Datum?: string | null
+          ID?: number
+          TeilnehmerAnzahl?: number | null
+          TeilnehmerEingetragen?: number | null
+          Titel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "1_BueroDienste_AbgenommenVonMitgliedID_fkey"
+            columns: ["AbgenommenVonMitgliedID"]
+            isOneToOne: false
+            referencedRelation: "1_Mitglieder"
+            referencedColumns: ["ID"]
+          },
+        ]
+      }
+      "1_BueroDiensteAufgabenMaster": {
+        Row: {
+          Aufgabe: string | null
+          AufgabeBereich: string | null
+          AufgabeBeschreibung: string | null
+          created_at: string
+          ID: number
+          Titel: string | null
+        }
+        Insert: {
+          Aufgabe?: string | null
+          AufgabeBereich?: string | null
+          AufgabeBeschreibung?: string | null
+          created_at?: string
+          ID?: number
+          Titel?: string | null
+        }
+        Update: {
+          Aufgabe?: string | null
+          AufgabeBereich?: string | null
+          AufgabeBeschreibung?: string | null
+          created_at?: string
+          ID?: number
+          Titel?: string | null
+        }
+        Relationships: []
+      }
+      "1_BueroDienstTeilnehmer": {
+        Row: {
+          BueroDienstID: number | null
+          created_at: string
+          ID: number
+          MitgliedID: number | null
+        }
+        Insert: {
+          BueroDienstID?: number | null
+          created_at?: string
+          ID?: number
+          MitgliedID?: number | null
+        }
+        Update: {
+          BueroDienstID?: number | null
+          created_at?: string
+          ID?: number
+          MitgliedID?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "1_BueroDienstTeilnehmer_BueroDienstID_fkey"
+            columns: ["BueroDienstID"]
+            isOneToOne: false
+            referencedRelation: "1_BueroDienste"
+            referencedColumns: ["ID"]
+          },
+          {
+            foreignKeyName: "1_BueroDienstTeilnehmer_MitgliedID_fkey"
+            columns: ["MitgliedID"]
+            isOneToOne: false
+            referencedRelation: "1_Mitglieder"
+            referencedColumns: ["ID"]
+          },
+        ]
+      }
       "1_Mitglieder": {
         Row: {
           Anwaertergeneration: string | null
@@ -206,6 +352,91 @@ export type Database = {
         }
         Relationships: []
       }
+      "1_MitgliedGuthaben": {
+        Row: {
+          BonusPunkte: number | null
+          created_at: string
+          ID: number
+          MitgliedID: number | null
+          Saldo: number | null
+          Titel: string | null
+        }
+        Insert: {
+          BonusPunkte?: number | null
+          created_at?: string
+          ID?: number
+          MitgliedID?: number | null
+          Saldo?: number | null
+          Titel?: string | null
+        }
+        Update: {
+          BonusPunkte?: number | null
+          created_at?: string
+          ID?: number
+          MitgliedID?: number | null
+          Saldo?: number | null
+          Titel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "1_MitgliedGuthaben_MitgliedID_fkey"
+            columns: ["MitgliedID"]
+            isOneToOne: false
+            referencedRelation: "1_Mitglieder"
+            referencedColumns: ["ID"]
+          },
+        ]
+      }
+      "1_MitgliedPassivScore": {
+        Row: {
+          Aktiv: boolean | null
+          created_at: string
+          Datum: string | null
+          ID: number
+          MitgliedID: number | null
+          MVEntschuldigt: number | null
+          MVUnentschuldigt: number | null
+          PassivScore: number | null
+          Titel: string | null
+          VBTEntschuldigt: number | null
+          VBTUnentschuldigt: number | null
+        }
+        Insert: {
+          Aktiv?: boolean | null
+          created_at?: string
+          Datum?: string | null
+          ID?: number
+          MitgliedID?: number | null
+          MVEntschuldigt?: number | null
+          MVUnentschuldigt?: number | null
+          PassivScore?: number | null
+          Titel?: string | null
+          VBTEntschuldigt?: number | null
+          VBTUnentschuldigt?: number | null
+        }
+        Update: {
+          Aktiv?: boolean | null
+          created_at?: string
+          Datum?: string | null
+          ID?: number
+          MitgliedID?: number | null
+          MVEntschuldigt?: number | null
+          MVUnentschuldigt?: number | null
+          PassivScore?: number | null
+          Titel?: string | null
+          VBTEntschuldigt?: number | null
+          VBTUnentschuldigt?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "1_MitgliedPassivScore_MitgliedID_fkey"
+            columns: ["MitgliedID"]
+            isOneToOne: false
+            referencedRelation: "1_Mitglieder"
+            referencedColumns: ["ID"]
+          },
+        ]
+      }
       "1_Rollen": {
         Row: {
           AzureSync: boolean | null
@@ -328,6 +559,140 @@ export type Database = {
             referencedColumns: ["ID"]
           },
         ]
+      }
+      "1_TeamwahlBewerbungen": {
+        Row: {
+          Besetzt: boolean | null
+          Bewerbungstext: string | null
+          created_at: string
+          ID: number
+          MitgliedID: number | null
+          PassivErklaerung: string | null
+          Passivplaene: boolean | null
+          Prioritaet: number | null
+          RollenID: number | null
+          Semester: string | null
+          Teamleitung: boolean | null
+          Titel: string | null
+        }
+        Insert: {
+          Besetzt?: boolean | null
+          Bewerbungstext?: string | null
+          created_at?: string
+          ID?: number
+          MitgliedID?: number | null
+          PassivErklaerung?: string | null
+          Passivplaene?: boolean | null
+          Prioritaet?: number | null
+          RollenID?: number | null
+          Semester?: string | null
+          Teamleitung?: boolean | null
+          Titel?: string | null
+        }
+        Update: {
+          Besetzt?: boolean | null
+          Bewerbungstext?: string | null
+          created_at?: string
+          ID?: number
+          MitgliedID?: number | null
+          PassivErklaerung?: string | null
+          Passivplaene?: boolean | null
+          Prioritaet?: number | null
+          RollenID?: number | null
+          Semester?: string | null
+          Teamleitung?: boolean | null
+          Titel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "1_TeamwahlBewerbungen_MitgliedID_fkey"
+            columns: ["MitgliedID"]
+            isOneToOne: false
+            referencedRelation: "1_Mitglieder"
+            referencedColumns: ["ID"]
+          },
+          {
+            foreignKeyName: "1_TeamwahlBewerbungen_RollenID_fkey"
+            columns: ["RollenID"]
+            isOneToOne: false
+            referencedRelation: "1_Rollen"
+            referencedColumns: ["ID"]
+          },
+        ]
+      }
+      "1_TeamwahlStatus": {
+        Row: {
+          created_at: string
+          EndeDatum: string | null
+          ID: number
+          MitgliedID: number | null
+          Semester: string | null
+          Status: string | null
+          Titel: string | null
+        }
+        Insert: {
+          created_at?: string
+          EndeDatum?: string | null
+          ID?: number
+          MitgliedID?: number | null
+          Semester?: string | null
+          Status?: string | null
+          Titel?: string | null
+        }
+        Update: {
+          created_at?: string
+          EndeDatum?: string | null
+          ID?: number
+          MitgliedID?: number | null
+          Semester?: string | null
+          Status?: string | null
+          Titel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "1_TeamwahlStatus_MitgliedID_fkey"
+            columns: ["MitgliedID"]
+            isOneToOne: false
+            referencedRelation: "1_Mitglieder"
+            referencedColumns: ["ID"]
+          },
+        ]
+      }
+      "3_JobboardAnzeigen": {
+        Row: {
+          AnzeigeAktivBis: string | null
+          Bachelor: boolean | null
+          Bewerbungsdeadline: string | null
+          created_at: string
+          Festeinstieg: boolean | null
+          ID: number
+          JobBeginn: string | null
+          Master: boolean | null
+          Titel: string | null
+        }
+        Insert: {
+          AnzeigeAktivBis?: string | null
+          Bachelor?: boolean | null
+          Bewerbungsdeadline?: string | null
+          created_at?: string
+          Festeinstieg?: boolean | null
+          ID?: number
+          JobBeginn?: string | null
+          Master?: boolean | null
+          Titel?: string | null
+        }
+        Update: {
+          AnzeigeAktivBis?: string | null
+          Bachelor?: boolean | null
+          Bewerbungsdeadline?: string | null
+          created_at?: string
+          Festeinstieg?: boolean | null
+          ID?: number
+          JobBeginn?: string | null
+          Master?: boolean | null
+          Titel?: string | null
+        }
+        Relationships: []
       }
       "4_EventBewerbungen": {
         Row: {
