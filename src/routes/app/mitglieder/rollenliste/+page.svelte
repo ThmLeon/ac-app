@@ -1,90 +1,98 @@
 <script lang="ts">
 	import '@xyflow/svelte/dist/style.css';
-	import { SvelteFlow, Background, Controls } from '@xyflow/svelte';
-	import type { Node, Edge } from '@xyflow/svelte';
-	import RoleNode from '$lib/components/pages/mitglieder/rollenliste/RoleNode.svelte';
-	import { getMitgliederRollenState, type Rolle } from '@/state/MitgliederRollen.svelte';
+	import OrgChart from '$lib/components/pages/mitglieder/rollenliste/OrgChart.svelte';
+	import {
+		getMitgliederRollenState,
+		type RoleFilter,
+		type Rolle,
+		type VB
+	} from '@/state/MitgliederRollen.svelte';
 	import { onMount } from 'svelte';
 
+	import RoleFilterBar from '$lib/components/pages/mitglieder/rollenliste/RoleFilterBar.svelte';
+	import RoleList from '$lib/components/pages/mitglieder/rollenliste/RoleList.svelte';
+	import RoleFormSheet from '$lib/components/pages/mitglieder/rollenliste/RoleFormSheet.svelte';
+	import { rollenIDToVB } from '@/utils/utils.js';
+
 	const { data } = $props();
+	const mitgliederRollenState = $derived(getMitgliederRollenState(data.supabase));
 
 	onMount(async () => {
-		const mitgliederRollenState = getMitgliederRollenState(data.supabase);
-		await mitgliederRollenState.loadOrganisation();
-		buildGraph(mitgliederRollenState.organisation, 0, 0, nodes, edges);
+		await mitgliederRollenState.loadRollen();
+	});
+	let roleFilter: RoleFilter = $state({
+		name: '',
+		vb: 'all',
+		kernteam: 'all',
+		aktiv: 'all',
+		showOrgChartOnly: 'all'
+	});
+	// Sheet + form state (dummy)
+	let sheetOpen = $state(false);
+	let editingRole: Rolle | null = $state(null);
+
+	let form = $state({
+		rollenname: '',
+		vb: 'TPM' as VB,
+		vorgesetzteRolleId: '' as string,
+		beschreibung: '',
+		bewerbungOffen: false,
+		kernteam: false,
+		rolleAktiviert: true,
+		anzeigenImChart: true
 	});
 
-	// Layout: simple top-down tree, fixed node size
-	// Make nodes a bit narrower and reduce horizontal gap to densify layout
-	const NODE_W = 200;
-	const NODE_H = 100;
-	const X_GAP = 10;
-	const Y_GAP = 100;
-
-	function measureSubtreeWidth(role: Rolle): number {
-		if (!role.Children || role.Children.length === 0) return NODE_W;
-		const childrenWidths = role.Children.map(measureSubtreeWidth);
-		return Math.max(
-			NODE_W,
-			childrenWidths.reduce((a, b) => a + b, 0) + X_GAP * (role.Children.length - 1)
-		);
+	function openForNew() {
+		editingRole = null;
+		form = {
+			rollenname: '',
+			vb: 'TPM' as VB,
+			vorgesetzteRolleId: '',
+			beschreibung: '',
+			bewerbungOffen: false,
+			kernteam: false,
+			rolleAktiviert: true,
+			anzeigenImChart: true
+		};
+		sheetOpen = true;
 	}
 
-	function buildGraph(role: Rolle, originX: number, depth: number, nodes: Node[], edges: Edge[]) {
-		const subtreeW = measureSubtreeWidth(role);
-		const x = originX + subtreeW / 2 - NODE_W / 2;
-		const y = depth * (NODE_H + Y_GAP);
-		nodes.push({
-			id: role.ID.toString(),
-			type: 'roleNode',
-			position: { x, y },
-			data: {
-				name: role.Titel ?? '',
-				members: (role.Mitglieder ?? []).map((m) => ({
-					name: m.Titel ?? '',
-					isTeamleiter: m.LeitendeFunktion ?? false
-				}))
-			}
-		});
-
-		if (!role.Children || role.Children.length === 0) return;
-		let childX = originX;
-		for (const child of role.Children) {
-			const w = measureSubtreeWidth(child);
-			buildGraph(child, childX, depth + 1, nodes, edges);
-			edges.push({
-				id: `${role.ID}-${child.ID}`,
-				source: role.ID.toString(),
-				target: child.ID.toString(),
-				type: 'smoothstep'
-			});
-			childX += w + X_GAP;
-		}
+	function openForEdit(role: Rolle) {
+		editingRole = role;
+		form = {
+			rollenname: role.Titel ?? '',
+			vb: rollenIDToVB(role.VBBezug, false) as VB,
+			vorgesetzteRolleId: '',
+			beschreibung: '',
+			bewerbungOffen: false,
+			kernteam: role.KernTeam ?? false,
+			rolleAktiviert: role.RolleAktiv ?? false,
+			anzeigenImChart: true
+		};
+		sheetOpen = true;
 	}
-
-	let nodes: Node[] = $state([]);
-	let edges: Edge[] = $state([]);
-
-	const nodeTypes = { roleNode: RoleNode } as const;
 </script>
 
 <section class="p-6 space-y-4">
 	<h1 class="text-2xl font-semibold">Rollenliste (Org Chart)</h1>
 	<div class="h-[70vh] rounded-md border">
-		{#if nodes.length}
-			<SvelteFlow
-				class="h-full w-full"
-				{nodes}
-				{edges}
-				{nodeTypes}
-				fitView
-				minZoom={0.1}
-				maxZoom={2}
-				nodesDraggable={false}
-			>
-				<Background />
-				<Controls showLock={false} />
-			</SvelteFlow>
-		{/if}
+		<OrgChart root={mitgliederRollenState.organisationTree} />
 	</div>
+
+	<!-- Roles list below the org chart -->
+	<div class="mt-6">
+		<div class="mb-2 flex items-center justify-between gap-3">
+			<h2 class="text-xl font-semibold">Alle Rollen</h2>
+		</div>
+
+		<RoleFilterBar onNew={openForNew} bind:filter={roleFilter} />
+		<RoleList roles={mitgliederRollenState.rollen} onDetails={openForEdit} {roleFilter} />
+	</div>
+
+	<RoleFormSheet
+		bind:open={sheetOpen}
+		bind:form
+		bind:editingRole
+		rolesForParent={mitgliederRollenState.rollen}
+	/>
 </section>

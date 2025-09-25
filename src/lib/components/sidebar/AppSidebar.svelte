@@ -41,7 +41,7 @@
 				{ title: 'Mailverteiler', url: '/app/mitglieder/mailverteiler' },
 				{ title: 'Rollenliste', url: '/app/mitglieder/rollenliste' },
 				{ title: 'Teamwahl', url: '/app/mitglieder/teamwahl' },
-				{ title: 'Job Ausschreibungen', url: '/app/mitglieder/job-ausschreibungen' }
+				{ title: 'Jobbboard', url: '/app/mitglieder/jobboard' }
 			]
 		},
 		{
