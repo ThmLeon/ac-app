@@ -9,7 +9,7 @@
 			options: {
 				// use environment variable in production
 				redirectTo: PUBLIC_BASE_URL + '/auth/callback',
-				scopes: 'openid email profile User.Read'
+                                scopes: 'openid email profile offline_access User.Read Sites.ReadWrite.All'
 			}
 		});
 

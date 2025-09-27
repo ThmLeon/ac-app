@@ -1,44 +1,109 @@
-/*import { ConfidentialClientApplication } from '@azure/msal-node';
+import { browser } from '$app/environment';
 import { Client } from '@microsoft/microsoft-graph-client';
+import type { SupabaseClient, Session } from '@supabase/supabase-js';
 import 'isomorphic-fetch';
-import {
-	PUBLIC_MS_CLIENT_ID,
-	PUBLIC_MS_CLIENT_SECRET,
-	PUBLIC_MS_TENANT_ID
-	//@ts-ignore
-} from '$env/static/public';
+import { readable, type Readable } from 'svelte/store';
 
-const msalConfig = {
-	auth: {
-		clientId: PUBLIC_MS_CLIENT_ID,
-		authority: `https://login.microsoftonline.com/${PUBLIC_MS_TENANT_ID}`,
-		clientSecret: PUBLIC_MS_CLIENT_SECRET
-	}
-};
+let supabaseClient: SupabaseClient | null = null;
+let graphClient: Client | null = null;
 
-const cca = new ConfidentialClientApplication(msalConfig);
+async function fetchMicrosoftAccessToken(): Promise<string> {
+        if (!supabaseClient) {
+                throw new Error('Supabase client is not initialised for SharePoint access.');
+        }
 
-let cachedAccessToken: string | null = null;
-let cachedExpiresAt: number = 0;
+        const {
+                data: { session },
+                error
+        } = await supabaseClient.auth.getSession();
 
-export async function getGraphClient() {
-	const now = Math.floor(Date.now() / 1000);
+        if (error) {
+                throw error;
+        }
 
-	if (!cachedAccessToken || now >= cachedExpiresAt - 60) {
-		const result = await cca.acquireTokenByClientCredential({
-			scopes: ['https://graph.microsoft.com/.default']
-		});
+        const accessToken = session?.provider_token;
 
-		if (!result) throw new Error('Backend Sharepoint Authentication failed');
+        if (!accessToken) {
+                throw new Error('No Microsoft access token available in the current session.');
+        }
 
-		cachedAccessToken = result.accessToken;
-		cachedExpiresAt = result.expiresOn?.getTime()! / 1000;
-	}
-
-	const client = Client.init({
-		authProvider: (done) => done(null, cachedAccessToken!)
-	});
-
-	return client;
+        return accessToken;
 }
-*/
+
+function createGraphClient(): Client {
+        if (!graphClient) {
+                graphClient = Client.init({
+                        authProvider: async (done) => {
+                                try {
+                                        const token = await fetchMicrosoftAccessToken();
+                                        done(null, token);
+                                } catch (err) {
+                                        done(err as Error, null);
+                                }
+                        }
+                });
+        }
+
+        return graphClient;
+}
+
+function resetGraphClient() {
+        graphClient = null;
+}
+
+function handleSession(session: Session | null, set: (client: Client | null) => void) {
+        if (session?.provider_token) {
+                const client = createGraphClient();
+                set(client);
+        } else {
+                resetGraphClient();
+                set(null);
+        }
+}
+
+export function createSharepointClientStore(
+        supabase: SupabaseClient
+): Readable<Client | null> {
+        if (!browser) {
+                return readable<Client | null>(null);
+        }
+
+        supabaseClient = supabase;
+
+        return readable<Client | null>(null, (set) => {
+                let active = true;
+
+                async function initialiseFromCurrentSession() {
+                        try {
+                                const {
+                                        data: { session }
+                                } = await supabase.auth.getSession();
+                                if (!active) return;
+                                handleSession(session, set);
+                        } catch (err) {
+                                console.error('Failed to initialise SharePoint client', err);
+                                set(null);
+                        }
+                }
+
+                initialiseFromCurrentSession();
+
+                const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+                        handleSession(session, set);
+                });
+
+                return () => {
+                        active = false;
+                        data.subscription.unsubscribe();
+                        resetGraphClient();
+                        supabaseClient = null;
+                };
+        });
+}
+
+export function getSharepointClient(): Client {
+        if (!graphClient) {
+                throw new Error('SharePoint client has not been initialised yet.');
+        }
+        return graphClient;
+}
