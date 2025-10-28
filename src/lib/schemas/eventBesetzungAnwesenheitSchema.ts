@@ -6,4 +6,4 @@ export const eventBesetzungAnwesenheitSchema = z.object({
 	Anwesend: z.boolean()
 });
 
-export type EventBesetzungAnwesenheitSchema = z.infer<typeof eventBesetzungAnwesenheitSchema>;
+export type EventBesetzungAnwesenheitForm = z.infer<typeof eventBesetzungAnwesenheitSchema>;

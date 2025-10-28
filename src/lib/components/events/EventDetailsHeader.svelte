@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { formatApplicationDeadline, formatDate, handleActionResultSonners } from '@/app.utils';
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 	import { Badge } from '../ui/badge';
 	import { Button } from '../ui/button';
+	import { page } from '$app/stores';
 	import {
 		Root as AlertDialog,
 		// removed Trigger import to avoid unmount-on-menu-close behavior
@@ -15,93 +15,89 @@
 		Action as AlertDialogAction
 	} from '../ui/alert-dialog';
 	import { buttonVariants } from '../ui/button/button.svelte';
-	import { badgeColors, eventBewerbungMoeglich } from '@/utils/utils';
-	import { superForm } from 'sveltekit-superforms/client';
-	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { eventDeleteSchema } from '@/schemas/eventDeleteSchema';
-	import { toast } from 'svelte-sonner';
-	import { goto } from '$app/navigation';
+	import {
+		badgeColors,
+		eventBewerbungMoeglich,
+		formatApplicationDeadline,
+		formatDate
+	} from '@/utils/utils';
 	import EventTitelbildRealistic from '$lib/assets/EventTitelbildRealistic.jpg';
 	import { DropdownMenu } from '../ui/dropdown-menu';
 	import DropdownMenuTrigger from '../ui/dropdown-menu/dropdown-menu-trigger.svelte';
 	import DropdownMenuContent from '../ui/dropdown-menu/dropdown-menu-content.svelte';
 	import DropdownMenuItem from '../ui/dropdown-menu/dropdown-menu-item.svelte';
+	import { getEventContext } from '@/context/eventContext';
+	import { getUserContext } from '@/context/userContext';
+	import { getRolesContext } from '@/context/rolesContext';
+	import { eventsQueries } from '@/query/events';
+	import { useQueryClient } from '@sveltestack/svelte-query';
+	import type { SupabaseClient } from '@supabase/supabase-js';
+	import type { Session } from '@supabase/supabase-js';
+	import { goto } from '$app/navigation';
 
-	export let eventData: {
-		ID: number;
-		Titel: string | null;
-		Beschreibung: string | null;
-		Beginn: string | null;
-		Ende: string | null;
-		Bewerbungsdeadline: string | null;
-		Anmeldeart: 'Bewerben' | 'Einschreiben' | 'FCFS' | null;
-		FCFSSlots: number | null;
-		event_master: {
-			Titel: string | null;
-		} | null;
-		event_verantwortliche: {
-			mitglieder: {
-				ID: number;
-				Vorname: string | null;
-				Nachname: string | null;
-			} | null;
-		}[];
-	};
-	export let applicationState: {
-		Besetzt: boolean | null;
-		Anwesend: boolean | null;
-	} | null;
-	export let totalApplications: number;
-	export let showApplyOrEditButton: boolean;
-	export let userId: number;
-	export let eventImageUrl: string | null;
-	export let deleteForm: any;
-	export let isAdmin: boolean;
+	const { eventDetails, totalApplications, eventImageURL } = getEventContext();
+	const { userDetails } = getUserContext();
+	const { userIsAppAdmin } = getRolesContext();
 
-	const deleteEventForm = superForm(deleteForm, {
-		validators: zodClient(eventDeleteSchema),
-		onSubmit: () => {
-			toast.loading('Event wird gelöscht', { id: 'delete_event_form' });
-		},
-		onResult: async ({ result }) => {
-			handleActionResultSonners(result, 'delete_event_form');
-			if (result.status !== 500 && result.type === 'success') {
-				await goto('../events', { replaceState: true });
-			}
-		}
-	});
+	// Props for supabase client and session
+	let { supabase, session }: { supabase: SupabaseClient; session: Session } = $props();
+
+	const queries = eventsQueries(supabase, session, useQueryClient());
+	const deleteEventMutation = queries.delete();
+
+	const showApplyOrEditButton = $derived(
+		!(
+			$page.url.pathname.endsWith('/bewerben') ||
+			$page.url.pathname.endsWith('/besetzen') ||
+			$page.url.pathname.endsWith('/bearbeiten')
+		)
+	);
 
 	// control the alert dialog outside the dropdown menu
-	let confirmDeleteOpen = false;
+	let confirmDeleteOpen = $state(false);
 
 	const PLACEHOLDER = EventTitelbildRealistic;
 
-	const { form: deleteEventFormData } = deleteEventForm;
+	async function handleDeleteEvent() {
+		if ($eventDetails?.ID) {
+			await $deleteEventMutation.mutateAsync($eventDetails.ID);
+			confirmDeleteOpen = false;
+			// Navigate to events list after deletion
+			goto('/app/events');
+		}
+	}
 
-	$: bewerbungAktiviert = eventBewerbungMoeglich(
-		eventData.Bewerbungsdeadline ? new Date(eventData.Bewerbungsdeadline) : null,
-		new Date(eventData.Beginn!),
-		eventData.Anmeldeart!,
-		!!applicationState,
-		eventData.FCFSSlots !== null && eventData.FCFSSlots <= totalApplications
+	const bewerbungAktiviert = $derived(
+		eventBewerbungMoeglich(
+			$eventDetails?.Bewerbungsdeadline ? new Date($eventDetails.Bewerbungsdeadline) : null,
+			new Date($eventDetails?.Beginn!),
+			$eventDetails?.Anmeldeart!,
+			!!$eventDetails?.userBewerbung[0],
+			$eventDetails?.FCFSSlots !== undefined &&
+				$eventDetails?.FCFSSlots != null &&
+				$eventDetails?.FCFSSlots <= $totalApplications
+		)
 	);
 
-	$: isUserEventResponsible = eventData.event_verantwortliche.some(
-		(verantwortlicher) => verantwortlicher.mitglieder?.ID === userId
+	const isUserEventResponsible = $derived(
+		$eventDetails?.eventVerantwortliche.some((v) => v.mitglieder?.ID === $userDetails.ID)
 	);
 
 	function status(): {
 		text: string;
 		variant: 'blue' | 'green' | 'orange' | 'red' | 'yellow';
 	} {
-		if (!applicationState) {
-			if (eventData.Bewerbungsdeadline && new Date(eventData.Bewerbungsdeadline) < new Date()) {
+		if (!$eventDetails?.userBewerbung[0]) {
+			if (
+				$eventDetails?.Bewerbungsdeadline &&
+				new Date($eventDetails?.Bewerbungsdeadline) < new Date()
+			) {
 				return { text: 'Deadline abgelaufen & nicht Beworben', variant: 'red' };
 			}
 			return { text: 'Offen', variant: 'blue' };
 		}
-		if (applicationState.Anwesend) return { text: 'Anwesend', variant: 'green' };
-		if (applicationState.Besetzt) return { text: 'Besetzt', variant: 'yellow' };
+		if ($eventDetails.userBewerbung[0].Anwesend) return { text: 'Anwesend', variant: 'green' };
+		if ($eventDetails.userBewerbung[0].Besetzt) return { text: 'Besetzt', variant: 'yellow' };
 		return { text: 'Beworben', variant: 'orange' };
 	}
 </script>
@@ -109,40 +105,40 @@
 <Card class="flex flex-col md:flex-row gap-4 p-0">
 	<!-- Image Section -->
 	<img
-		src={eventImageUrl || PLACEHOLDER}
-		alt={eventData.Titel || 'Event Image'}
+		src={$eventImageURL || PLACEHOLDER}
+		alt={$eventDetails?.Titel || 'Event Image'}
 		class="w-full md:w-1/3 object-cover rounded-lg aspect-16/10"
 	/>
 
 	<!-- Content Section -->
 	<div class="flex flex-1 flex-col justify-between pt-5 pb-5 h-64">
 		<CardHeader>
-			<CardTitle>{eventData.Titel || 'Kein Titel'}</CardTitle>
+			<CardTitle>{$eventDetails?.Titel || 'Kein Titel'}</CardTitle>
 			<CardDescription class="text-sm text-gray-500">
 				<strong>Beginn:</strong>
-				{formatDate(eventData.Beginn)}<br />
+				{formatDate($eventDetails?.Beginn || '')}<br />
 				<strong>Ende:</strong>
-				{formatDate(eventData.Ende)}<br />
+				{formatDate($eventDetails?.Ende || '')}<br />
 				<strong>Bewerbungsdeadline:</strong>
-				{formatApplicationDeadline(eventData.Bewerbungsdeadline)}<br />
-				{#if eventData.Anmeldeart === 'FCFS'}
+				{formatApplicationDeadline($eventDetails?.Bewerbungsdeadline || '')}<br />
+				{#if $eventDetails?.Anmeldeart === 'FCFS'}
 					<strong>Plätze:</strong>
-					{totalApplications} von {eventData.FCFSSlots !== null
-						? eventData.FCFSSlots
+					{$totalApplications} von {$eventDetails?.FCFSSlots !== null
+						? $eventDetails.FCFSSlots
 						: 'unbegrenzt'} belegt
 				{/if}
 			</CardDescription>
 		</CardHeader>
 		<CardContent class="flex gap-2">
 			<Badge variant="default" class={badgeColors[status().variant]}>{status().text}</Badge>
-			{#if eventData.event_master && eventData.event_master.Titel}
+			{#if $eventDetails?.eventMaster && $eventDetails?.eventMaster.Titel}
 				<Badge variant="default">
-					{eventData.event_master.Titel.charAt(0).toUpperCase() +
-						eventData.event_master.Titel.slice(1)}
+					{$eventDetails.eventMaster.Titel.charAt(0).toUpperCase() +
+						$eventDetails.eventMaster.Titel.slice(1)}
 				</Badge>
 			{/if}
 			<Badge variant="default">
-				{eventData.Anmeldeart}
+				{$eventDetails?.Anmeldeart}
 			</Badge>
 		</CardContent>
 
@@ -150,14 +146,14 @@
 		<CardContent class="flex gap-2 items-center" style="min-height:2.5rem;">
 			{#if showApplyOrEditButton}
 				{#if bewerbungAktiviert.possible || bewerbungAktiviert.modification}
-					<a href={`./${eventData.ID}/bewerben`}>
+					<a href={`./${$eventDetails?.ID}/bewerben`}>
 						<Button variant="default">{bewerbungAktiviert.message}</Button>
 					</a>
 				{:else}
 					<Button variant="default" disabled>{bewerbungAktiviert.message}</Button>
 				{/if}
 			{/if}
-			{#if (isUserEventResponsible || isAdmin) && showApplyOrEditButton}
+			{#if (isUserEventResponsible || userIsAppAdmin) && showApplyOrEditButton}
 				<DropdownMenu>
 					<DropdownMenuTrigger>
 						{#snippet child({ props })}
@@ -166,16 +162,13 @@
 					</DropdownMenuTrigger>
 					<DropdownMenuContent>
 						<DropdownMenuItem>
-							<a href={`./${eventData.ID}/besetzen`}> Bewerbungen & Besetzung </a>
+							<a href={`./${$eventDetails?.ID}/besetzen`}> Bewerbungen & Besetzung </a>
 						</DropdownMenuItem>
 						<DropdownMenuItem>
-							<a href={`./${eventData.ID}/bearbeiten`}> Event bearbeiten </a>
+							<a href={`./${$eventDetails?.ID}/bearbeiten`}> Event bearbeiten </a>
 						</DropdownMenuItem>
 						<DropdownMenuItem>
-							<!-- Open alert dialog via local state to avoid unmount when menu closes -->
-							<button type="button" on:click={() => (confirmDeleteOpen = true)}
-								>Event löschen</button
-							>
+							<button onclick={() => (confirmDeleteOpen = true)}>Event löschen</button>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -193,16 +186,12 @@
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel>Abbrechen</AlertDialogCancel>
-						<form method="POST" use:deleteEventForm.enhance class="inline">
-							<input type="hidden" name="ID" bind:value={$deleteEventFormData.ID} />
-							<AlertDialogAction
-								class={buttonVariants({ variant: 'destructive' })}
-								type="submit"
-								formaction="?/deleteEvent"
-							>
-								Event löschen
-							</AlertDialogAction>
-						</form>
+						<AlertDialogAction
+							class={buttonVariants({ variant: 'destructive' })}
+							onclick={handleDeleteEvent}
+						>
+							Event löschen
+						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>

@@ -2,7 +2,7 @@
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 import { createServerClient } from '@supabase/ssr';
 import type { RequestEvent } from '@sveltejs/kit';
-import type { Database } from '@/database.types';
+import type { Database } from '@/api/supabase/database.types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 export default class SupabaseServerClient {

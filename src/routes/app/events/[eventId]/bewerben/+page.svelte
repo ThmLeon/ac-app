@@ -1,35 +1,44 @@
 <script lang="ts">
-	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
-	import type { PageData } from './$types';
-	import EventDetailsHeader from '@/components/events/EventDetailsHeader.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Button } from '$lib/components/ui/button';
-	import { toast } from 'svelte-sonner';
-	import { handleActionResultSonners } from '@/app.utils';
-	import { goto, invalidate } from '$app/navigation';
 	import { FormControl, FormField, FormFieldErrors } from '@/components/ui/form';
 	import RequiredLabel from '@/components/general/RequiredLabel.svelte';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { eventBewerbungSchema, type EventBewerbungForm } from '@/schemas/eventBewerbungSchema';
-	import { fileProxy, superForm, type SuperFormData } from 'sveltekit-superforms/client';
-	import { eventBewerbungMoeglich } from '@/utils/utils';
-	import { page } from '$app/state';
+	import { eventBewerbungSchema } from '@/schemas/eventBewerbungSchema';
+	import { fileProxy, superForm } from 'sveltekit-superforms/client';
+	import { getEventContext } from '@/context/eventContext';
+	import { eventsQueries } from '@/query/events';
+	import { useQueryClient } from '@sveltestack/svelte-query';
+	import { getUserContext } from '@/context/userContext';
 
-	export let data: PageData;
+	const { eventDetails } = getEventContext();
+	const { userDetails } = getUserContext();
+
+	let { data } = $props();
+
+	const queries = eventsQueries(data.supabase, data.session!, useQueryClient());
+	const createEventApplicationMutation = queries.applications.create(
+		$eventDetails?.ID || -1,
+		$userDetails.Titel!,
+		$userDetails.ID
+	);
+	const updateEventApplicationMutation = queries.applications.update();
+	const deleteEventApplicationMutation = queries.applications.delete();
 
 	const form = superForm(data.form, {
+		SPA: true,
 		validators: zodClient(eventBewerbungSchema),
-		onSubmit: () => {
-			toast.loading('Eingabe wird verarbeitet', {
-				id: 'event_bewerbung_form'
-			});
-		},
-		onResult: async ({ result }) => {
-			handleActionResultSonners(result, 'event_bewerbung_form');
-			if (result.type !== 'failure' && result.status !== 500) {
-				await invalidate(`../${data.eventData.ID}`);
-				await goto(`../${data.eventData.ID}`, { replaceState: true });
+		dataType: 'json',
+		onUpdate: async ({ form }) => {
+			if (form.valid) {
+				if ($eventDetails && $eventDetails.userBewerbung.length === 0) {
+					//user noch nicht beworben -> create
+					$createEventApplicationMutation.mutate(form);
+				} else {
+					//user schon beworben -> update
+					$updateEventApplicationMutation.mutate(form);
+				}
 			}
 		}
 	});
@@ -37,20 +46,44 @@
 	const { form: formData } = form; // Extract formData
 	const file = fileProxy(form, 'Anlage');
 
-	if (data.applicationState) {
-		$formData.Essgewohnheiten = data.applicationState.Essgewohnheiten || '';
-		$formData.BewerbungText = data.applicationState.BewerbungText || '';
+	function handleDeleteApplication(event: MouseEvent) {
+		console.log('Deleting application');
+		event.preventDefault();
+		if ($eventDetails && $eventDetails.userBewerbung.length === 1) {
+			const applicationId = $eventDetails.userBewerbung[0].ID;
+			$deleteEventApplicationMutation.mutate(applicationId);
+		}
 	}
+
+	$effect(() => {
+		if ($eventDetails) {
+			// Set common fields
+			$formData.BewerbungstextGewuenscht = $eventDetails.BewerbungstextGewuenscht ?? false;
+			$formData.AnlageGewuenscht = $eventDetails.AnlageGewuenscht ?? false;
+			$formData.AngabeEssgewGewuenscht = $eventDetails.AngabeEssgewGewuenscht ?? false;
+			$formData.Anmeldeart = $eventDetails.Anmeldeart ?? 'Bewerben';
+
+			// Set application-specific fields if updating
+			if ($eventDetails.userBewerbung.length === 1) {
+				$formData.ID = $eventDetails.userBewerbung[0].ID;
+				$formData.Essgewohnheiten = $eventDetails.userBewerbung[0].Essgewohnheiten || '';
+				$formData.BewerbungText = $eventDetails.userBewerbung[0].BewerbungText || '';
+			} else {
+				// New application - ID will be generated server-side
+				$formData.ID = 0;
+			}
+		}
+	});
 </script>
 
 <form method="POST" class="mt-6 space-y-6" enctype="multipart/form-data" use:form.enhance>
-	{#if data.eventData.BewerbungstextGewuenscht}
+	{#if $eventDetails?.BewerbungstextGewuenscht}
 		<FormField {form} name="BewerbungText">
 			<FormControl>
 				{#snippet children({ props })}
 					<RequiredLabel required label="Bewerbungstext" />
-					{#if data.eventData.BewTextVorgabe}
-						<p class="text-sm text-gray-500">{data.eventData.BewTextVorgabe}</p>
+					{#if $eventDetails?.BewTextVorgabe}
+						<p class="text-sm text-gray-500">{$eventDetails?.BewTextVorgabe}</p>
 					{/if}
 					<Textarea
 						{...props}
@@ -64,7 +97,7 @@
 		</FormField>
 	{/if}
 
-	{#if data.eventData.AngabeEssgewGewuenscht}
+	{#if $eventDetails?.AngabeEssgewGewuenscht}
 		<FormField {form} name="Essgewohnheiten">
 			<FormControl>
 				{#snippet children({ props })}
@@ -81,7 +114,7 @@
 		</FormField>
 	{/if}
 
-	{#if data.eventData.AnlageGewuenscht}
+	{#if $eventDetails?.AnlageGewuenscht}
 		<FormField {form} name="Anlage">
 			<FormControl>
 				{#snippet children({ props })}
@@ -93,28 +126,12 @@
 		</FormField>
 	{/if}
 
-	<!-- Hidden fields for gewuenscht values -->
-	<input
-		type="hidden"
-		name="BewerbungstextGewuenscht"
-		value={data.eventData.BewerbungstextGewuenscht}
-	/>
-	<input type="hidden" name="AnlageGewuenscht" value={data.eventData.AnlageGewuenscht} />
-	<input
-		type="hidden"
-		name="AngabeEssgewGewuenscht"
-		value={data.eventData.AngabeEssgewGewuenscht}
-	/>
-	<input type="hidden" name="ID" value={data.applicationState?.ID} />
-	<input type="hidden" name="Anmeldeart" value={data.eventData.Anmeldeart} />
-
-	{#if data.applicationState}
-		<Button formaction="?/updateApplication" type="submit" class="w-full">Bewerbung anpassen</Button
-		>
-		<Button formaction="?/deleteApplication" type="submit" variant="destructive" class="w-full"
+	{#if $eventDetails?.userBewerbung.length === 1}
+		<Button type="submit" class="w-full">Bewerbung anpassen</Button>
+		<Button type="button" variant="destructive" class="w-full" onclick={handleDeleteApplication}
 			>Bewerbung zurückziehen</Button
 		>
 	{:else}
-		<Button formaction="?/sendApplication" type="submit" class="w-full">Bewerben</Button>
+		<Button type="submit" class="w-full">Bewerben</Button>
 	{/if}
 </form>

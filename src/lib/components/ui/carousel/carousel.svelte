@@ -5,7 +5,7 @@
 		type EmblaContext,
 		setEmblaContext,
 	} from "./context.js";
-	import { cn, type WithElementRef } from "$lib/utils.js";
+	import { cn, type WithElementRef } from "@/utils/utils.shadcn.js";
 
 	let {
 		ref = $bindable(null),

@@ -15,12 +15,24 @@
 
 	export let form: SuperForm<EventMasterForm>;
 	export let sheetStatus: 'new' | 'edit' | 'hidden';
+
 	let formData: SuperFormData<EventMasterForm> = form.form;
 	export let canEdit: boolean;
 	export let canDelete: boolean;
+	export let submitForm: (_formAction: 'add' | 'update' | 'delete') => void;
 
 	let sheetOpen = sheetStatus !== 'hidden';
 	$: sheetOpen = sheetStatus !== 'hidden';
+
+	function handleKeyDown(e: KeyboardEvent) {
+		if (e.key === 'Enter') {
+			// Prevent submit on Enter unless inside a textarea
+			const target = e.target as HTMLElement;
+			if (!target || target.tagName !== 'TEXTAREA') {
+				e.preventDefault();
+			}
+		}
+	}
 </script>
 
 <Sheet.Root
@@ -37,15 +49,7 @@
 			method="POST"
 			class="flex flex-col h-full"
 			use:form.enhance
-			on:keydown={(e) => {
-				if (e.key === 'Enter') {
-					const target = e.target as HTMLElement;
-					// Prevent submit on Enter unless inside a textarea
-					if (!target || target.tagName !== 'TEXTAREA') {
-						e.preventDefault();
-					}
-				}
-			}}
+			on:keydown={handleKeyDown}
 		>
 			<div class="grow">
 				<Sheet.Header>
@@ -107,6 +111,7 @@
 					<FormFieldErrors />
 				</FormField>
 			</div>
+
 			<Sheet.Footer class="flex justify-end gap-4 mt-4">
 				{#if sheetStatus === 'edit'}
 					<!-- Delete confirmation dialog -->
@@ -139,11 +144,12 @@
 								<AlertDialog.Footer class="flex justify-end gap-2">
 									<AlertDialog.Cancel type="button">Abbrechen</AlertDialog.Cancel>
 									<AlertDialog.Action
-										type="submit"
-										name="Action"
-										value="delete"
+										type="button"
 										form="event-master-form"
 										class={buttonVariants({ variant: 'destructive' })}
+										onclick={() => {
+											submitForm('delete');
+										}}
 									>
 										Löschen
 									</AlertDialog.Action>
@@ -153,10 +159,25 @@
 					</AlertDialog.Root>
 
 					{#if canEdit}
-						<Button type="submit" name="Action" value="update">Speichern</Button>
+						<Button
+							type="button"
+							onclick={() => {
+								submitForm('update');
+							}}
+						>
+							Speichern
+						</Button>
 					{/if}
 				{:else}
-					<Button type="submit" name="Action" value="add">Hinzufügen</Button>
+					<Button
+						type="button"
+						onclick={() => {
+							// Explicitly mark as add for new entries
+							submitForm('add');
+						}}
+					>
+						Hinzufügen
+					</Button>
 				{/if}
 			</Sheet.Footer>
 		</form>

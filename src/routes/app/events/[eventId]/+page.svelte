@@ -1,22 +1,10 @@
 <script lang="ts">
-	import {
-		Card,
-		CardContent,
-		CardHeader,
-		CardTitle,
-		CardDescription
-	} from '$lib/components/ui/card';
-	import { Badge } from '$lib/components/ui/badge'; // Import the ShadCN badge component
-	import { Button } from '$lib/components/ui/button'; // Import the button component
+	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import MitgliedCard from '@/components/general/MitgliedCard.svelte'; // Import MitgliedCard component
-	import { formatApplicationDeadline, formatDate, formatTextWithHTML } from '@/app.utils';
-	import type { PageData } from './$types';
-	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
-	import EventDetailsHeader from '@/components/events/EventDetailsHeader.svelte';
-	import { eventBewerbungMoeglich } from '@/utils/utils';
-	import { getContext, onDestroy } from 'svelte';
+	import { formatTextWithHTML } from '@/utils/utils';
+	import { getEventContext } from '@/context/eventContext';
 
-	export let data: PageData;
+	const { eventDetails } = getEventContext();
 </script>
 
 <Card>
@@ -25,7 +13,7 @@
 	</CardHeader>
 	<CardContent>
 		<p class="text-gray-700">
-			{@html formatTextWithHTML(data.eventData.Beschreibung || 'Lädt...')}
+			{@html formatTextWithHTML($eventDetails?.Beschreibung || 'Lädt...')}
 		</p>
 	</CardContent>
 </Card>
@@ -37,15 +25,15 @@
 		</CardHeader>
 		<CardContent>
 			<div class="flex flex-wrap gap-4 w-full">
-				{#each data.eventData.event_verantwortliche! as verantwortlicher}
+				{#each $eventDetails?.eventVerantwortliche as verantwortlicher}
 					<div class="shrink-0">
 						<MitgliedCard
 							name={verantwortlicher?.mitglieder?.Vorname +
 								' ' +
 								verantwortlicher?.mitglieder?.Nachname}
 							imageUrl=""
-							art={verantwortlicher?.mitglieder?.Art!}
-							rolle={verantwortlicher?.mitglieder?.Rolle!}
+							art={verantwortlicher?.mitglieder?.Art ?? 'Aktiv'}
+							rolle={verantwortlicher?.mitglieder?.Rolle ?? 'Mitglied'}
 						/>
 					</div>
 				{/each}
@@ -58,9 +46,9 @@
 			<CardTitle class="text-xl font-bold">Ort</CardTitle>
 		</CardHeader>
 		<CardContent>
-			{data.eventData.StrasseHausnummer}<br />
-			{data.eventData.Postleitzahl}
-			{data.eventData.Ort}
+			{$eventDetails?.StrasseHausnummer}<br />
+			{$eventDetails?.Postleitzahl}
+			{$eventDetails?.Ort}
 		</CardContent>
 	</Card>
 </div>

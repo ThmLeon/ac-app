@@ -1,5 +1,4 @@
-import type { MitgliederFilterType } from '@/types/mitglieder';
-import { list } from 'postcss';
+import { applyAction } from '$app/forms';
 
 export const qk = {
 	mitglieder: {
@@ -7,6 +6,8 @@ export const qk = {
 	},
 	events: {
 		listPaginatedFiltered: () => ['events', 'listPaginatedFiltered'] as const,
-		master: () => ['events', 'master'] as const
+		details: (eventId: number) => ['events', 'details', eventId] as const,
+		masters: () => ['events', 'masters'] as const,
+		applications: () => ['events', 'applications'] as const
 	}
 };

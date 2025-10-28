@@ -16,7 +16,7 @@
 	import { page } from '$app/stores';
 	import { toast } from 'svelte-sonner';
 	import type { SupabaseClient } from '@supabase/supabase-js';
-	import type { Database } from '@/database.types';
+	import type { Database } from '@/api/supabase/database.types';
 
 	const { supabase } = $props<{ supabase: SupabaseClient<Database> }>();
 

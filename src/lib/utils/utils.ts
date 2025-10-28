@@ -1,11 +1,10 @@
-import type { Database } from '@/database.types';
-import type { PostgrestError } from '@supabase/supabase-js';
-import { error as svelteError } from '@sveltejs/kit';
+import type { Database } from '@/api/supabase/database.types';
+import { type PostgrestError, type Session, type SupabaseClient } from '@supabase/supabase-js';
+import { type ActionResult, error as svelteError } from '@sveltejs/kit';
 import type { QueryClient, QueryKey } from '@sveltestack/svelte-query';
-
-export function formatEuro(amount: number, locale = 'de-DE'): string {
-	return new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' }).format(amount);
-}
+import { toast } from 'svelte-sonner';
+import { differenceInDays, differenceInHours, differenceInMinutes, format } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 export function throwFetchErrorIfNeeded<T>(
 	data: T,
@@ -27,14 +26,17 @@ export function mitgliederStatusAsText(art: Art, rolle: Rolle): string {
 			if (art === 'Aktiv') return 'Aktives Mitglied';
 			if (art === 'Passiv') return 'Passives Mitglied';
 			if (art === 'Ehemalig') return 'Ehemaliges Mitglied';
+			return 'Unbekannter Status';
 		case 'Alumni':
 			if (art === 'Aktiv') return 'Aktiver Alumni';
 			if (art === 'Passiv') return 'Passiver Alumni';
 			if (art === 'Ehemalig') return 'Ehemaliger Alumni';
+			return 'Unbekannter Status';
 		case 'Anwärter':
 			if (art === 'Aktiv') return 'Aktiver Trainee';
 			if (art === 'Passiv') return 'Passiver Trainee';
 			if (art === 'Ehemalig') return 'Ehemaliger Trainee';
+			return 'Unbekannter Status';
 		default:
 			return 'Unbekannter Status';
 	}
@@ -96,44 +98,29 @@ export const badgeColors = {
 	orange: 'bg-orange-200 text-orange-800',
 	red: 'bg-red-200 text-red-800'
 };
-
-export const rollenIDToVB = (ID: number | null, kurz: boolean) => {
-	if (ID === null) return 'N/A';
-	switch (ID) {
-		case 9:
-			return kurz ? 'F&R' : 'Finanzen & Recht';
-		case 12:
-			return kurz ? 'Internes' : 'Internes';
-		case 11:
-			return kurz ? 'KB' : 'Kundenbetreuung';
-		case 13:
-			return kurz ? 'MPR' : 'Marketing & PR';
-		case 10:
-			return kurz ? 'TPM' : 'Technologie & Prozessmanagement';
-		case 16:
-			return 'Sonstige';
-		default:
-			return 'N/A';
-	}
-};
-
 export function throwSupabaseErrorIfNeeded<T>(
 	data: T,
 	error: PostgrestError | null,
 	errorMessage: string = 'Ein unbekannter Fehler ist aufgetreten',
 	emptyArrayIsError: boolean = false
 ): NonNullable<T> {
-	if (error || !data || (Array.isArray(data) && data.length === 0 && emptyArrayIsError)) {
+	if (
+		error ||
+		data === null ||
+		data === undefined ||
+		(Array.isArray(data) && data.length === 0 && emptyArrayIsError)
+	) {
 		throw new Error(errorMessage);
 	}
 	return data;
 }
 
 export function throwSupabaseActionErrorIfNeeded(
-	error: PostgrestError | null,
+	error: PostgrestError | Error | null,
 	errorMessage: string = 'Ein unbekannter Fehler ist aufgetreten'
 ): void {
 	if (error) {
+		console.log(error);
 		throw new Error(errorMessage);
 	}
 }
@@ -175,4 +162,119 @@ export async function optimisticDeleteArray<T extends { ID: number }>(
 	);
 	if (sortFunction) optimistic.sort(sortFunction);
 	queryClient.setQueryData(queryKey, optimistic);
+}
+
+type SharepointAction =
+	| { action: 'insert'; formData: any; tableName: string }
+	| { action: 'update'; itemId: number; formData: any; tableName: string }
+	| { action: 'delete'; itemId: number; tableName: string };
+
+export async function callSharepointAPI(
+	supabase: SupabaseClient<Database>,
+	session: Session,
+	action: SharepointAction
+) {
+	if (action.action === 'insert') {
+		const { data, error } = await supabase.functions.invoke(
+			'sharepoint-list-api/' + action.tableName,
+			{
+				method: 'POST',
+				body: action.formData,
+				headers: {
+					Authorization: `Bearer ${session.access_token}`
+				}
+			}
+		);
+		if (error || !data?.success || !data || !data.id) throw new Error('Sharepoint Fehler');
+		else return data.id as number;
+	} else if (action.action === 'update') {
+		const { data, error } = await supabase.functions.invoke(
+			'sharepoint-list-api/' + action.tableName + '/' + action.itemId,
+			{
+				method: 'PATCH',
+				body: action.formData,
+				headers: {
+					Authorization: `Bearer ${session.access_token}`
+				}
+			}
+		);
+		if (error || !data?.success) throw new Error('Sharepoint Fehler');
+		else return;
+	} else if (action.action === 'delete') {
+		const { data, error } = await supabase.functions.invoke(
+			'sharepoint-list-api/' + action.tableName + '/' + action.itemId,
+			{
+				method: 'DELETE',
+				headers: {
+					Authorization: `Bearer ${session.access_token}`
+				}
+			}
+		);
+		if (error || !data?.success) throw new Error('Sharepoint Fehler');
+		else return;
+	}
+}
+export function formatDate(date: string | null): string {
+	if (!date) return '-';
+	const parsedDate = new Date(date);
+	return format(parsedDate, 'dd.MM.yyyy HH:mm', { locale: de });
+}
+
+export function formatApplicationDeadline(deadline: string | null): string {
+	if (!deadline) return 'Keine Frist angegeben';
+	const now = new Date();
+	const deadlineDate = new Date(deadline);
+
+	const minutesDiff = differenceInMinutes(deadlineDate, now);
+	const hoursDiff = differenceInHours(deadlineDate, now);
+	const daysDiff = differenceInDays(deadlineDate, now);
+
+	if (minutesDiff <= 0) {
+		return 'Abgelaufen'; // Deadline has passed
+	} else if (minutesDiff < 60) {
+		return `in ${minutesDiff} Minuten`;
+	} else if (hoursDiff < 24) {
+		const remainingMinutes = minutesDiff % 60;
+		return `in ${hoursDiff} Stunden und ${remainingMinutes} Minuten`;
+	} else if (daysDiff <= 7) {
+		const remainingHours = hoursDiff % 24;
+		return `in ${daysDiff} Tagen und ${remainingHours} Stunden`;
+	} else {
+		return format(deadlineDate, 'dd.MM.yyyy HH:mm', { locale: de }); // Format date in German standard
+	}
+}
+
+export function getInitials(name: string): string {
+	const names = name.split(' ');
+	if (names.length === 0) return '';
+	const firstName = names[0].charAt(0).toUpperCase();
+	const lastName = names.length > 1 ? names[names.length - 1].charAt(0).toUpperCase() : '';
+	return `${firstName}${lastName}`;
+}
+
+export function formatTextWithHTML(text: string): string {
+	return text
+		.replace(/\n/g, '<br>') // Zeilenumbrüche in <br>
+		.replace(/\t•\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;• ') // Tabs mit Bulletpoints ersetzen
+		.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
+}
+
+export function handleActionResultSonners(result: ActionResult, toastId: string) {
+	toast.dismiss(toastId);
+	if (result.type === 'success') {
+		const message = (result.data?.form.message as string) || 'Eingabe erfolgreich';
+		toast.success(message, {
+			id: `${toastId}_success`
+		});
+	} else if (result.type === 'failure') {
+		console.log(result);
+		const message = (result.data?.form.message as string) || 'Ein Fehler ist aufgetreten';
+		toast.error(message, {
+			id: `${toastId}_failure`
+		});
+	} else {
+		toast.error('Ein unerwarteter Fehler ist aufgetreten', {
+			id: `${toastId}_failure`
+		});
+	}
 }

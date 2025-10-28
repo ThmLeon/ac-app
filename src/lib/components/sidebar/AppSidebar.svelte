@@ -29,7 +29,7 @@
 	export let avatarUrl: string;
 
 	const navItems = [
-		{
+		/*{
 			title: 'Mitglieder',
 			url: '/app/mitglieder/profil',
 			icon: User,
@@ -43,7 +43,7 @@
 				{ title: 'Teamwahl', url: '/app/mitglieder/teamwahl' },
 				{ title: 'Job Ausschreibungen', url: '/app/mitglieder/job-ausschreibungen' }
 			]
-		},
+		},*/
 		{
 			title: 'Events',
 			url: '/app/events',
@@ -54,13 +54,13 @@
 				{ title: 'Events Master', url: '/app/events/master' }
 			]
 		},
-		{
+		/*{
 			title: 'Büro',
 			url: '/app/buero',
 			icon: Building,
 			isActive: true,
 			items: [{ title: 'Bürodienst', url: '/app/buero/buerodienst' }]
-		},
+		},*/
 		{
 			title: 'More coming soon...',
 			url: '#',

@@ -15,10 +15,20 @@
 	import { derived, writable, type Readable } from 'svelte/store';
 	import { setContext } from 'svelte';
 	import FeedbackDialog from '@/components/feedback/FeedbackDialog.svelte';
-	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
+	import { QueryClientProvider } from '@sveltestack/svelte-query';
+	import createQueryClient from '@/query/createQueryClient.js';
+    import {createRolesContext, setRolesContext} from "@/context/rolesContext";
+    import type {LayoutData} from "./$types";
+    import {setUserContext} from "@/context/userContext";
 
-	let { data, children } = $props();
-	const queryClient = new QueryClient();
+	export let data : LayoutData;
+    const queryClient = createQueryClient();
+
+    const rolesContext = createRolesContext(writable(data.rolesData), writable(data.isAdmin));
+    setRolesContext(rolesContext);
+
+    const userContext = {userDetails: writable(data.userDetails), user: writable(data.user!)};
+    setUserContext(userContext);
 
 	const fullName = data.user?.user_metadata.full_name ?? 'User';
 	const firstName = fullName.split(' ')[0];
@@ -121,8 +131,8 @@
 			</header>
 
 			<div class="flex flex-1 flex-col gap-4 p-4">
-				{@render children()}
-			</div>
+			    <slot />
+            </div>
 		</SidebarInset>
 		<FeedbackDialog supabase={data.supabase} />
 	</SidebarProvider>

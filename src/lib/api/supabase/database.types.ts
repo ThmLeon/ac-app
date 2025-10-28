@@ -971,22 +971,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_mitglied_id: {
-        Args: Record<PropertyKey, never>
+      get_event_application_count: {
+        Args: { event_id: number }
         Returns: number
       }
-      get_user_oid: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      has_role: {
-        Args: { roleid: number }
-        Returns: boolean
-      }
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      get_mitglied_id: { Args: never; Returns: number }
+      get_user_oid: { Args: never; Returns: string }
+      has_role: { Args: { roleid: number }; Returns: boolean }
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       Beraterstufe:

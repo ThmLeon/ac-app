@@ -13,9 +13,8 @@
 	import RequiredLabel from '@/components/general/RequiredLabel.svelte';
 	import DateTimePicker from '@/components/general/DateTimePicker.svelte';
 	import MitgliederSelector from '@/components/general/MitgliederSelector.svelte';
-	import type { Database } from '@/database.types';
+	import type { Database } from '@/api/supabase/database.types';
 	import type { SupabaseClient } from '@supabase/supabase-js';
-	import SuperDebug from 'sveltekit-superforms';
 
 	// Mitglieder-Selector: Typ vor Verwendung deklarieren
 	type Mitglied = {
@@ -62,12 +61,25 @@
 		if (selectedMasterId) {
 			const id = Number(selectedMasterId);
 			$formData.MasterEventID = id; // garantiert number
-			const art = eventMasters.find((m: any) => m.ID === id)?.Eventart ?? null;
+			const art =
+				eventMasters.find((m: (typeof eventMasters)[number]) => m.ID === id)?.Eventart ?? null;
 			$formData.IstHSMEvent = (art?.toLowerCase?.() ?? '') === 'hsm';
 		} else {
 			// Nichts ausgewählt: HSM zurücksetzen, MasterEventID unverändert lassen (vermeidet Typkonflikte)
 			$formData.IstHSMEvent = false;
 		}
+	});
+
+	// Get the selected master event title for display
+	const selectedMasterTitle = $derived(
+		$formData.MasterEventID
+			? eventMasters.find((m: (typeof eventMasters)[number]) => m.ID === $formData.MasterEventID)
+					?.Titel || 'Event Master auswählen'
+			: 'Event Master auswählen'
+	);
+
+	$effect(() => {
+		console.log($formData);
 	});
 </script>
 
@@ -98,13 +110,7 @@
 
 				<Select type="single" bind:value={selectedMasterId}>
 					<SelectTrigger class="w-full">
-						{#if $formData.MasterEventID}
-							{eventMasters.find(
-								(m: { ID: number; Titel: string | null }) => m.ID === $formData.MasterEventID
-							)?.Titel || 'Event Master auswählen'}
-						{:else}
-							Event Master auswählen
-						{/if}
+						{selectedMasterTitle}
 					</SelectTrigger>
 					<SelectContent>
 						{#each eventMasters as { ID, Titel }}
@@ -278,7 +284,7 @@
 
 	<h2 class="text-lg mt-4 font-semibold mb-2">
 		Orga Team
-		<p class="text-red-500 inline" aria-label="required">*</p>
+		<span class="text-red-500 inline" aria-label="required">*</span>
 	</h2>
 	<FormField {form} name="EventVerantwortliche">
 		<FormControl>

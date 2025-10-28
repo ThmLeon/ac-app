@@ -3,7 +3,7 @@ import { redirect } from '@sveltejs/kit';
 // @ts-ignore - Provided by SvelteKit at build/runtime; ignore IDE type resolution here
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
 import type { LayoutLoad } from './$types';
-import type { Database } from '@/database.types';
+import type { Database } from '@/api/supabase/database.types';
 
 export const load: LayoutLoad = async ({ data, depends, fetch, url }) => {
 	/**
@@ -36,9 +36,17 @@ export const load: LayoutLoad = async ({ data, depends, fetch, url }) => {
 		data: { session }
 	} = await supabase.auth.getSession();
 
+	if (!session && url.pathname !== '/') {
+		throw redirect(302, '/');
+	}
+
 	const {
 		data: { user }
 	} = await supabase.auth.getUser();
+
+	if (!user && url.pathname !== '/') {
+		throw redirect(302, '/');
+	}
 
 	// If user is signed in and on the root path, redirect to the app dashboard
 	if (user && url.pathname === '/') {

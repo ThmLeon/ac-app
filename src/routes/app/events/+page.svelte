@@ -12,7 +12,7 @@
 	import { useQueryClient } from '@sveltestack/svelte-query';
 
 	let { data }: PageProps = $props();
-	const queries = eventsQueries(data.supabase, useQueryClient());
+	const queries = eventsQueries(data.supabase, data.session!, useQueryClient());
 
 	let eventsFilter: EventsFilterType = $state({
 		textSearch: '',

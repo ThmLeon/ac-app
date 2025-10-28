@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Database } from '@/database.types';
+import type { Database } from '@/api/supabase/database.types';
 
 export type EventArt = Database['public']['Enums']['Eventart'];
 const eventArtEnumValues: EventArt[] = ['HSM', 'Kuratoren', 'Netzwerk', 'Social', 'Sonstiges'];
@@ -12,8 +12,7 @@ export const eventMasterSchema = z.object({
 	MasterBeschreibung: z
 		.string({ required_error: 'Beschreibung darf nicht leer sein' })
 		.min(1, 'Beschreibung darf nicht leer sein'),
-	Eventart: z.enum(eventArtEnumValues as [EventArt, ...EventArt[]]),
-	Action: z.enum(['update', 'delete', 'add'])
+	Eventart: z.enum(eventArtEnumValues as [EventArt, ...EventArt[]])
 });
 
 export type EventMasterForm = z.infer<typeof eventMasterSchema>;
