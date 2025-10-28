@@ -1,10 +1,8 @@
-import type { Database } from '@/database.types';
+import type { Database } from '@/api/supabase/database.types';
 import type { LayoutLoad } from './$types';
 import { error } from '@sveltejs/kit';
-
-type RoleListKey = number;
-type RoleListValue = { Rolle: string } & Database['public']['Tables']['1_RollenMitglieder']['Row'];
-type RoleMap = Map<RoleListKey, RoleListValue>;
+import {createRolesContext, setRolesContext} from "@/context/rolesContext";
+import {writable} from "svelte/store";
 
 export const load: LayoutLoad = async ({ parent, depends }) => {
 	// Invalidate when auth state changes so userId is refreshed
@@ -13,36 +11,29 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 	const { supabase, user } = await parent();
 
 	let userId: number = -1;
-	let roles: RoleMap = new Map();
-	let isAdmin: boolean = false;
+    let isAdmin: boolean = false;
+    let rolesData : Database['public']['Tables']['1_RollenMitglieder']['Row'][] = [];
+    let userDetails : Database['public']['Tables']['1_Mitglieder']['Row'];
 
 	if (user) {
-		const { data: userIdData, error: userIdError } = await supabase
+		const { data: userData, error: userError } = await supabase
 			.from('1_Mitglieder')
-			.select('ID')
+			.select('*')
 			.eq('UserID', user.user_metadata?.custom_claims?.oid)
 			.single();
-		if (userIdError || !userIdData || !userIdData.ID) {
+		if (userError || !userData || !userData.ID) {
 			throw error(401, 'Benutzer nicht gefunden oder Zugriff nicht erlaubt');
 		} else {
-			userId = userIdData.ID;
+			userDetails = userData;
 		}
 
-		const { data: rolesData, error: rolesError } = await supabase
+		const { data: rolesFetchingData, error: rolesError } = await supabase
 			.from('1_RollenMitglieder')
 			.select('*, rollen:1_Rollen(Titel)')
 			.eq('MitgliedID', userId)
 			.is('EndeDatum', null);
 		if (rolesError) throw error(401, 'Rollen konnten nicht geladen werden');
-
-		const makeKey = (r: (typeof rolesData)[number]): RoleListKey => r.RollenID;
-
-		for (const r of rolesData ?? []) {
-			if (!r.rollen?.Titel) continue;
-			const { rollen, ...row } = r;
-			const value: RoleListValue = { Rolle: rollen.Titel || '', ...row };
-			roles.set(makeKey(r), value);
-		}
+        rolesData = rolesFetchingData;
 
 		const { data: isAdminData, error: isAdminError } = await supabase
 			.from('0_Metadata')
@@ -51,7 +42,9 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 			.eq('Key', 'MitgliedID')
 			.eq('Value', userId.toString());
 		if (isAdminError) isAdmin = false;
-		else isAdmin = isAdminData.length === 1 ? true : false;
-	}
-	return { userId, roles, isAdmin };
+		else isAdmin = isAdminData.length === 1;
+	}else{
+        throw error(401, 'Benutzer nicht gefunden oder Zugriff nicht erlaubt');
+    }
+	return { userId, rolesData, isAdmin, userDetails };
 };

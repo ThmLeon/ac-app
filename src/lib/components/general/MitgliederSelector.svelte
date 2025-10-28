@@ -13,7 +13,7 @@
 	import MitgliedCard from '$lib/components/general/MitgliedCard.svelte';
 	import { mitgliederStatusAsText } from '@/utils/utils';
 	import { getMitgliederSelector } from '@/state/MitgliederSelector.svelte';
-	import type { Database } from '@/database.types';
+	import type { Database } from '@/api/supabase/database.types';
 
 	type Mitglied = {
 		ID: number;
@@ -102,10 +102,10 @@
 						</Button>
 						<div class="align-middle">
 							<MitgliedCard
-								name={mitglied.Titel!}
+								name={mitglied.Titel}
 								imageUrl=""
-								art={mitglied.Art!}
-								rolle={mitglied.Rolle!}
+								art={mitglied.Art}
+								rolle={mitglied.Rolle}
 							/>
 						</div>
 					</div>

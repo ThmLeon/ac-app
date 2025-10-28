@@ -1,11 +1,11 @@
 import { z } from 'zod';
-import type { Database } from '@/database.types';
+import type { Database } from '@/api/supabase/database.types';
 
 export type EventArt = Database['public']['Enums']['Eventart'];
 const eventArtEnumValues: EventArt[] = ['HSM', 'Kuratoren', 'Netzwerk', 'Social', 'Sonstiges'];
 
 export const eventMasterSchema = z.object({
-	ID: z.number(),
+	ID: z.number().min(0),
 	Titel: z
 		.string({ required_error: 'Name darf nicht leer sein' })
 		.min(1, 'Name darf nicht leer sein'),

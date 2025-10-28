@@ -12,7 +12,7 @@
 
 <script lang="ts">
 	import { ToggleGroup as ToggleGroupPrimitive } from "bits-ui";
-	import { cn } from "$lib/utils.js";
+	import { cn } from "@/utils/utils.shadcn.js";
 
 	let {
 		ref = $bindable(null),

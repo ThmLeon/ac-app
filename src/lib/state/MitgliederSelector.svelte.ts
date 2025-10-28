@@ -1,4 +1,4 @@
-import type { Database } from '@/database.types';
+import type { Database } from '@/api/supabase/database.types';
 import { throwFetchErrorIfNeeded } from '@/utils/utils';
 import type { SupabaseClient } from '@supabase/supabase-js';
 

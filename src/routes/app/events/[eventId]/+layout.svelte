@@ -2,40 +2,45 @@
 	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
 	import type { LayoutData } from './$types';
 	import EventDetailsHeader from '@/components/events/EventDetailsHeader.svelte';
-	import { page } from '$app/stores';
 	import BreadcrumbOverride from '$lib/components/general/BreadcrumbOverride.svelte';
-	import { isVorstand } from '@/utils/rollen.utils';
+	import { eventsQueries } from '@/query/events';
+	import { useQueryClient } from '@sveltestack/svelte-query';
+	import { getUserContext } from '@/context/userContext';
+	import { setEventContext } from '@/context/eventContext';
+	import type { EventDetails } from '@/context/eventContext';
+	import { writable } from 'svelte/store';
+
+	const { userDetails } = getUserContext();
+
+	// Provide EventContext to children (e.g., EventDetailsHeader)
+	const eventDetails = writable<EventDetails | null>(null);
+	const eventImageURL = writable<string | null>(null);
+	const totalApplications = writable<number>(0);
+	setEventContext({ eventDetails, eventImageURL, totalApplications });
 
 	let { data, children }: { data: LayoutData; children: any } = $props();
+	const queries = eventsQueries(data.supabase, data.session!, useQueryClient());
+	const eventDetailsFetched = queries.getDetails(Number(data.eventId), $userDetails.ID);
 
-	// Dynamically determine if we are on the /bewerben page
-	let isBewerbenPage = $derived(
-		$page.url.pathname.endsWith('/bewerben') ||
-			$page.url.pathname.endsWith('/besetzen') ||
-			$page.url.pathname.endsWith('/bearbeiten')
-	);
-	const isAdmin = () => {
-		return data.isAdmin || isVorstand(data.roles);
-	};
+	$effect(() => {
+		const res = $eventDetailsFetched.data;
+		if (!res) return;
+		eventDetails.set(res.eventDetails);
+		eventImageURL.set(res.imageURL);
+		totalApplications.set(res.totalApplications);
+	});
 </script>
 
-<!-- Provide breadcrumb override (renders nothing) -->
-{#if data?.eventData?.ID}
-	<BreadcrumbOverride segment={data.eventData.ID} label={data.eventData.Titel || 'Event'} />
-{/if}
-
-{#await data.eventData}
+{#if !$eventDetails}
 	<PageLoadSkeleton />
-{:then eventData}
-	<EventDetailsHeader
-		userId={data.userId}
-		{eventData}
-		applicationState={data.applicationState}
-		totalApplications={data.totalApplications}
-		showApplyOrEditButton={!isBewerbenPage}
-		eventImageUrl={data.eventImageUrl}
-		deleteForm={data.deleteForm}
-		isAdmin={isAdmin()}
-	/>
+{:else}
+	<!-- Provide breadcrumb override (renders nothing) -->
+	{#if $eventDetails.ID}
+		<BreadcrumbOverride segment={$eventDetails.ID} label={$eventDetails.Titel || 'Event'} />
+	{/if}
+
+	{#if data.session}
+		<EventDetailsHeader supabase={data.supabase} session={data.session} />
+	{/if}
 	{@render children()}
-{/await}
+{/if}

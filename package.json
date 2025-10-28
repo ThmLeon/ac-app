@@ -15,7 +15,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
-		"genSupabaseTypes": "supabase gen types typescript --project-id cvtgbcawyzxelwgnjsrj --schema public > src/lib/database.types.ts",
+		"genSupabaseTypes": "supabase gen types typescript --project-id cvtgbcawyzxelwgnjsrj --schema public > src/lib/api/supabase/database.types.ts",
 		"start": "node build/index.js"
 	},
 	"devDependencies": {
@@ -71,10 +71,13 @@
 		"zod": "^3.25.67"
 	},
 	"dependencies": {
+		"@azure/msal-browser": "^4.24.0",
 		"@azure/msal-node": "^3.6.4",
 		"@microsoft/microsoft-graph-client": "^3.0.7",
 		"@supabase/ssr": "^0.6.1",
 		"@supabase/supabase-js": "^2.49.9",
+		"@sveltestack/svelte-query": "^1.6.0",
+		"@xyflow/svelte": "^1.2.4",
 		"date-fns": "^4.1.0",
 		"file-saver": "^2.0.5",
 		"isomorphic-fetch": "^3.0.0",

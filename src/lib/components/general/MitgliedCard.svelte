@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { Avatar, AvatarImage, AvatarFallback } from '$lib/components/ui/avatar';
-	import { getInitials } from '@/app.utils';
-	import type { Database } from '@/database.types';
-	import { mitgliederStatusAsText } from '@/utils/utils';
+	import type { Database } from '@/api/supabase/database.types';
+	import { getInitials, mitgliederStatusAsText } from '@/utils/utils';
 
 	export let name: string;
 	export let imageUrl: string;

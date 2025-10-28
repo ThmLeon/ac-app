@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 	import { Switch } from '@/components/ui/switch';
-	import type { PageServerData } from './$types';
 	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
-	import { toast } from 'svelte-sonner';
-	import { handleActionResultSonners } from '@/app.utils';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { eventBesetzungAnwesenheitSchema } from '@/schemas/eventBesetzungAnwesenheitSchema';
 	import { tick } from 'svelte';
 	import EventApplications from '@/components/events/EventApplications.svelte';
-	import { isVorstand } from '@/utils/rollen.utils';
 	import { goto } from '$app/navigation';
+	import { getRolesContext, Roles } from '@/context/rolesContext';
+	import { getEventContext } from '@/context/eventContext';
+	import { eventsQueries } from '@/query/events';
+	import { useQueryClient } from '@sveltestack/svelte-query';
 
 	type EventApplication = {
 		ID: number;
@@ -22,36 +22,42 @@
 		Essgewohnheiten: string | null;
 	};
 
+	const { userHasRole, userIsAppAdmin } = getRolesContext();
+	const { eventDetails } = getEventContext();
 	let { data } = $props();
+
+	const queries = eventsQueries(data.supabase, data.session!, useQueryClient());
+	const eventApplications = queries.applications.listAll($eventDetails?.ID ?? -1);
+	const setApplicationBesetztAnwesendMutation = queries.applications.setBesetzenAnwesenheit();
 
 	$effect(() => {
 		if (
 			data &&
-			!data.isAdmin &&
-			!isVorstand(data.roles) &&
-			!data.eventData.event_verantwortliche.some((ev: any) => ev.ID === data.userId)
+			!userIsAppAdmin &&
+			!userHasRole(Roles.Vorstand) &&
+			!$eventDetails?.eventVerantwortliche.some((ev) => ev.ID === data.userId)
 		) {
-			goto(`../${data.eventData.ID}`, { replaceState: true });
+			goto(`../${$eventDetails?.ID}`, { replaceState: true });
 		}
 	});
 
-	let besetzteMitglieder: EventApplication[] = $state(
-		data.eventApplications.filter((a) => a.Besetzt)
-	); // initial snapshot
+	let besetzteMitglieder: EventApplication[] = $state([]);
+
+	// Initialize besetzteMitglieder when query data loads
+	$effect(() => {
+		if ($eventApplications?.data) {
+			besetzteMitglieder = $eventApplications.data.filter((a) => a.Besetzt);
+		}
+	});
 
 	const form = superForm(data.form, {
+		SPA: true,
 		validators: zodClient(eventBesetzungAnwesenheitSchema),
-		onSubmit: () => {
-			toast.loading('Eingabe wird verarbeitet', {
-				id: 'event_besetzung_anwesenheit_form'
-			});
-		},
-		onResult: async ({ result }) => {
-			handleActionResultSonners(result, 'event_besetzung_anwesenheit_form');
-			/*if (result.type !== 'failure' && result.status !== 500) {
-				await invalidate(`../${data.eventData.ID}`);
-				await goto(`../${data.eventData.ID}`, { replaceState: true });
-			}*/
+		dataType: 'json',
+		onUpdate: async ({ form }) => {
+			if (form.valid) {
+				$setApplicationBesetztAnwesendMutation.mutate(form);
+			}
 		}
 	});
 
@@ -103,15 +109,18 @@
 				<CardTitle>Besetzung</CardTitle>
 			</CardHeader>
 			<CardContent class="space-y-2">
-				{#if data.eventApplications.length === 0}
+				{#if $eventApplications?.data?.length === 0}
 					<div class="text-sm text-muted-foreground">Keine Bewerbungen vorhanden.</div>
 				{/if}
-				{#each data.eventApplications as application (application.ID)}
+				{#each $eventApplications?.data as application (application.ID)}
 					<div class="flex items-center justify-between rounded-md border px-3 py-2">
 						<span>{application.Titel}</span>
 						<Switch
-							bind:checked={application.Besetzt!}
-							onCheckedChange={() => handleBesetztChange(application)}
+							checked={application.Besetzt ?? false}
+							onCheckedChange={(checked) => {
+								application.Besetzt = checked;
+								handleBesetztChange(application);
+							}}
 						/>
 					</div>
 				{/each}
@@ -123,15 +132,18 @@
 				<CardTitle>Anwesenheit</CardTitle>
 			</CardHeader>
 			<CardContent class="space-y-2">
-				{#if data.eventApplications.length === 0}
+				{#if $eventApplications?.data?.length === 0}
 					<div class="text-sm text-muted-foreground">Keine besetzten Mitglieder.</div>
 				{:else}
 					{#each besetzteMitglieder as application (application.ID)}
 						<div class="flex items-center justify-between rounded-md border px-3 py-2">
 							<span>{application.Titel}</span>
 							<Switch
-								bind:checked={application.Anwesend!}
-								onCheckedChange={() => handleAnwesendChange(application)}
+								checked={application.Anwesend ?? false}
+								onCheckedChange={(checked) => {
+									application.Anwesend = checked;
+									handleAnwesendChange(application);
+								}}
 							/>
 						</div>
 					{/each}
@@ -142,7 +154,7 @@
 	<div class="mb-2"></div>
 	<EventApplications
 		supabase={data.supabase}
-		applications={data.eventApplications}
+		applications={$eventApplications?.data ?? []}
 		eventId={Number(data.eventId)}
 	/>
 {/await}

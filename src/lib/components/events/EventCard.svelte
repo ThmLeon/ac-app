@@ -10,10 +10,10 @@
 	import EventTitelbildRealistic from '$lib/assets/EventTitelbildRealistic.jpg';
 	import { Button } from '../ui/button';
 	import { Badge } from '../ui/badge'; // Import the ShadCN badge component
-	import { formatApplicationDeadline, formatDate } from '@/app.utils';
 	import { onMount } from 'svelte';
 	import type { SupabaseClient } from '@supabase/supabase-js';
-	import type { Database } from '@/database.types';
+	import type { Database } from '@/api/supabase/database.types';
+	import { formatApplicationDeadline, formatDate } from '@/utils/utils';
 
 	type EventCardProps = {
 		ID: number;

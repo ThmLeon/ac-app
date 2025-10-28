@@ -5,33 +5,38 @@
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { newEventSchema } from '@/schemas/newEventSchema';
-	import { toast } from 'svelte-sonner';
-	import { handleActionResultSonners } from '@/app.utils';
-	import { goto } from '$app/navigation';
+	import { eventsQueries } from '@/query/events';
+	import { useQueryClient } from '@sveltestack/svelte-query';
+	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
 
 	let { data } = $props();
+	const queries = eventsQueries(data.supabase, data.session!, useQueryClient());
+	const eventMasters = queries.masters.listAll();
+	const newEventMutation = queries.add();
+
 	const form = superForm(data.form, {
+		SPA: true,
 		validators: zodClient(newEventSchema),
 		dataType: 'json',
-		onSubmit: () => {
-			toast.loading('Eingabe wird verarbeitet', { id: 'new_event_form' });
-		},
-		onResult: async ({ result }) => {
-			handleActionResultSonners(result, 'new_event_form');
-			if (result.status != 500 && result.type === 'success') {
-				await goto(`../events`, { replaceState: true });
+		onUpdate: async ({ form }) => {
+			if (form.valid) {
+				$newEventMutation.mutate(form);
 			}
 		}
 	});
 </script>
 
-<div class="container mx-auto py-8 px-4 max-w-2xl">
-	<Card>
-		<CardHeader>
-			<CardTitle class="text-2xl font-bold">Neues Event erstellen</CardTitle>
-		</CardHeader>
-		<CardContent class="space-y-6">
-			<NewEventForm {form} eventMasters={data.data} supabase={data.supabase} />
-		</CardContent>
-	</Card>
-</div>
+{#if !$eventMasters.data}
+	<PageLoadSkeleton />
+{:else}
+	<div class="container mx-auto py-8 px-4 max-w-2xl">
+		<Card>
+			<CardHeader>
+				<CardTitle class="text-2xl font-bold">Neues Event erstellen</CardTitle>
+			</CardHeader>
+			<CardContent class="space-y-6">
+				<NewEventForm {form} eventMasters={$eventMasters.data} supabase={data.supabase} />
+			</CardContent>
+		</Card>
+	</div>
+{/if}

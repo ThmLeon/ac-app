@@ -1,38 +1,54 @@
 <script lang="ts">
-	import EventMasterSheet from '$lib/components/pages/events/master/EventMasterSheet.svelte';
-	import EventMasterList from '$lib/components/pages/events/master/EventMasterList.svelte';
-	import type { PageServerData } from './$types';
-	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
-	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { toast } from 'svelte-sonner';
-	import { handleActionResultSonners } from '@/app.utils';
-	import { eventMasterSchema } from '@/schemas/eventMasterSchema';
-	import { onMount } from 'svelte';
-	import { isVorstand } from '@/utils/rollen.utils';
+    import EventMasterSheet from '$lib/components/pages/events/master/EventMasterSheet.svelte';
+    import EventMasterList from '$lib/components/pages/events/master/EventMasterList.svelte';
+    import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
+    import {superForm} from 'sveltekit-superforms';
+    import {zodClient} from 'sveltekit-superforms/adapters';
+    import {type EventMasterForm, eventMasterSchema} from '@/schemas/eventMasterSchema';
+    import {eventsQueries} from '@/query/events';
+    import {useQueryClient} from '@sveltestack/svelte-query';
+    import type {SuperFormData} from 'sveltekit-superforms/client';
+    import {getRolesContext, Roles} from "@/context/rolesContext";
 
-	let { data } = $props();
+    let { data } = $props();
+	const queries = eventsQueries(data.supabase, data.session!, useQueryClient());
+	const eventMasters = queries.masters.listAll();
+	const masterUpdate = queries.masters.update();
+	const masterDelete = queries.masters.delete();
+	const masterAdd = queries.masters.add();
+
+    const {userHasRole, userIsAppAdmin} = getRolesContext();
 
 	let sheetStatus: 'new' | 'edit' | 'hidden' = $state('hidden');
+	let formAction: 'add' | 'update' | 'delete' = $state('add');
+
 	const form = superForm(data.form, {
+		SPA: true,
 		validators: zodClient(eventMasterSchema),
-		onSubmit: () => {
-			toast.loading('Eingabe wird verarbeitet', { id: 'event_master_form' });
-		},
-		onResult: ({ result }) => {
-			handleActionResultSonners(result, 'event_master_form');
-			if (result.type != 'failure' && result.status != 500) {
+		onUpdate: async ({ form }) => {
+			if (form.valid) {
+				if (formAction === 'add') {
+					$masterAdd.mutate(form);
+				} else if (formAction === 'update') {
+					$masterUpdate.mutate(form);
+				} else if (formAction === 'delete') {
+					$masterDelete.mutate(form.data.ID);
+				}
 				sheetStatus = 'hidden';
 			}
 		}
 	});
-	const { form: formData } = form;
-	let canEdit = data.isAdmin || isVorstand(data.roles);
-	let canCreate = data.isAdmin || isVorstand(data.roles);
-	let canDelete = data.isAdmin || isVorstand(data.roles);
+	let formData: SuperFormData<EventMasterForm> = form.form;
 
-	function onEdit(id: number) {
-		const current = data.data.find((eventMaster: { ID: number }) => eventMaster.ID === id);
+    let canEdit = userIsAppAdmin || userHasRole(Roles.Vorstand);
+    let canCreate = userIsAppAdmin || userHasRole(Roles.Vorstand);
+    let canDelete = userIsAppAdmin || userHasRole(Roles.Vorstand);
+
+
+	function prepareForm(id: number) {
+		const current = $eventMasters.data!.find(
+			(eventMaster: { ID: number }) => eventMaster.ID === id
+		);
 		if (current) {
 			formData.set({
 				ID: current.ID,
@@ -41,27 +57,34 @@
 				Eventart: current.Eventart!
 			});
 			sheetStatus = 'edit';
+		} else {
+			formData.set({
+				ID: 0,
+				Titel: '',
+				MasterBeschreibung: '',
+				Eventart: 'HSM'
+			});
+			sheetStatus = 'new';
 		}
 	}
 
-	function onAddNew() {
-		formData.set({ ID: 0, Titel: '', MasterBeschreibung: '', Eventart: 'Sonstiges' });
-		sheetStatus = 'new';
+	function submitForm(_formAction: 'add' | 'update' | 'delete') {
+		formAction = _formAction;
+		form.submit();
 	}
 </script>
 
-{#await data}
+{#if !$eventMasters.data}
 	<PageLoadSkeleton />
-{:then data}
+{:else}
 	<div class="container mx-auto p-4">
 		<EventMasterList
-			eventMasters={data.data}
-			{onAddNew}
-			{onEdit}
+			eventMasters={$eventMasters.data}
+			{prepareForm}
 			{canCreate}
 			{canEdit}
 			{canDelete}
 		/>
-		<EventMasterSheet bind:sheetStatus {form} {canDelete} {canEdit} />
+		<EventMasterSheet bind:sheetStatus {form} {canDelete} {canEdit} {submitForm} />
 	</div>
-{/await}
+{/if}

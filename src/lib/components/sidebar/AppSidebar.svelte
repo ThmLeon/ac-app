@@ -15,12 +15,14 @@
 		Wallet,
 		Wallet2,
 		User,
-		Clock
+		Clock,
+		Building
 	} from 'lucide-svelte';
 	import SidebarFooter from '../ui/sidebar/sidebar-footer.svelte';
 	import NavFooter from './NavFooter.svelte';
 	import { url } from 'valibot';
 	import { is } from 'superstruct';
+	import { isAborted } from 'zod';
 
 	export let props = {};
 	export let name: string;
@@ -29,14 +31,17 @@
 	const navItems = [
 		/*{
 			title: 'Mitglieder',
-			url: '/app/mitglieder/meinProfil',
+			url: '/app/mitglieder/profil',
 			icon: User,
 			isActive: true,
 			items: [
-				{ title: 'Mein Profil', url: '/app/mitglieder/meinProfil' },
-				{ title: 'Mitglieder', url: '/app/mitglieder/mitglieder' },
-				{ title: 'Vereinsrollen', url: '/app/mitglieder/vereinsrollen' },
-				{ title: 'Teamwahl', url: '/app/mitglieder/teamwahl' }
+				{ title: 'Mein Profil', url: '/app/mitglieder/profil' },
+				{ title: 'Mitgliedersuche', url: '/app/mitglieder/mitgliedersuche' },
+				{ title: 'Getränkeguthaben', url: '/app/mitglieder/getraenkeguthaben' },
+				{ title: 'Mailverteiler', url: '/app/mitglieder/mailverteiler' },
+				{ title: 'Rollenliste', url: '/app/mitglieder/rollenliste' },
+				{ title: 'Teamwahl', url: '/app/mitglieder/teamwahl' },
+				{ title: 'Job Ausschreibungen', url: '/app/mitglieder/job-ausschreibungen' }
 			]
 		},*/
 		{
@@ -49,6 +54,13 @@
 				{ title: 'Events Master', url: '/app/events/master' }
 			]
 		},
+		/*{
+			title: 'Büro',
+			url: '/app/buero',
+			icon: Building,
+			isActive: true,
+			items: [{ title: 'Bürodienst', url: '/app/buero/buerodienst' }]
+		},*/
 		{
 			title: 'More coming soon...',
 			url: '#',
