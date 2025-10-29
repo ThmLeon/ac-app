@@ -9,6 +9,8 @@
 	import { useQueryClient } from '@sveltestack/svelte-query';
 	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
 
+	export const ssr = false;
+
 	let { data } = $props();
 	const queries = eventsQueries(data.supabase, data.session!, useQueryClient());
 	const eventMasters = queries.masters.listAll();
