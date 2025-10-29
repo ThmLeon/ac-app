@@ -9,6 +9,7 @@
 	import { setEventContext } from '@/context/eventContext';
 	import type { EventDetails } from '@/context/eventContext';
 	import { writable } from 'svelte/store';
+	export const ssr = false;
 
 	const { userDetails } = getUserContext();
 
