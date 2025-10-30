@@ -72,15 +72,31 @@ export function eventsQueries(
 			});
 		},
 		add() {
-			return useMutation(async (payload: SuperValidated<NewEventForm>) => {
-				const { newEventID, eventVerantwortlicheIDs } = await createNewEventSharepoint(
-					supabase,
-					session,
-					payload.data
-				);
-				await createNewEventSupabase(supabase, newEventID!, eventVerantwortlicheIDs, payload.data);
-				return;
-			});
+			return useMutation(
+				async (payload: SuperValidated<NewEventForm>) => {
+					const { newEventID, eventVerantwortlicheIDs } = await createNewEventSharepoint(
+						supabase,
+						session,
+						payload.data
+					);
+					await createNewEventSupabase(
+						supabase,
+						newEventID!,
+						eventVerantwortlicheIDs,
+						payload.data
+					);
+					return newEventID ?? null;
+				},
+				{
+					onSuccess: (newEventID) => {
+						queryClient.invalidateQueries({ queryKey: qk.events.listPaginatedFiltered() });
+						if (typeof newEventID === 'number') {
+							queryClient.invalidateQueries({ queryKey: qk.events.details(newEventID) });
+							queryClient.invalidateQueries({ queryKey: qk.events.applications(newEventID) });
+						}
+					}
+				}
+			);
 		},
 		update(eventId: number) {
 			return useMutation(
@@ -99,6 +115,10 @@ export function eventsQueries(
 						silent: false,
 						loading: 'Event wird aktualisiert...',
 						success: 'Event erfolgreich aktualisiert'
+					},
+					onSuccess: () => {
+						queryClient.invalidateQueries({ queryKey: qk.events.details(eventId) });
+						queryClient.invalidateQueries({ queryKey: qk.events.listPaginatedFiltered() });
 					}
 				}
 			);
@@ -114,6 +134,13 @@ export function eventsQueries(
 						silent: false,
 						loading: 'Event wird gelöscht...',
 						success: 'Event erfolgreich gelöscht'
+					},
+					onSuccess: (_, eventId) => {
+						queryClient.invalidateQueries({ queryKey: qk.events.listPaginatedFiltered() });
+						if (typeof eventId === 'number') {
+							queryClient.invalidateQueries({ queryKey: qk.events.details(eventId) });
+							queryClient.invalidateQueries({ queryKey: qk.events.applications(eventId) });
+						}
 					}
 				}
 			);
@@ -122,7 +149,7 @@ export function eventsQueries(
 			listAll(eventId: number) {
 				return useQuery(
 					{
-						queryKey: qk.events.masters(),
+						queryKey: qk.events.applications(eventId),
 						queryFn: async () => {
 							return await getEventApplications(supabase, eventId);
 						}
@@ -134,7 +161,7 @@ export function eventsQueries(
 					}
 				);
 			},
-			setBesetzenAnwesenheit() {
+			setBesetzenAnwesenheit(eventId: number) {
 				return useMutation(
 					async (payload: SuperValidated<EventBesetzungAnwesenheitForm>) => {
 						await setEventBesetzungAnwesenheitSharepoint(supabase, session, payload.data);
@@ -143,6 +170,10 @@ export function eventsQueries(
 					{
 						meta: {
 							silent: true
+						},
+						onSuccess: () => {
+							queryClient.invalidateQueries({ queryKey: qk.events.applications(eventId) });
+							queryClient.invalidateQueries({ queryKey: qk.events.details(eventId) });
 						}
 					}
 				);
@@ -170,11 +201,16 @@ export function eventsQueries(
 					{
 						meta: {
 							silent: true
+						},
+						onSuccess: () => {
+							queryClient.invalidateQueries({ queryKey: qk.events.applications(eventId) });
+							queryClient.invalidateQueries({ queryKey: qk.events.details(eventId) });
+							queryClient.invalidateQueries({ queryKey: qk.events.listPaginatedFiltered() });
 						}
 					}
 				);
 			},
-			update() {
+			update(eventId: number) {
 				return useMutation(
 					async (payload: SuperValidated<EventBewerbungForm>) => {
 						await updateEventApplicationSharepoint(supabase, session, payload.data);
@@ -183,11 +219,15 @@ export function eventsQueries(
 					{
 						meta: {
 							silent: true
+						},
+						onSuccess: () => {
+							queryClient.invalidateQueries({ queryKey: qk.events.applications(eventId) });
+							queryClient.invalidateQueries({ queryKey: qk.events.details(eventId) });
 						}
 					}
 				);
 			},
-			delete() {
+			delete(eventId: number) {
 				return useMutation(
 					async (applicationId: number) => {
 						await deleteEventApplicationSharepoint(supabase, session, applicationId);
@@ -196,6 +236,11 @@ export function eventsQueries(
 					{
 						meta: {
 							silent: true
+						},
+						onSuccess: () => {
+							queryClient.invalidateQueries({ queryKey: qk.events.applications(eventId) });
+							queryClient.invalidateQueries({ queryKey: qk.events.details(eventId) });
+							queryClient.invalidateQueries({ queryKey: qk.events.listPaginatedFiltered() });
 						}
 					}
 				);
