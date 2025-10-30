@@ -7,7 +7,6 @@
 	import type { PageProps } from '../$types';
 	import { eventsQueries } from '@/query/events';
 	import type { EventsFilterType } from '@/types/events';
-	import { onMount } from 'svelte';
 	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
 	import { useQueryClient } from '@sveltestack/svelte-query';
 
@@ -22,15 +21,6 @@
 
 	const events = queries.listPaginatedFiltered(eventsFilter, data.userId);
 
-	onMount(() => {
-		$events.refetch();
-	});
-
-	$effect(() => {
-		if (eventsFilter) {
-			$events.refetch();
-		}
-	});
 </script>
 
 {#if !$events.data}

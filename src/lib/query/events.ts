@@ -44,15 +44,27 @@ export function eventsQueries(
 ) {
 	return {
 		listPaginatedFiltered(filter: EventsFilterType, mitgliedID: number, pageSize = 20) {
+			const filterSnapshot: EventsFilterType = {
+				textSearch: filter.textSearch,
+				dateFilter: filter.dateFilter,
+				statusFilter: filter.statusFilter
+			};
 			return useInfiniteQuery({
-				queryKey: qk.events.listPaginatedFiltered(),
+				queryKey: [
+					...qk.events.listPaginatedFiltered(),
+					mitgliedID,
+					filterSnapshot.textSearch || '',
+					filterSnapshot.dateFilter,
+					filterSnapshot.statusFilter,
+					pageSize
+				],
 				queryFn: async ({ pageParam = 0 }) => {
 					const offset: number = pageParam as number;
 					const limitExclusive = offset + pageSize;
 					return await listEventsPaginatedFiltered(
 						supabase,
 						mitgliedID,
-						filter,
+						filterSnapshot,
 						offset,
 						limitExclusive - 1
 					);
