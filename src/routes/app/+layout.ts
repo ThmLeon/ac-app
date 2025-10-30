@@ -1,8 +1,10 @@
 import type { Database } from '@/api/supabase/database.types';
 import type { LayoutLoad } from './$types';
 import { error } from '@sveltejs/kit';
-import {createRolesContext, setRolesContext} from "@/context/rolesContext";
-import {writable} from "svelte/store";
+import { createRolesContext, setRolesContext } from '@/context/rolesContext';
+import { writable } from 'svelte/store';
+
+export const ssr = false;
 
 export const load: LayoutLoad = async ({ parent, depends }) => {
 	// Invalidate when auth state changes so userId is refreshed
@@ -11,9 +13,9 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 	const { supabase, user } = await parent();
 
 	let userId: number = -1;
-    let isAdmin: boolean = false;
-    let rolesData : Database['public']['Tables']['1_RollenMitglieder']['Row'][] = [];
-    let userDetails : Database['public']['Tables']['1_Mitglieder']['Row'];
+	let isAdmin: boolean = false;
+	let rolesData: Database['public']['Tables']['1_RollenMitglieder']['Row'][] = [];
+	let userDetails: Database['public']['Tables']['1_Mitglieder']['Row'];
 
 	if (user) {
 		const { data: userData, error: userError } = await supabase
@@ -33,7 +35,7 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 			.eq('MitgliedID', userId)
 			.is('EndeDatum', null);
 		if (rolesError) throw error(401, 'Rollen konnten nicht geladen werden');
-        rolesData = rolesFetchingData;
+		rolesData = rolesFetchingData;
 
 		const { data: isAdminData, error: isAdminError } = await supabase
 			.from('0_Metadata')
@@ -43,8 +45,8 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 			.eq('Value', userId.toString());
 		if (isAdminError) isAdmin = false;
 		else isAdmin = isAdminData.length === 1;
-	}else{
-        throw error(401, 'Benutzer nicht gefunden oder Zugriff nicht erlaubt');
-    }
+	} else {
+		throw error(401, 'Benutzer nicht gefunden oder Zugriff nicht erlaubt');
+	}
 	return { userId, rolesData, isAdmin, userDetails };
 };

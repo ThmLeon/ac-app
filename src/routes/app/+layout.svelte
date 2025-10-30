@@ -20,7 +20,6 @@
 	import { createRolesContext, setRolesContext } from '@/context/rolesContext';
 	import type { LayoutData } from './$types';
 	import { setUserContext } from '@/context/userContext';
-	export const ssr = false;
 
 	export let data: LayoutData;
 	const queryClient = createQueryClient();
