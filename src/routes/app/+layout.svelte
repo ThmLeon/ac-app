@@ -17,18 +17,19 @@
 	import FeedbackDialog from '@/components/feedback/FeedbackDialog.svelte';
 	import { QueryClientProvider } from '@sveltestack/svelte-query';
 	import createQueryClient from '@/query/createQueryClient.js';
-    import {createRolesContext, setRolesContext} from "@/context/rolesContext";
-    import type {LayoutData} from "./$types";
-    import {setUserContext} from "@/context/userContext";
+	import { createRolesContext, setRolesContext } from '@/context/rolesContext';
+	import type { LayoutData } from './$types';
+	import { setUserContext } from '@/context/userContext';
+	export const ssr = false;
 
-	export let data : LayoutData;
-    const queryClient = createQueryClient();
+	export let data: LayoutData;
+	const queryClient = createQueryClient();
 
-    const rolesContext = createRolesContext(writable(data.rolesData), writable(data.isAdmin));
-    setRolesContext(rolesContext);
+	const rolesContext = createRolesContext(writable(data.rolesData), writable(data.isAdmin));
+	setRolesContext(rolesContext);
 
-    const userContext = {userDetails: writable(data.userDetails), user: writable(data.user!)};
-    setUserContext(userContext);
+	const userContext = { userDetails: writable(data.userDetails), user: writable(data.user!) };
+	setUserContext(userContext);
 
 	const fullName = data.user?.user_metadata.full_name ?? 'User';
 	const firstName = fullName.split(' ')[0];
@@ -131,8 +132,8 @@
 			</header>
 
 			<div class="flex flex-1 flex-col gap-4 p-4">
-			    <slot />
-            </div>
+				<slot />
+			</div>
 		</SidebarInset>
 		<FeedbackDialog supabase={data.supabase} />
 	</SidebarProvider>
