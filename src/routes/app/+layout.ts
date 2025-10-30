@@ -27,6 +27,7 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 			throw error(401, 'Benutzer nicht gefunden oder Zugriff nicht erlaubt');
 		} else {
 			userDetails = userData;
+			userId = userData.ID;
 		}
 
 		const { data: rolesFetchingData, error: rolesError } = await supabase
