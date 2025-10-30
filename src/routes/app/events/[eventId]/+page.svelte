@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
-	import MitgliedCard from '@/components/general/MitgliedCard.svelte'; // Import MitgliedCard component
+	import MitgliedCard from '@/components/general/MitgliedCard.svelte';
 	import { formatTextWithHTML } from '@/utils/utils';
 	import { getEventContext } from '@/context/eventContext';
+	import type { EventDetails } from '@/context/eventContext';
 
 	const { eventDetails } = getEventContext();
 </script>
@@ -25,15 +26,15 @@
 		</CardHeader>
 		<CardContent>
 			<div class="flex flex-wrap gap-4 w-full">
-				{#each $eventDetails?.eventVerantwortliche as verantwortlicher}
+				{#each ($eventDetails?.eventVerantwortliche ?? []) as verantwortlicher: EventDetails['eventVerantwortliche'][number] (verantwortlicher.ID)}
 					<div class="shrink-0">
 						<MitgliedCard
-							name={verantwortlicher?.mitglieder?.Vorname +
+							name={(verantwortlicher.mitglieder?.Vorname ?? '') +
 								' ' +
-								verantwortlicher?.mitglieder?.Nachname}
+								(verantwortlicher.mitglieder?.Nachname ?? '')}
 							imageUrl=""
-							art={verantwortlicher?.mitglieder?.Art ?? 'Aktiv'}
-							rolle={verantwortlicher?.mitglieder?.Rolle ?? 'Mitglied'}
+							art={verantwortlicher.mitglieder?.Art ?? 'Aktiv'}
+							rolle={verantwortlicher.mitglieder?.Rolle ?? 'Mitglied'}
 						/>
 					</div>
 				{/each}

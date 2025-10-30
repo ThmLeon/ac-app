@@ -19,12 +19,12 @@
 
 	const queries = eventsQueries(data.supabase, data.session!, useQueryClient());
 	const createEventApplicationMutation = queries.applications.create(
-		$eventDetails?.ID || -1,
+		Number(data.eventId),
 		$userDetails.Titel!,
 		$userDetails.ID
 	);
-	const updateEventApplicationMutation = queries.applications.update();
-	const deleteEventApplicationMutation = queries.applications.delete();
+	const updateEventApplicationMutation = queries.applications.update(Number(data.eventId));
+	const deleteEventApplicationMutation = queries.applications.delete(Number(data.eventId));
 
 	const form = superForm(data.form, {
 		SPA: true,

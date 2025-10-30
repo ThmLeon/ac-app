@@ -18,10 +18,11 @@
 		Essgewohnheiten: string | null;
 	};
 
-	const { supabase, applications, eventId } = $props<{
+	const { supabase, applications, eventId, header } = $props<{
 		supabase: SupabaseClient<Database>;
 		applications: EventApplication[];
 		eventId: number;
+		header?: () => unknown;
 	}>();
 
 	async function showAnlage(app: EventApplication) {
@@ -72,7 +73,9 @@
 </script>
 
 <div class="grid gap-4 w-full">
-	<slot name="header">
+	{#if header}
+		{@render header()}
+	{:else}
 		<div class="flex items-center justify-between gap-4">
 			<h2 class="text-lg font-semibold tracking-tight">Bewerbungen</h2>
 			<Button
@@ -85,7 +88,7 @@
 				Alle Anlagen herunterladen
 			</Button>
 		</div>
-	</slot>
+	{/if}
 
 	{#if applications.length === 0}
 		<div class="text-sm text-muted-foreground">Keine Bewerbungen vorhanden.</div>

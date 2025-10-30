@@ -17,7 +17,7 @@
 	const masterDelete = queries.masters.delete();
 	const masterAdd = queries.masters.add();
 
-    const {userHasRole, userIsAppAdmin} = getRolesContext();
+	const { userHasRole, userIsAppAdmin } = getRolesContext();
 
 	let sheetStatus: 'new' | 'edit' | 'hidden' = $state('hidden');
 	let formAction: 'add' | 'update' | 'delete' = $state('add');
@@ -39,11 +39,6 @@
 		}
 	});
 	let formData: SuperFormData<EventMasterForm> = form.form;
-
-    let canEdit = userIsAppAdmin || userHasRole(Roles.Vorstand);
-    let canCreate = userIsAppAdmin || userHasRole(Roles.Vorstand);
-    let canDelete = userIsAppAdmin || userHasRole(Roles.Vorstand);
-
 
 	function prepareForm(id: number) {
 		const current = $eventMasters.data!.find(
@@ -81,10 +76,16 @@
 		<EventMasterList
 			eventMasters={$eventMasters.data}
 			{prepareForm}
-			{canCreate}
-			{canEdit}
-			{canDelete}
+			canCreate={$userIsAppAdmin || userHasRole(Roles.Vorstand)}
+			canEdit={$userIsAppAdmin || userHasRole(Roles.Vorstand)}
+			canDelete={$userIsAppAdmin || userHasRole(Roles.Vorstand)}
 		/>
-		<EventMasterSheet bind:sheetStatus {form} {canDelete} {canEdit} {submitForm} />
+		<EventMasterSheet
+			bind:sheetStatus
+			{form}
+			canDelete={$userIsAppAdmin || userHasRole(Roles.Vorstand)}
+			canEdit={$userIsAppAdmin || userHasRole(Roles.Vorstand)}
+			{submitForm}
+		/>
 	</div>
 {/if}

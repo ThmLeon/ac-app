@@ -27,8 +27,10 @@
 	let { data } = $props();
 
 	const queries = eventsQueries(data.supabase, data.session!, useQueryClient());
-	const eventApplications = queries.applications.listAll($eventDetails?.ID ?? -1);
-	const setApplicationBesetztAnwesendMutation = queries.applications.setBesetzenAnwesenheit();
+	const eventApplications = queries.applications.listAll(Number(data.eventId));
+	const setApplicationBesetztAnwesendMutation = queries.applications.setBesetzenAnwesenheit(
+		Number(data.eventId)
+	);
 
 	$effect(() => {
 		if (
@@ -42,12 +44,18 @@
 	});
 
 	let besetzteMitglieder: EventApplication[] = $state([]);
+	let eventApplicationRecords: EventApplication[] = $state([]);
 
 	// Initialize besetzteMitglieder when query data loads
 	$effect(() => {
-		if ($eventApplications?.data) {
-			besetzteMitglieder = $eventApplications.data.filter((a) => a.Besetzt);
+		const data = $eventApplications?.data as EventApplication[] | undefined;
+		if (!data || data.length === 0) {
+			eventApplicationRecords = [];
+			besetzteMitglieder = [];
+			return;
 		}
+		eventApplicationRecords = data;
+		besetzteMitglieder = data.filter((a) => a.Besetzt);
 	});
 
 	const form = superForm(data.form, {
@@ -109,10 +117,10 @@
 				<CardTitle>Besetzung</CardTitle>
 			</CardHeader>
 			<CardContent class="space-y-2">
-				{#if $eventApplications?.data?.length === 0}
+				{#if eventApplicationRecords.length === 0}
 					<div class="text-sm text-muted-foreground">Keine Bewerbungen vorhanden.</div>
 				{/if}
-				{#each $eventApplications?.data as application (application.ID)}
+				{#each eventApplicationRecords as application (application.ID)}
 					<div class="flex items-center justify-between rounded-md border px-3 py-2">
 						<span>{application.Titel}</span>
 						<Switch
@@ -132,7 +140,7 @@
 				<CardTitle>Anwesenheit</CardTitle>
 			</CardHeader>
 			<CardContent class="space-y-2">
-				{#if $eventApplications?.data?.length === 0}
+				{#if eventApplicationRecords.length === 0}
 					<div class="text-sm text-muted-foreground">Keine besetzten Mitglieder.</div>
 				{:else}
 					{#each besetzteMitglieder as application (application.ID)}
@@ -151,10 +159,10 @@
 			</CardContent>
 		</Card>
 	</div>
-	<div class="mb-2"></div>
-	<EventApplications
-		supabase={data.supabase}
-		applications={$eventApplications?.data ?? []}
-		eventId={Number(data.eventId)}
-	/>
-{/await}
+		<div class="mb-2"></div>
+		<EventApplications
+			supabase={data.supabase}
+			applications={eventApplicationRecords}
+			eventId={Number(data.eventId)}
+		/>
+	{/await}
