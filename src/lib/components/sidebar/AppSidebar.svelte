@@ -54,6 +54,17 @@
 				{ title: 'Events Master', url: '/app/events/master' }
 			]
 		},
+		{
+			title: 'Schulungen',
+			url: '/app/schulungen',
+			icon: BookOpen,
+			isActive: true,
+			items: [
+				{ title: 'Alle Schulungen', url: '/app/schulungen' },
+				{ title: 'Schulungen Master', url: '/app/schulungen/master' },
+				{ title: 'Schulungen Bewerben', url: '/app/schulungen/bewerben' }
+			]
+		},
 		/*{
 			title: 'Büro',
 			url: '/app/buero',

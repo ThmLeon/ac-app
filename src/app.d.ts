@@ -9,7 +9,7 @@ type UserDetails = {
 };
 
 declare global {
-	namespace App {
+namespace App {
 		// interface Error {}
 		interface Locals {
 			supabase: SupabaseClient<Database>;
@@ -24,6 +24,16 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+}
+
+declare module '*.png' {
+	const src: string;
+	export default src;
+}
+
+declare module '*.png?url' {
+	const src: string;
+	export default src;
 }
 
 export {};

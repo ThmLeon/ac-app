@@ -83,6 +83,7 @@
 		"isomorphic-fetch": "^3.0.0",
 		"jszip": "^3.10.1",
 		"jwt-decode": "^4.0.0",
+		"svelte-charts": "^0.0.1",
 		"svelte-inview": "^4.0.4",
 		"svelte-ux": "^1.0.7"
 	}
