@@ -179,27 +179,43 @@ export async function callSharepointAPI(
 			'sharepoint-list-api/' + action.tableName,
 			{
 				method: 'POST',
-				body: action.formData,
+				body: {
+					...action.formData,
+					operation: 'insert'
+				},
 				headers: {
 					Authorization: `Bearer ${session.access_token}`
 				}
 			}
 		);
-		if (error || !data?.success || !data || !data.id) throw new Error('Sharepoint Fehler');
-		else return data.id as number;
+
+		if (error || !data?.success || !data?.id) {
+			console.error('SharePoint insert error:', error ?? data);
+			throw new Error('Sharepoint Fehler');
+		} else {
+			return data.id as number;
+		}
 	} else if (action.action === 'update') {
 		const { data, error } = await supabase.functions.invoke(
 			'sharepoint-list-api/' + action.tableName + '/' + action.itemId,
 			{
-				method: 'PATCH',
-				body: action.formData,
+				method: 'POST', // <-- now POST instead of PATCH
+				body: {
+					...action.formData,
+					operation: 'update'
+				},
 				headers: {
 					Authorization: `Bearer ${session.access_token}`
 				}
 			}
 		);
-		if (error || !data?.success) throw new Error('Sharepoint Fehler');
-		else return;
+
+		if (error || !data?.success) {
+			console.error('SharePoint update error:', error ?? data);
+			throw new Error('Sharepoint Fehler');
+		} else {
+			return;
+		}
 	} else if (action.action === 'delete') {
 		const { data, error } = await supabase.functions.invoke(
 			'sharepoint-list-api/' + action.tableName + '/' + action.itemId,
@@ -210,10 +226,16 @@ export async function callSharepointAPI(
 				}
 			}
 		);
-		if (error || !data?.success) throw new Error('Sharepoint Fehler');
-		else return;
+
+		if (error || !data?.success) {
+			console.error('SharePoint delete error:', error ?? data);
+			throw new Error('Sharepoint Fehler');
+		} else {
+			return;
+		}
 	}
 }
+
 export function formatDate(date: string | null): string {
 	if (!date) return '-';
 	const parsedDate = new Date(date);
