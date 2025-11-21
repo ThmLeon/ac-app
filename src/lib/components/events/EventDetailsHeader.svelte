@@ -111,7 +111,7 @@
 	/>
 
 	<!-- Content Section -->
-	<div class="flex flex-1 flex-col justify-between pt-5 pb-5 h-64">
+	<div class="flex flex-1 flex-col pt-5 pb-5 gap-4 md:gap-3">
 		<CardHeader>
 			<CardTitle>{$eventDetails?.Titel || 'Kein Titel'}</CardTitle>
 			<CardDescription class="text-sm text-gray-500">
@@ -129,7 +129,7 @@
 				{/if}
 			</CardDescription>
 		</CardHeader>
-		<CardContent class="flex gap-2">
+		<CardContent class="mt-4 flex flex-wrap gap-2">
 			<Badge variant="default" class={badgeColors[status().variant]}>{status().text}</Badge>
 			{#if $eventDetails?.eventMaster && $eventDetails?.eventMaster.Titel}
 				<Badge variant="default">
@@ -143,7 +143,7 @@
 		</CardContent>
 
 		<!-- Button-Zeile jetzt immer vorhanden, mit fixer Mindesthöhe -->
-		<CardContent class="flex gap-2 items-center" style="min-height:2.5rem;">
+		<CardContent class="mt-4 flex flex-wrap items-center gap-2" style="min-height:2.5rem;">
 			{#if showApplyOrEditButton}
 				{#if bewerbungAktiviert.possible || bewerbungAktiviert.modification}
 					<a href={`./${$eventDetails?.ID}/bewerben`}>

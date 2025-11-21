@@ -19,7 +19,17 @@
 		statusFilter: 'all'
 	});
 
-	const events = queries.listPaginatedFiltered(eventsFilter, data.userId);
+	let events: ReturnType<typeof queries.listPaginatedFiltered> = $state(
+		queries.listPaginatedFiltered(eventsFilter, data.userId)
+	);
+
+	$effect(() => {
+		// re-run query when any filter changes
+		eventsFilter.textSearch;
+		eventsFilter.dateFilter;
+		eventsFilter.statusFilter;
+		events = queries.listPaginatedFiltered(eventsFilter, data.userId);
+	});
 
 </script>
 
@@ -27,21 +37,21 @@
 	<PageLoadSkeleton />
 {:else}
 	<div class="container mx-auto pt-5">
-		<div class="flex justify-between items-center">
+		<div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 			<a href={`./events/neuesEvent`}>
 				<Button variant="default">Neues Event hinzufügen</Button>
 			</a>
 
-			<div class="flex items-center gap-4">
+			<div class="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-4">
 				<Input
 					type="text"
 					placeholder="Nach Name filtern..."
-					class="w-64"
+					class="w-full md:w-64"
 					bind:value={eventsFilter.textSearch}
 				/>
 
 				<Select type="single" bind:value={eventsFilter.dateFilter}>
-					<SelectTrigger class="w-48"
+					<SelectTrigger class="w-full md:w-48"
 						>{eventsFilter.dateFilter === 'all'
 							? 'Datum'
 							: eventsFilter.dateFilter === 'upcoming'
@@ -56,7 +66,7 @@
 				</Select>
 
 				<Select type="single" bind:value={eventsFilter.statusFilter}>
-					<SelectTrigger class="w-48"
+					<SelectTrigger class="w-full md:w-48"
 						>{eventsFilter.statusFilter === 'all'
 							? 'Bewerbungsstatus'
 							: eventsFilter.statusFilter.charAt(0).toUpperCase() +

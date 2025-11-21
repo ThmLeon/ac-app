@@ -120,9 +120,9 @@
 				{event.Bewerbungsdeadline ? formatApplicationDeadline(event.Bewerbungsdeadline) : '-'}
 			</p>
 		</CardContent>
-		<CardFooter class="flex justify-between items-center">
+		<CardFooter class="mt-6 flex w-full flex-col items-start gap-3 md:mt-4 md:flex-row md:items-center md:justify-between">
 			<!-- Linke Seite: Badges -->
-			<div class="flex gap-2">
+			<div class="flex flex-wrap gap-2">
 				<Badge variant="default" class={badgeColors[status().variant]}>
 					{status().text}
 				</Badge>
@@ -134,8 +134,8 @@
 			</div>
 
 			<!-- Rechte Seite: Button -->
-			<a href={`./events/${event.ID}`}>
-				<Button variant="default">Details</Button>
+			<a href={`./events/${event.ID}`} class="self-end md:self-auto">
+				<Button variant="default" class="w-full md:w-auto">Details</Button>
 			</a>
 
 			<!-- Navigate to event details -->
