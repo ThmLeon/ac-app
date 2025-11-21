@@ -85,6 +85,12 @@
 			form.form.set(initial as any);
 		}
 	});
+
+	$effect(() => {
+		if ($updateEventMutation.isSuccess && $eventDetails?.ID) {
+			goto(`/app/events/${$eventDetails.ID}`);
+		}
+	});
 </script>
 
 <div class="container mx-auto py-8 px-4 max-w-2xl">

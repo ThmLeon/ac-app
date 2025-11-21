@@ -58,6 +58,8 @@ export function eventsQueries(
 					filterSnapshot.statusFilter,
 					pageSize
 				],
+				placeholderData: (previousData) =>
+					previousData ?? { pages: [], pageParams: [] },
 				queryFn: async ({ pageParam = 0 }) => {
 					const offset: number = pageParam as number;
 					const limitExclusive = offset + pageSize;

@@ -30,7 +30,6 @@
 		eventsFilter.statusFilter;
 		events = queries.listPaginatedFiltered(eventsFilter, data.userId);
 	});
-
 </script>
 
 {#if !$events.data}
@@ -100,15 +99,5 @@
 				{/if}
 			{/each}
 		{/each}
-
-		{#if $events.isLoading}
-			<div class="text-center py-4">
-				<p>Lade weitere Events...</p>
-			</div>
-		{:else if $events.data.pages.length === 0}
-			<div class="text-center py-4">
-				<p>Keine Events gefunden.</p>
-			</div>
-		{/if}
 	</div>
 {/if}

@@ -25,6 +25,7 @@
 	);
 	const updateEventApplicationMutation = queries.applications.update(Number(data.eventId));
 	const deleteEventApplicationMutation = queries.applications.delete(Number(data.eventId));
+	let shouldRedirect = $state(false);
 
 	const form = superForm(data.form, {
 		SPA: true,
@@ -35,9 +36,11 @@
 				if ($eventDetails && $eventDetails.userBewerbung.length === 0) {
 					//user noch nicht beworben -> create
 					$createEventApplicationMutation.mutate(form);
+					shouldRedirect = true;
 				} else {
 					//user schon beworben -> update
 					$updateEventApplicationMutation.mutate(form);
+					shouldRedirect = true;
 				}
 			}
 		}
@@ -52,10 +55,20 @@
 		if ($eventDetails && $eventDetails.userBewerbung.length === 1) {
 			const applicationId = $eventDetails.userBewerbung[0].ID;
 			$deleteEventApplicationMutation.mutate(applicationId);
+			shouldRedirect = true;
 		}
 	}
 
 	$effect(() => {
+		if (
+			shouldRedirect &&
+			($createEventApplicationMutation.isSuccess ||
+				$updateEventApplicationMutation.isSuccess ||
+				$deleteEventApplicationMutation.isSuccess)
+		) {
+			goto(`/app/events/${data.eventId}`);
+		}
+
 		if ($eventDetails) {
 			// Set common fields
 			$formData.BewerbungstextGewuenscht = $eventDetails.BewerbungstextGewuenscht ?? false;

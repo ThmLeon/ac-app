@@ -8,6 +8,7 @@
 	import { eventsQueries } from '@/query/events';
 	import { useQueryClient } from '@sveltestack/svelte-query';
 	import PageLoadSkeleton from '@/components/general/PageLoadSkeleton.svelte';
+	import { goto } from '$app/navigation';
 
 	let { data } = $props();
 	const queries = eventsQueries(data.supabase, data.session!, useQueryClient());
@@ -22,6 +23,12 @@
 			if (form.valid) {
 				$newEventMutation.mutate(form);
 			}
+		}
+	});
+
+	$effect(() => {
+		if ($newEventMutation.isSuccess) {
+			goto('/app/events');
 		}
 	});
 </script>
