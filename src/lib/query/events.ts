@@ -58,8 +58,6 @@ export function eventsQueries(
 					filterSnapshot.statusFilter,
 					pageSize
 				],
-				placeholderData: (previousData) =>
-					previousData ?? { pages: [], pageParams: [] },
 				queryFn: async ({ pageParam = 0 }) => {
 					const offset: number = pageParam as number;
 					const limitExclusive = offset + pageSize;
@@ -228,7 +226,7 @@ export function eventsQueries(
 				return useMutation(
 					async (payload: SuperValidated<EventBewerbungForm>) => {
 						await updateEventApplicationSharepoint(supabase, session, payload.data);
-						await updateEventApplicationSupabase(supabase, payload.data);
+						await updateEventApplicationSupabase(supabase, payload.data, eventId);
 					},
 					{
 						meta: {
