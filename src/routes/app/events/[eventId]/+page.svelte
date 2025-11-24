@@ -19,37 +19,45 @@
 	</CardContent>
 </Card>
 
-<div class="flex gap-4 w-full">
-	<Card class="flex-1">
+<div class="flex w-full flex-col gap-4 md:flex-row">
+	<Card class="flex-1 w-full">
 		<CardHeader>
 			<CardTitle class="text-xl font-bold">Orga-Team</CardTitle>
 		</CardHeader>
 		<CardContent>
-			<div class="flex flex-wrap gap-4 w-full">
-				{#each ($eventDetails?.eventVerantwortliche ?? []) as verantwortlicher: EventDetails['eventVerantwortliche'][number] (verantwortlicher.ID)}
-					<div class="shrink-0">
-						<MitgliedCard
-							name={(verantwortlicher.mitglieder?.Vorname ?? '') +
-								' ' +
-								(verantwortlicher.mitglieder?.Nachname ?? '')}
-							imageUrl=""
-							art={verantwortlicher.mitglieder?.Art ?? 'Aktiv'}
-							rolle={verantwortlicher.mitglieder?.Rolle ?? 'Mitglied'}
-						/>
-					</div>
-				{/each}
-			</div>
+			{#if $eventDetails?.eventVerantwortliche?.length}
+				<div class="flex flex-wrap gap-4 w-full">
+					{#each ($eventDetails?.eventVerantwortliche ?? []) as verantwortlicher: EventDetails['eventVerantwortliche'][number] (verantwortlicher.ID)}
+						<div class="shrink-0">
+							<MitgliedCard
+								name={(verantwortlicher.mitglieder?.Vorname ?? '') +
+									' ' +
+									(verantwortlicher.mitglieder?.Nachname ?? '')}
+								imageUrl=""
+								art={verantwortlicher.mitglieder?.Art ?? 'Aktiv'}
+								rolle={verantwortlicher.mitglieder?.Rolle ?? 'Mitglied'}
+							/>
+						</div>
+					{/each}
+				</div>
+			{:else}
+				<p class="text-gray-600">Kein Orga-Team angegeben</p>
+			{/if}
 		</CardContent>
 	</Card>
 
-	<Card class="w-[350px] shrink-0">
+	<Card class="w-full md:w-[350px] md:shrink-0">
 		<CardHeader>
 			<CardTitle class="text-xl font-bold">Ort</CardTitle>
 		</CardHeader>
 		<CardContent>
-			{$eventDetails?.StrasseHausnummer}<br />
-			{$eventDetails?.Postleitzahl}
-			{$eventDetails?.Ort}
+			{#if $eventDetails && ($eventDetails.StrasseHausnummer || $eventDetails.Postleitzahl || $eventDetails.Ort)}
+				{$eventDetails?.StrasseHausnummer}<br />
+				{$eventDetails?.Postleitzahl}
+				{$eventDetails?.Ort}
+			{:else}
+				<p class="text-gray-600">Kein Ort angegeben</p>
+			{/if}
 		</CardContent>
 	</Card>
 </div>

@@ -301,7 +301,8 @@ export async function createEventApplication(
 			.from('events')
 			.upload(
 				`bewerbungenAnhang/${eventID}/${applicationID}.${formData.Anlage.name.split('.').pop()}`,
-				formData.Anlage
+				formData.Anlage,
+				{ upsert: true }
 			);
 		throwSupabaseActionErrorIfNeeded(anlageError, 'Anlage konnte nicht gesendet werden');
 	}
@@ -311,7 +312,8 @@ export async function createEventApplication(
 
 export async function updateEventApplication(
 	supabase: SupabaseClient<Database>,
-	formData: EventBewerbungForm
+	formData: EventBewerbungForm,
+	eventId: number
 ) {
 	const { error } = await supabase
 		.from('4_EventBewerbungen')
@@ -321,6 +323,17 @@ export async function updateEventApplication(
 		})
 		.eq('ID', formData.ID);
 	throwSupabaseActionErrorIfNeeded(error, 'Bewerbung konnte nicht aktualisiert werden');
+
+	if (formData.Anlage) {
+		const { error: anlageError } = await supabase.storage
+			.from('events')
+			.upload(
+				`bewerbungenAnhang/${eventId}/${formData.ID}.${formData.Anlage.name.split('.').pop()}`,
+				formData.Anlage,
+				{ upsert: true }
+			);
+		throwSupabaseActionErrorIfNeeded(anlageError, 'Anlage konnte nicht gesendet werden');
+	}
 	return;
 }
 

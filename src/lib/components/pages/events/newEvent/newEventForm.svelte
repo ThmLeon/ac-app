@@ -201,7 +201,7 @@
 		<FormFieldErrors />
 	</FormField>
 	<h2 class="text-lg mt-4 font-semibold mb-2">Daten</h2>
-	<div class="grid grid-cols-2 gap-4">
+	<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 		<FormField {form} name="Beginn">
 			<FormControl>
 				{#snippet children({ props })}
@@ -242,7 +242,7 @@
 		</FormField>
 	</div>
 	<h2 class="text-lg font-semibold mb-2">Adresse</h2>
-	<div class="grid grid-cols-2 gap-4">
+	<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 		<FormField {form} name="StrasseHausnummer" class="col-span-2">
 			<FormControl>
 				{#snippet children({ props })}

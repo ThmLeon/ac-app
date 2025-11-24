@@ -226,7 +226,7 @@ export function eventsQueries(
 				return useMutation(
 					async (payload: SuperValidated<EventBewerbungForm>) => {
 						await updateEventApplicationSharepoint(supabase, session, payload.data);
-						await updateEventApplicationSupabase(supabase, payload.data);
+						await updateEventApplicationSupabase(supabase, payload.data, eventId);
 					},
 					{
 						meta: {
